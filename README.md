@@ -1,0 +1,2 @@
+# smines
+Suckless minesweeper
