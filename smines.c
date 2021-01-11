@@ -8,6 +8,10 @@
 
 bool mines[10][10];
 int map[10][10];
+bool visible[10][10];
+
+static int selx = 0;
+static int sely = 0;
 
 int getsurround(int x, int y) {
     /* 1 2 3  row 1
@@ -28,13 +32,13 @@ int getsurround(int x, int y) {
     }
 
     int ax, ay;
-    printf("Group:\n");
+    /* printf("Group:\n");
     for (ay = 0; ay < 3; ay++) {
         for (ax = 0; ax < 3; ax++) {
             printf("%i ", group[ax][ay]);
         }
         printf("\n");
-    }
+    } */
 
     int c, r;
     int surrmines = 0;
@@ -78,11 +82,28 @@ void printmines() {
     }
 }
 
+bool revealtile(int x, int y) {
+    if (mines[x][y] == true) {
+        return false;
+    } else {
+        visible[x][y] = true;
+        return true;
+    }
+}
+
 int main() {
+    /* zero the mines array */
     int x, y;
     for (x = 0; x < 10; x++) {
         for (y = 0; y < 10; y++) {
             mines[x][y] = 0;
+        }
+    }
+
+    /* zero the visible array */
+    for (x = 0; x < 10; x++) {
+        for (y = 0; y < 10; y++) {
+            visible[x][y] = false;
         }
     }
 
@@ -122,7 +143,7 @@ int main() {
                 map[x][y] = 9;
             } else {
                 s = getsurround(x, y);
-                printf("map[%i][%i] has %i surrounding mines\n", x, y, s);
+                //printf("map[%i][%i] has %i surrounding mines\n", x, y, s);
                 map[x][y] = s;
             }
         }
