@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 int mines[10][10];
+int map[10][10];
 
 int getsurround(int x, int y) {
     /* 1 2 3  row 1
@@ -20,7 +21,7 @@ int getsurround(int x, int y) {
 
     for (gy = 0; gy < 3; gy++) {
         for (gx = 0; gx < 3; gx++) {
-            printf("I am setting group[%i][%i] to %i, %i\n", gx, gx, grpstartx + gx, grpstarty + gy);
+            //printf("I am setting group[%i][%i] to %i, %i\n", gx, gx, grpstartx + gx, grpstarty + gy);
             group[gx][gy] = mines[grpstartx + gx][grpstarty + gy];
         }
     }
@@ -35,12 +36,12 @@ int getsurround(int x, int y) {
     }
 
     int c, r;
-    int surrmines;
+    int surrmines = 0;
     for (r = 0; r < 3; r = r + 2) { /* loop through 1-6 */
         for (c = 0; c < 3; c++) {
-            printf("I am on position %i, %i\n", c, r);
+            //printf("I am on position %i, %i\n", c, r);
             if (group[c][r] == 9) {
-                printf("I found a mine!\n");
+                //printf("I found a mine!\n");
                 surrmines++;
             }
         }
@@ -54,6 +55,16 @@ int getsurround(int x, int y) {
     }
 
     return surrmines;
+}
+
+void printmap(int pmap[10][10]) {
+    int x, y;
+    for (y = 0; y < 10; y++) {
+        for (x = 0; x < 10; x++) {
+            printf("%d ", pmap[x][y]);
+        }
+        printf("\n");
+    }
 }
 
 int main() {
@@ -82,16 +93,29 @@ int main() {
 
     mines[3][8] = 9;
 
-    for (y = 0; y < 10; y++) {
-        for (x = 0; x < 10; x++) {
-            printf("%d ", mines[x][y]);
-        }
-        printf("\n");
-    }
+    printmap(mines);
 
     int surr;
     printf("surmines(4, 4);\n");
     surr = getsurround(4, 4);
     printf("surrounding mines: %i\n", surr);
+
+    printf("surmines(9, 9);\n");
+    surr = getsurround(9, 9);
+    printf("surrounding mines: %i\n", surr);
+
+    int s;
+    for (y = 0; y < 10; y++) {
+        for (x = 0; x < 10; x++) {
+            if (!(mines[x][y] == 9)) {
+                s = getsurround(x, y);
+                printf("map[%i][%i] has %i surrounding mines\n", x, y, s);
+                map[x][y] = s;
+            }
+        }
+    }
+
+    printf("Map:\n");
+    printmap(map);
 
 }
