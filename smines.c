@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-int map[10][10];
+int mines[10][10];
 
 int getsurround(int x, int y) {
     /* 1 2 3  row 1
@@ -21,7 +21,7 @@ int getsurround(int x, int y) {
     for (gy = 0; gy < 3; gy++) {
         for (gx = 0; gx < 3; gx++) {
             printf("I am setting group[%i][%i] to %i, %i\n", gx, gx, grpstartx + gx, grpstarty + gy);
-            group[gx][gy] = map[grpstartx + gx][grpstarty + gy];
+            group[gx][gy] = mines[grpstartx + gx][grpstarty + gy];
         }
     }
 
@@ -60,31 +60,31 @@ int main() {
     int x, y;
     for (x = 0; x < 10; x++) {
         for (y = 0; y < 10; y++) {
-            map[x][y] = 0;
+            mines[x][y] = 0;
         }
     }
 
-    map[7][1] = 9;
-    map[1][2] = 9;
+    mines[7][1] = 9;
+    mines[1][2] = 9;
 
 
-    map[5][3] = 9;
-    map[5][4] = 9;
-    map[5][5] = 9;
+    mines[5][3] = 9;
+    mines[5][4] = 9;
+    mines[5][5] = 9;
 
-    map[3][3] = 9;
-    map[3][4] = 9;
-    map[3][5] = 9;
+    mines[3][3] = 9;
+    mines[3][4] = 9;
+    mines[3][5] = 9;
 
-    map[4][3] = 9;
-    map[4][5] = 9;
+    mines[4][3] = 9;
+    mines[4][5] = 9;
 
 
-    map[3][8] = 9;
+    mines[3][8] = 9;
 
     for (y = 0; y < 10; y++) {
         for (x = 0; x < 10; x++) {
-            printf("%d ", map[x][y]);
+            printf("%d ", mines[x][y]);
         }
         printf("\n");
     }
