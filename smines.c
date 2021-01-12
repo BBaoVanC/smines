@@ -7,9 +7,13 @@
 #include <stdbool.h>
 #include <ncurses.h>
 
-bool mines[10][10];
-int map[10][10];
-bool visible[10][10];
+#define MCOLS 10
+#define MROWS 10
+
+bool mines[MCOLS][MROWS];
+int map[MCOLS][MROWS];
+bool visible[MCOLS][MROWS];
+bool flagged[MCOLS][MROWS];
 
 static int selx = 0;
 static int sely = 0;
@@ -55,7 +59,7 @@ int getsurround(int x, int y) {
 
     r = 1;
     for (c = 0; c < 3; c = c + 2) { /* loop through 7-8 */
-        if (group[c][r] == 9) {
+        if (group[c][r] == true) {
             surrmines++;
         }
     }
@@ -64,8 +68,10 @@ int getsurround(int x, int y) {
 }
 
 void printtile(int x, int y) {
-    if (visible[x][y]) {
-        if (map[x][y] == 10) {
+    if (flagged[x][y]) {
+        printw("F");
+    } else if (visible[x][y]) {
+        if (mines[x][y] == true) {
             printw("X");
         } else {
             printw("%d", map[x][y]);
@@ -77,8 +83,8 @@ void printtile(int x, int y) {
 
 void printmap() {
     int x, y;
-    for (y = 0; y < 10; y++) {
-        for (x = 0; x < 10; x++) {
+    for (y = 0; y < MROWS; y++) {
+        for (x = 0; x < MCOLS; x++) {
             if ((x == selx) && (y == sely)) {
                 attron(A_UNDERLINE);
                 printtile(x, y);
@@ -95,8 +101,8 @@ void printmap() {
 
 void printmines() {
     int x, y;
-    for (y = 0; y < 10; y++) {
-        for (x = 0; x < 10; x++) {
+    for (y = 0; y < MROWS; y++) {
+        for (x = 0; x < MCOLS; x++) {
             printw("%d ", mines[x][y]);
         }
         printw("\n");
@@ -104,12 +110,22 @@ void printmines() {
 }
 
 bool revealtile(int x, int y) {
-    if (mines[x][y] == true) {
+    if (flagged[x][y]) {
+        return true;
+    } else if (mines[x][y] == true) {
         visible[x][y] = true;
-        map[x][y] = 10;
         return false;
     } else {
-        visible[x][y] = true;
+        if (map[x][y] == 0) {
+            int rx, ry;
+            for (rx = 0; rx < MCOLS; rx++) {
+                for (ry = 0; ry < MROWS; ry++) {
+                    visible[x][y] = true;
+                }
+            }
+        } else {
+            visible[x][y] = true;
+        }
         return true;
     }
 }
@@ -134,19 +150,35 @@ void addmines() {
     mines[3][8] = true;
 }
 
+void death() {
+    int x, y;
+    for (x = 0; x < MCOLS; x++) {
+        for (y = 0; y < MROWS; y++) {
+            map[x][y] = 9;
+        }
+    }
+}
+
 void setup() {
     /* zero the mines array */
     int x, y;
-    for (x = 0; x < 10; x++) {
-        for (y = 0; y < 10; y++) {
+    for (x = 0; x < MCOLS; x++) {
+        for (y = 0; y < MROWS; y++) {
             mines[x][y] = 0;
         }
     }
 
     /* zero the visible array */
-    for (x = 0; x < 10; x++) {
-        for (y = 0; y < 10; y++) {
+    for (x = 0; x < MCOLS; x++) {
+        for (y = 0; y < MROWS; y++) {
             visible[x][y] = false;
+        }
+    }
+
+    /* zero the flagged array */
+    for (x = 0; x < MCOLS; x++) {
+        for (y = 0; y < MROWS; y++) {
+            flagged[x][y] = false;
         }
     }
 
@@ -154,11 +186,9 @@ void setup() {
 
     /* calculate map */
     int s;
-    for (y = 0; y < 10; y++) {
-        for (x = 0; x < 10; x++) {
-            if (mines[x][y] == true) {
-                map[x][y] = 9;
-            } else {
+    for (y = 0; y < MROWS; y++) {
+        for (x = 0; x < MCOLS; x++) {
+            if (!(mines[x][y] == true)) {
                 s = getsurround(x, y);
                 //printf("map[%i][%i] has %i surrounding mines\n", x, y, s);
                 map[x][y] = s;
@@ -208,7 +238,7 @@ int main() {
                 }
                 break;
             case 'j':
-                if (sely < 9) {
+                if (sely < MROWS-1) {
                     sely++;
                 }
                 break;
@@ -218,12 +248,17 @@ int main() {
                 }
                 break;
             case 'l':
-                if (selx < 9) {
+                if (selx < MCOLS-1) {
                     selx++;
                 }
                 break;
             case ' ':
-                revealtile(selx, sely);
+                if (!(revealtile(selx, sely))) {
+                    death();
+                }
+                break;
+            case 'f':
+                flagged[selx][sely] = true;
                 break;
         }
 
