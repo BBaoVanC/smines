@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <ncurses.h>
 
 bool mines[10][10];
 int map[10][10];
@@ -62,13 +63,33 @@ int getsurround(int x, int y) {
     return surrmines;
 }
 
+void printtile(int x, int y) {
+    if (visible[x][y]) {
+        if (map[x][y] == 10) {
+            printw("X");
+        } else {
+            printw("%d", map[x][y]);
+        }
+    } else {
+        printw("h");
+    }
+}
+
 void printmap() {
     int x, y;
     for (y = 0; y < 10; y++) {
         for (x = 0; x < 10; x++) {
-            printf("%d ", map[x][y]);
+            if ((x == selx) && (y == sely)) {
+                attron(A_UNDERLINE);
+                printtile(x, y);
+                attroff(A_UNDERLINE);
+                printw(" ");
+            } else {
+                printtile(x, y);
+                printw(" ");
+            }
         }
-        printf("\n");
+        printw("\n");
     }
 }
 
@@ -76,14 +97,16 @@ void printmines() {
     int x, y;
     for (y = 0; y < 10; y++) {
         for (x = 0; x < 10; x++) {
-            printf("%d ", mines[x][y]);
+            printw("%d ", mines[x][y]);
         }
-        printf("\n");
+        printw("\n");
     }
 }
 
 bool revealtile(int x, int y) {
     if (mines[x][y] == true) {
+        visible[x][y] = true;
+        map[x][y] = 10;
         return false;
     } else {
         visible[x][y] = true;
@@ -91,22 +114,7 @@ bool revealtile(int x, int y) {
     }
 }
 
-int main() {
-    /* zero the mines array */
-    int x, y;
-    for (x = 0; x < 10; x++) {
-        for (y = 0; y < 10; y++) {
-            mines[x][y] = 0;
-        }
-    }
-
-    /* zero the visible array */
-    for (x = 0; x < 10; x++) {
-        for (y = 0; y < 10; y++) {
-            visible[x][y] = false;
-        }
-    }
-
+void addmines() {
     mines[7][1] = true;
     mines[1][2] = true;
 
@@ -124,18 +132,27 @@ int main() {
 
 
     mines[3][8] = true;
+}
 
-    printmines();
+void setup() {
+    /* zero the mines array */
+    int x, y;
+    for (x = 0; x < 10; x++) {
+        for (y = 0; y < 10; y++) {
+            mines[x][y] = 0;
+        }
+    }
 
-    int surr;
-    printf("surmines(4, 4);\n");
-    surr = getsurround(4, 4);
-    printf("surrounding mines: %i\n", surr);
+    /* zero the visible array */
+    for (x = 0; x < 10; x++) {
+        for (y = 0; y < 10; y++) {
+            visible[x][y] = false;
+        }
+    }
 
-    printf("surmines(9, 9);\n");
-    surr = getsurround(9, 9);
-    printf("surrounding mines: %i\n", surr);
+    addmines();
 
+    /* calculate map */
     int s;
     for (y = 0; y < 10; y++) {
         for (x = 0; x < 10; x++) {
@@ -148,8 +165,73 @@ int main() {
             }
         }
     }
+}
 
-    printf("Map:\n");
+int main() {
+    setup();
+
+    //printmines();
+
+    int surr;
+    printf("surmines(4, 4);\n");
+    surr = getsurround(4, 4);
+    printf("surrounding mines: %i\n", surr);
+
+    printf("surmines(9, 9);\n");
+    surr = getsurround(9, 9);
+    printf("surrounding mines: %i\n", surr);
+
+
+    //printf("Map:\n");
+    //printmap();
+
+    int ch;
+    printf("Starting game\n\n");
+
+    initscr();
+    keypad(stdscr, TRUE);
+    noecho();
     printmap();
+    refresh();
+    bool keeprunning = true;
+    while (keeprunning) {
+        ch = getch();
+
+        switch(ch) {
+            case 'q':
+                keeprunning = false;
+                break;
+
+            case 'h':
+                if (selx > 0) {
+                    selx--;
+                }
+                break;
+            case 'j':
+                if (sely < 9) {
+                    sely++;
+                }
+                break;
+            case 'k':
+                if (sely > 0) {
+                    sely--;
+                }
+                break;
+            case 'l':
+                if (selx < 9) {
+                    selx++;
+                }
+                break;
+            case ' ':
+                revealtile(selx, sely);
+                break;
+        }
+
+        clear();
+        printmap();
+        refresh();
+    }
+
+    endwin();
 
 }
