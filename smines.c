@@ -50,7 +50,7 @@ int getsurround(int x, int y) {
     for (r = 0; r < 3; r = r + 2) { /* loop through 1-6 */
         for (c = 0; c < 3; c++) {
             //printf("I am on position %i, %i\n", c, r);
-            if (group[c][r] == true) {
+            if (group[c][r]) {
                 //printf("I found a mine!\n");
                 surrmines++;
             }
@@ -59,7 +59,7 @@ int getsurround(int x, int y) {
 
     r = 1;
     for (c = 0; c < 3; c = c + 2) { /* loop through 7-8 */
-        if (group[c][r] == true) {
+        if (group[c][r]) {
             surrmines++;
         }
     }
@@ -71,7 +71,7 @@ void printtile(int x, int y) {
     if (flagged[x][y]) {
         printw("F");
     } else if (visible[x][y]) {
-        if (mines[x][y] == true) {
+        if (mines[x][y]) {
             printw("X");
         } else {
             printw("%d", map[x][y]);
@@ -112,7 +112,7 @@ void printmines() {
 bool revealtile(int x, int y) {
     if (flagged[x][y]) {
         return true;
-    } else if (mines[x][y] == true) {
+    } else if (mines[x][y]) {
         visible[x][y] = true;
         return false;
     } else {
@@ -188,7 +188,7 @@ void setup() {
     int s;
     for (y = 0; y < MROWS; y++) {
         for (x = 0; x < MCOLS; x++) {
-            if (!(mines[x][y] == true)) {
+            if (!(mines[x][y])) {
                 s = getsurround(x, y);
                 //printf("map[%i][%i] has %i surrounding mines\n", x, y, s);
                 map[x][y] = s;
@@ -257,8 +257,9 @@ int main() {
                     death();
                 }
                 break;
+            case 'F':
             case 'f':
-                flagged[selx][sely] = true;
+                flagged[selx][sely] = !flagged[selx][sely];
                 break;
         }
 
