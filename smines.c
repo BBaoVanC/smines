@@ -116,18 +116,17 @@ bool revealtile(int x, int y) {
         visible[x][y] = true;
         return false;
     } else {
-        if (map[x][y] == 0) {
+        /* if (map[x][y] == 0) {
             int rx, ry;
-            for (rx = 0; rx < MCOLS; rx++) {
-                for (ry = 0; ry < MROWS; ry++) {
-                    visible[x][y] = true;
+            for (rx = x - 1; rx <= x + 1; rx++) {
+                for (ry = y - 1; ry <= y + 1; ry++) {
+                    visible[rx][ry] = true;
                 }
             }
-        } else {
-            visible[x][y] = true;
-        }
-        return true;
+        } else { */
+        visible[x][y] = true;
     }
+    return true;
 }
 
 void addmines() {
