@@ -217,21 +217,6 @@ int main() {
 
     setup();
 
-    //printmines();
-
-    int surr;
-    printf("surmines(4, 4);\n");
-    surr = getsurround(4, 4);
-    printf("surrounding mines: %i\n", surr);
-
-    printf("surmines(9, 9);\n");
-    surr = getsurround(9, 9);
-    printf("surrounding mines: %i\n", surr);
-
-
-    //printf("Map:\n");
-    //printmap();
-
     int ch;
     printf("Starting game\n\n");
 
