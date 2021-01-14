@@ -142,6 +142,24 @@ void printmines() {
     }
 }
 
+void revealzero(int x, int y) {
+    int rx, ry;
+    for (rx = x - 1; rx <= x + 1; rx++) {
+        for (ry = y - 1; ry <= y + 1; ry++) {
+            if ((rx >= 0) && (rx < MCOLS) && (ry >= 0) && (ry < MROWS))
+                visible[rx][ry] = true;
+        }
+    }
+
+    /*for (rx = x - 1; rx <= x + 1; rx++) {
+        for (ry = y - 1; ry <= y + 1; ry++) {
+                if (map[rx][ry] == 0) {
+                revealzero(rx, ry);
+            }
+        }
+    }*/
+}
+
 bool revealtile(int x, int y) {
     if (flagged[x][y]) {
         return true;
@@ -149,20 +167,15 @@ bool revealtile(int x, int y) {
         visible[x][y] = true;
         return false;
     } else {
-        /* if (map[x][y] == 0) {
-            int rx, ry;
-            for (rx = x - 1; rx <= x + 1; rx++) {
-                for (ry = y - 1; ry <= y + 1; ry++) {
-                    visible[rx][ry] = true;
-                }
-            }
-        } else { */
         visible[x][y] = true;
+        if (map[x][y] == 0) {
+            revealzero(x, y);
+        }
     }
     return true;
 }
 
-void revealzero() {
+void findzero() {
     int x, y;
     while (true) {
         x = (rand() % (MCOLS - 1 + 1));
@@ -211,7 +224,8 @@ void death() {
     int x, y;
     for (x = 0; x < MCOLS; x++) {
         for (y = 0; y < MROWS; y++) {
-            map[x][y] = 9;
+            if (mines[x][y])
+                visible[x][y] = true;
         }
     }
 }
@@ -253,7 +267,7 @@ void setup() {
         }
     }
 
-    revealzero();
+    findzero();
 }
 
 int main() {
@@ -313,7 +327,8 @@ int main() {
                 break;
             case 'F':
             case 'f':
-                flagged[selx][sely] = !flagged[selx][sely];
+                if (!visible[selx][sely])
+                    flagged[selx][sely] = !flagged[selx][sely];
                 break;
 
             case KEY_MOUSE:
