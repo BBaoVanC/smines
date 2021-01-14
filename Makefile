@@ -1,4 +1,5 @@
 all: smines
+dev: clean smines
 
 smines:
 	gcc -o smines smines.c -lncurses
