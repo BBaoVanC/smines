@@ -70,17 +70,47 @@ int getsurround(int x, int y) {
     return surrmines;
 }
 
+void initcolorpairs() {
+    /* 10 is the 0 tile (0 can't be used for the pair number) */
+    /* 9 is a mine */
+    init_pair(10, COLOR_WHITE, COLOR_BLACK);
+    init_pair(9, COLOR_BLACK, COLOR_RED);
+
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
+    init_pair(2, COLOR_WHITE, COLOR_GREEN);
+    init_pair(3, COLOR_WHITE, COLOR_RED);
+    init_pair(4, COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(5, COLOR_WHITE, COLOR_YELLOW);
+    init_pair(6, COLOR_WHITE, COLOR_CYAN);
+    init_pair(7, COLOR_WHITE, COLOR_BLACK);
+    init_pair(8, COLOR_BLACK, COLOR_WHITE);
+
+    /* 11 is a hidden tile */
+    /* 12 is a flag */
+    init_pair(11, COLOR_WHITE, COLOR_BLACK);
+    init_pair(12, COLOR_WHITE, COLOR_YELLOW);
+}
+
 void printtile(int x, int y) {
     if (flagged[x][y]) {
+        attron(COLOR_PAIR(12));
         printw("F");
+        attroff(COLOR_PAIR(12));
     } else if (visible[x][y]) {
         if (mines[x][y]) {
+            attron(COLOR_PAIR(9));
             printw("X");
+            attroff(COLOR_PAIR(9));
         } else {
+            int color = COLOR_PAIR(map[x][y]);
+            attron(color);
             printw("%d", map[x][y]);
+            attroff(color);
         }
     } else {
-        printw("h");
+        attron(COLOR_PAIR(11));
+        printw(" ");
+        attroff(COLOR_PAIR(11));
     }
 }
 
@@ -130,6 +160,18 @@ bool revealtile(int x, int y) {
         visible[x][y] = true;
     }
     return true;
+}
+
+void revealzero() {
+    int x, y;
+    while (true) {
+        x = (rand() % (MCOLS - 1 + 1));
+        y = (rand() % (MCOLS - 1 + 1));
+        if ((map[x][y] == 0) && (!mines[x][y])) {
+            visible[x][y] = true;
+            break;
+        }
+    }
 }
 
 void adddummymines() {
@@ -210,6 +252,8 @@ void setup() {
             }
         }
     }
+
+    revealzero();
 }
 
 int main() {
@@ -223,6 +267,8 @@ int main() {
     initscr();
     keypad(stdscr, TRUE);
     noecho();
+    start_color();
+    initcolorpairs();
     printmap();
     refresh();
     bool keeprunning = true;
