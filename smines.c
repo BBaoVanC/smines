@@ -264,16 +264,6 @@ int main() {
     int ch;
     printf("Starting game\n\n");
 
-    WINDOW *minefield;
-    int startx, starty, width, height;
-
-    width = MCOLS;
-    height = MROWS;
-    startx = (COLS - width) / 2;
-    starty = (LINES - height) / 2;
-
-    minefield = newwin(height, width, starty, startx);
-
     initscr();
     keypad(stdscr, TRUE);
     noecho();
