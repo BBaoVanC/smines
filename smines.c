@@ -53,18 +53,16 @@ int getsurround(int x, int y) {
     for (r = 0; r < 3; r = r + 2) { /* loop through 1-6 */
         for (c = 0; c < 3; c++) {
             //printf("I am on position %i, %i\n", c, r);
-            if (group[c][r]) {
+            if (group[c][r])
                 //printf("I found a mine!\n");
                 surrmines++;
-            }
         }
     }
 
     r = 1;
     for (c = 0; c < 3; c = c + 2) { /* loop through 7-8 */
-        if (group[c][r]) {
+        if (group[c][r])
             surrmines++;
-        }
     }
 
     return surrmines;
@@ -161,9 +159,9 @@ void revealzero(int x, int y) {
 }
 
 bool revealtile(int x, int y) {
-    if (flagged[x][y]) {
+    if (flagged[x][y])
         return true;
-    } else if (mines[x][y]) {
+    else if (mines[x][y]) {
         visible[x][y] = true;
         return false;
     } else {
@@ -301,29 +299,24 @@ int main() {
                 break;
 
             case 'h':
-                if (selx > 0) {
+                if (selx > 0)
                     selx--;
-                }
                 break;
             case 'j':
-                if (sely < MROWS-1) {
+                if (sely < MROWS-1)
                     sely++;
-                }
                 break;
             case 'k':
-                if (sely > 0) {
+                if (sely > 0)
                     sely--;
-                }
                 break;
             case 'l':
-                if (selx < MCOLS-1) {
+                if (selx < MCOLS-1)
                     selx++;
-                }
                 break;
             case ' ':
-                if (!(revealtile(selx, sely))) {
+                if (!(revealtile(selx, sely)))
                     death();
-                }
                 break;
             case 'F':
             case 'f':
@@ -337,11 +330,10 @@ int main() {
                     int my = event.y;
                     selx = mx;
                     sely = my;
-                    if (event.bstate & BUTTON1_CLICKED) {
+                    if (event.bstate & BUTTON1_CLICKED)
                         revealtile(selx, sely);
-                    } else if (event.bstate & BUTTON3_CLICKED) {
+                    else if (event.bstate & BUTTON3_CLICKED)
                         flagged[selx][sely] = !flagged[selx][sely];
-                    }
                 }
                 break;
         }
