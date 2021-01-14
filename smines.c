@@ -264,13 +264,29 @@ int main() {
     int ch;
     printf("Starting game\n\n");
 
+    WINDOW *minefield;
+    int startx, starty, width, height;
+
+    width = MCOLS;
+    height = MROWS;
+    startx = (COLS - width) / 2;
+    starty = (LINES - height) / 2;
+
+    minefield = newwin(height, width, starty, startx);
+
     initscr();
     keypad(stdscr, TRUE);
     noecho();
+
     start_color();
     initcolorpairs();
+
+    MEVENT event;
+    mousemask(BUTTON1_CLICKED | BUTTON3_CLICKED, NULL);
+
     printmap();
     refresh();
+
     bool keeprunning = true;
     while (keeprunning) {
         ch = getch();
