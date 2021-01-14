@@ -298,26 +298,36 @@ int main() {
                 keeprunning = false;
                 break;
 
+            case KEY_LEFT:
             case 'h':
                 if (selx > 0)
                     selx--;
                 break;
+
+            case KEY_DOWN:
             case 'j':
                 if (sely < MROWS-1)
                     sely++;
                 break;
+
+            case KEY_UP:
             case 'k':
                 if (sely > 0)
                     sely--;
                 break;
+
+            case KEY_RIGHT:
             case 'l':
                 if (selx < MCOLS-1)
                     selx++;
                 break;
+
+            case '\n':
             case ' ':
                 if (!(revealtile(selx, sely)))
                     death();
                 break;
+
             case 'F':
             case 'f':
                 if (!visible[selx][sely])
