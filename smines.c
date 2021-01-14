@@ -309,6 +309,20 @@ int main() {
             case 'f':
                 flagged[selx][sely] = !flagged[selx][sely];
                 break;
+
+            case KEY_MOUSE:
+                if (getmouse(&event) == OK) {
+                    int mx = (event.x + 1) / 2;
+                    int my = event.y;
+                    selx = mx;
+                    sely = my;
+                    if (event.bstate & BUTTON1_CLICKED) {
+                        revealtile(selx, sely);
+                    } else if (event.bstate & BUTTON3_CLICKED) {
+                        flagged[selx][sely] = !flagged[selx][sely];
+                    }
+                }
+                break;
         }
 
         clear();
