@@ -4,11 +4,14 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include <ncurses.h>
 
-#define MCOLS 10
-#define MROWS 10
+#define MCOLS 16
+#define MROWS 16
+#define MINES 40
 
 bool mines[MCOLS][MROWS];
 int map[MCOLS][MROWS];
@@ -129,7 +132,7 @@ bool revealtile(int x, int y) {
     return true;
 }
 
-void addmines() {
+void adddummymines() {
     mines[7][1] = true;
     mines[1][2] = true;
 
@@ -147,6 +150,19 @@ void addmines() {
 
 
     mines[3][8] = true;
+}
+
+void addmines() {
+    int i, m;
+    int x, y;
+    for (i = 0; i < MINES;) {
+        x = (rand() % (MCOLS - 1 + 1));
+        y = (rand() % (MCOLS - 1 + 1));
+        if (!(mines[x][y])) {
+            mines[x][y] = true;
+            i++;
+        }
+    }
 }
 
 void death() {
@@ -197,6 +213,8 @@ void setup() {
 }
 
 int main() {
+    srand((unsigned) time(NULL));
+
     setup();
 
     //printmines();
