@@ -340,9 +340,10 @@ int main() {
                     int my = event.y;
                     selx = mx;
                     sely = my;
-                    if (event.bstate & BUTTON1_CLICKED)
-                        revealtile(selx, sely);
-                    else if (event.bstate & BUTTON3_CLICKED)
+                    if (event.bstate & BUTTON1_CLICKED) {
+                        if (!(revealtile(selx, sely)))
+                            death();
+                    } else if (event.bstate & BUTTON3_CLICKED)
                         flagged[selx][sely] = !flagged[selx][sely];
                 }
                 break;
