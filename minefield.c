@@ -3,6 +3,7 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
 
@@ -15,11 +16,15 @@ Tile *get_tile_ptr(Minefield *minefield, int col, int row) {
 }
 
 void init_minefield(Minefield *minefield, int cols, int rows) {
+    printf("Setting cols to %i\n", cols);
     minefield->cols = cols;
+    printf("Setting rows to %i\n", rows);
     minefield->rows = rows;
+    printf("Setting mines to 0\n");
     minefield->mines = 0;
 
     /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
+    printf("Allocating tiles array\n");
     minefield->tiles = (Tile *)malloc(cols * rows * sizeof(Tile));
 }
 

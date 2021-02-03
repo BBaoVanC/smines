@@ -6,28 +6,31 @@
 #include "minefield.h"
 #include "colors.h"
 #include <ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 Minefield *minefield;
 
 void setup_minefield();
 
 int main() {
-    printf("Setting up the minefield");
+    Minefield *minefield = malloc(sizeof(Minefield));
+    printf("Setting up the minefield\n");
     setup_minefield();
 
-    printf("Initializing screen");
+    printf("Initializing screen\n");
     initscr(); /* start ncurses */
-    printf("Enabling extra keys with keypad()");
+    printf("Enabling extra keys with keypad()\n");
     keypad(stdscr, TRUE); /* more keys */
-    printf("Hiding key output");
+    printf("Hiding key output\n");
     noecho(); /* hide keys when pressed */
 
-    printf("Setting up color");
+    printf("Setting up color\n");
     start_color(); /* start color */
-    printf("Initializing color pairs");
+    printf("Initializing color pairs\n");
     initcolorpairs(); /* set our color pairs */
 
-    printf("Printing minefield");
+    printf("Printing minefield\n");
     print_minefield(minefield);
     refresh();
 }
