@@ -1,7 +1,7 @@
 all: clean smines
 
 smines:
-	gcc -o smines smines.c -lncurses minefield.c colors.c -Wall
+	gcc -o smines smines.c -lncurses minefield.c -Wall
 
 clean:
 	rm -f smines

@@ -8,7 +8,6 @@
 #include <ncurses.h>
 
 #include "minefield.h"
-#include "colors.h"
 
 Tile *get_tile_ptr(Minefield *minefield, int col, int row) {
     /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
@@ -28,6 +27,16 @@ void init_minefield(Minefield *minefield, int cols, int rows) {
     minefield->tiles = (Tile *)malloc(cols * rows * sizeof(Tile));
 }
 
+int getcolorforsurround(int surrounding) {
+    if (surrounding == 0) {
+        return COLOR_PAIR(10);
+    } else if ((surrounding <= 8) && (surrounding >= 1)) {
+        return COLOR_PAIR(surrounding);
+    } else {
+        return COLOR_PAIR(100);
+    }
+}
+
 void print_tile(Tile *tile) {
     if (tile->flagged) {
         attron(COLOR_PAIR(12));
@@ -39,7 +48,7 @@ void print_tile(Tile *tile) {
             printw(" X");
             attroff(COLOR_PAIR(9));
         } else {
-            int color = getcolorforsurround(tile->surrounding); // TODO
+            int color = getcolorforsurround(tile->surrounding);
             attron(color);
             printw(" %d", tile->surrounding);
             attroff(color);
@@ -55,6 +64,11 @@ void print_minefield(Minefield *minefield) {
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             print_tile(get_tile_ptr(minefield, x, y));
+            printw("\n");
         }
     }
+}
+
+int getsurround(Minefield *minefield, int x, int y) {
+    return 1;
 }
