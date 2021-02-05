@@ -17,7 +17,7 @@ int main() {
     srand((unsigned) time(NULL));
     FILE *logfile = fopen("full.log", "w+");
 
-    Minefield *minefield = malloc(sizeof(Minefield));
+    Minefield *minefield;
     logger(logfile, "debug", "Setting up the minefield\n");
     init_minefield(minefield, 10, 20);
     minefield->mines = 5;
@@ -99,4 +99,5 @@ int main() {
     }
 
     endwin();
+    free_minefield_memory(minefield);
 }
