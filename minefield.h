@@ -30,3 +30,4 @@ int getcolorforsurround(int);
 void print_tile(Tile *);
 void print_minefield(Minefield *);
 int getsurround(Minefield *, int, int);
+void free_minefield_memory(Minefield *);
