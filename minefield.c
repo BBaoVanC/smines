@@ -16,7 +16,7 @@ Tile *get_tile_ptr(Minefield *minefield, int col, int row) {
 
 void init_minefield(Minefield *minefield, int cols, int rows) {
     /* Allocate memory for minefield */
-    minefield = malloc(sizeof(Minefield));
+    minefield = (Minefield *)malloc(sizeof(Minefield));
     
     printf("Setting cols to %i\n", cols);
     minefield->cols = cols;
