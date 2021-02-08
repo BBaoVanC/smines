@@ -17,14 +17,15 @@ int main() {
     srand((unsigned) time(NULL));
     FILE *logfile = fopen("full.log", "w+");
 
-    Minefield *minefield;
+    Minefield *minefield = NULL;
     logger(logfile, "debug", "Setting up the minefield\n");
     init_minefield(minefield, 10, 20);
     minefield->mines = 5;
 
     int i, x, y;
-    Tile *t;
+    Tile *t = NULL;
     for (i = 0; i < minefield->mines;) {
+        logger(logfile, "debug", "for loop");
         x = (rand() % (minefield->cols - 1 + 1));
         y = (rand() % (minefield->rows - 1 + 1));
         t = get_tile_ptr(minefield, x, y);
