@@ -11,10 +11,13 @@
 
 Tile *get_tile_ptr(Minefield *minefield, int col, int row) {
     /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
-    return (minefield->tiles + col*row + row);
+    return (minefield->tiles + (row*minefield->cols + col)*sizeof(Tile));
 }
 
 void init_minefield(Minefield *minefield, int cols, int rows) {
+    /* Allocate memory for minefield */
+    minefield = (Minefield *)malloc(sizeof(Minefield));
+    
     printf("Setting cols to %i\n", cols);
     minefield->cols = cols;
     printf("Setting rows to %i\n", rows);
@@ -24,6 +27,7 @@ void init_minefield(Minefield *minefield, int cols, int rows) {
 
     /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
     printf("Allocating tiles array\n");
+    /* Allocate memory for 2D tile array */
     minefield->tiles = (Tile *)malloc(cols * rows * sizeof(Tile));
 }
 
@@ -71,4 +75,9 @@ void print_minefield(Minefield *minefield) {
 
 int getsurround(Minefield *minefield, int x, int y) {
     return 1;
+}
+
+void free_minefield_memory(Minefield *minefield) {
+    free(minefield->tiles);
+    free(minefield);
 }
