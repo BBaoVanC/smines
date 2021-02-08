@@ -4,7 +4,7 @@ run: clean smines
 	./smines
 
 smines:
-	gcc -o smines smines.c -lncurses minefield.c logger.c -Wall
+	gcc -o smines smines.c -lncurses minefield.c logger.c -Wall -g
 
 clean:
 	rm -f smines
