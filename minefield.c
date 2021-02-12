@@ -8,23 +8,27 @@
 #include <ncurses.h>
 
 #include "minefield.h"
+#include "config.h"
 
-Tile *get_tile_ptr(Minefield *minefield, int col, int row) {
-    /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
-    return (minefield->tiles + col*row + row);
+Minefield *init_minefield(int rows, int cols, int mines) {
+    /* Allocate memory for minefield */
+    Minefield *minefield = malloc(sizeof(Minefield));
+
+    minefield->rows = rows;
+    minefield->cols = cols;
+    minefield->mines = mines;
+
+    return minefield;
 }
 
-void init_minefield(Minefield *minefield, int cols, int rows) {
-    printf("Setting cols to %i\n", cols);
-    minefield->cols = cols;
-    printf("Setting rows to %i\n", rows);
-    minefield->rows = rows;
-    printf("Setting mines to 0\n");
-    minefield->mines = 0;
-
-    /* https://www.tutorialspoint.com/how-to-dynamically-allocate-a-2d-array-in-c */
-    printf("Allocating tiles array\n");
-    minefield->tiles = (Tile *)malloc(cols * rows * sizeof(Tile));
+void generate_surrounding(Minefield *minefield) {
+    Tile *t = NULL;
+    for (int c = 0; c < minefield->cols; c++) {
+        for (int r = 0; r < minefield->rows; r++) {
+            t = &minefield->tiles[r][c];
+            t->surrounding = getsurround(minefield, r, c);
+        }
+    }
 }
 
 int getcolorforsurround(int surrounding) {
@@ -63,12 +67,44 @@ void print_tile(Tile *tile) {
 void print_minefield(Minefield *minefield) {
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
-            print_tile(get_tile_ptr(minefield, x, y));
+            move(y, x*2);
+            print_tile(&minefield->tiles[y][x]);
             printw("\n");
         }
     }
 }
 
-int getsurround(Minefield *minefield, int x, int y) {
-    return 1;
+int getsurround(Minefield *minefield, int row, int col) {
+    int r, c;
+    int surrounding = 0;
+    Tile *current_tile = NULL;
+#if 0
+    int rstart = 0;
+    int rend = 0;
+    int cstart = 0;
+    int cend = 0;
+
+    if (row > 0)
+        rstart = row - 1;
+    if (row < minefield->rows - 1)
+        rend = row + 1;
+
+    if (col > 0)
+        cstart = col - 1;
+    if (col < minefield->rows - 1)
+        cend = col + 1;
+#endif
+
+    for (r = row - 1; r < row + 1; r++) {
+        for (c = col - 1; c < col + 1; c++) {
+            if (r >= 0 && c >= 0) {
+                current_tile = &minefield->tiles[r][c];
+                if (current_tile->mine) {
+                    surrounding++;
+                }
+            }
+        }
+    }
+
+    return surrounding;
 }
