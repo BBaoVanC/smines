@@ -39,6 +39,7 @@ int main() {
     }
 #endif
 
+    minefield->tiles[1][1].mine = true;
     generate_surrounding(minefield); /* set the surrounding value in each tile */
 
 
@@ -67,10 +68,9 @@ int main() {
     init_pair(7, COLOR_WHITE, COLOR_BLACK);
     init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
-    /* 11 is a hidden tile */
-    /* 12 is a flag */
-    init_pair(11, COLOR_BLACK, COLOR_WHITE);
-    init_pair(12, COLOR_WHITE, COLOR_YELLOW);
+    init_pair(11, COLOR_BLACK, COLOR_WHITE); /* hidden tile */
+    init_pair(12, COLOR_WHITE, COLOR_YELLOW); /* flag */
+    init_pair(13, COLOR_BLACK, COLOR_WHITE); /* cursor */
 
     /* 100 is for errors */
     init_pair(100, COLOR_WHITE, COLOR_RED);

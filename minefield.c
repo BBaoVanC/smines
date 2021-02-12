@@ -12,11 +12,14 @@
 
 Minefield *init_minefield(int rows, int cols, int mines) {
     /* Allocate memory for minefield */
-    Minefield *minefield = malloc(sizeof(Minefield));
+    Minefield *minefield = (Minefield*)calloc(1, sizeof(Minefield));
 
     minefield->rows = rows;
     minefield->cols = cols;
     minefield->mines = mines;
+
+    minefield->cur.col = cols / 2;
+    minefield->cur.row = rows / 2;
 
     return minefield;
 }
@@ -95,8 +98,8 @@ int getsurround(Minefield *minefield, int row, int col) {
         cend = col + 1;
 #endif
 
-    for (r = row - 1; r < row + 1; r++) {
-        for (c = col - 1; c < col + 1; c++) {
+    for (r = row - 1; r < row + 2; r++) {
+        for (c = col - 1; c < col + 2; c++) {
             if (r >= 0 && c >= 0) {
                 current_tile = &minefield->tiles[r][c];
                 if (current_tile->mine) {

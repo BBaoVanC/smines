@@ -5,4 +5,4 @@
 
 #define MROWS 10
 #define MCOLS 20
-#define MINES 5
+#define MINES 10

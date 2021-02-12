@@ -9,7 +9,7 @@
 typedef struct {
     int col;
     int row;
-} Coordinate;
+} Cursor;
 
 typedef struct {
     bool mine;
@@ -22,6 +22,7 @@ typedef struct {
     int rows;
     int cols;
     int mines;
+    Cursor cur;
     Tile tiles[MROWS][MCOLS];
 } Minefield;
 
