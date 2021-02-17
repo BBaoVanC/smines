@@ -26,12 +26,12 @@ int main() {
         t = &minefield->tiles[y][x];
         if (!t->mine) {
             t->mine = true;
-            t->visible = true; /* TODO remove this */
+            //t->visible = true; /* TODO remove this */
             i++;
         }
     }
 
-#if 1 /* TODO remove this */
+#if 0 /* TODO remove this */
     for (y = 0; y < minefield->rows; y++) {
         for (x = 0; x < minefield->cols; x++) {
             minefield->tiles[y][x].visible = true;
@@ -39,7 +39,6 @@ int main() {
     }
 #endif
 
-    minefield->tiles[1][1].mine = true;
     generate_surrounding(minefield); /* set the surrounding value in each tile */
 
 
@@ -54,10 +53,8 @@ int main() {
     start_color(); /* start color */
     fprintf(logfile, "debug: Initializing color pairs\n");
 
-    /* 10 is the 0 tile (0 can't be used for the pair number) */
-    /* 9 is a mine */
-    init_pair(10, COLOR_WHITE, COLOR_BLACK);
-    init_pair(9, COLOR_BLACK, COLOR_RED);
+    init_pair(10, COLOR_WHITE, COLOR_BLACK);    /* 0 */
+    init_pair(9, COLOR_BLACK, COLOR_RED);       /* mine */
 
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
     init_pair(2, COLOR_WHITE, COLOR_GREEN);
@@ -68,9 +65,9 @@ int main() {
     init_pair(7, COLOR_WHITE, COLOR_BLACK);
     init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
-    init_pair(11, COLOR_BLACK, COLOR_WHITE); /* hidden tile */
-    init_pair(12, COLOR_WHITE, COLOR_YELLOW); /* flag */
-    init_pair(13, COLOR_BLACK, COLOR_WHITE); /* cursor */
+    init_pair(11, COLOR_BLACK, COLOR_BLACK);    /* hidden tile */
+    init_pair(12, COLOR_WHITE, COLOR_YELLOW);   /* flag */
+    init_pair(13, COLOR_BLACK, COLOR_WHITE);    /* cursor */
 
     /* 100 is for errors */
     init_pair(100, COLOR_WHITE, COLOR_RED);
@@ -86,6 +83,32 @@ int main() {
         switch (ch) {
             case 'q': /* quit */
                 keeprunning = false;
+                break;
+
+            /* movement keys */
+            case 'h':
+            case KEY_LEFT:
+                if (minefield->cur.col > 0)
+                    minefield->cur.col--;
+                break;
+            case 'j':
+            case KEY_DOWN:
+                if (minefield->cur.row < minefield->rows - 1)
+                    minefield->cur.row++;
+                break;
+            case 'k':
+            case KEY_UP:
+                if (minefield->cur.row > 0)
+                    minefield->cur.row--;
+                break;
+            case 'l':
+            case KEY_RIGHT:
+                if (minefield->cur.col < minefield->cols - 1)
+                    minefield->cur.col++;
+                break;
+
+            case ' ':
+                reveal_tile(minefield, minefield->cur.row, minefield->cur.col);
                 break;
         }
 

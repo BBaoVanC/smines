@@ -21,6 +21,8 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     minefield->cur.col = cols / 2;
     minefield->cur.row = rows / 2;
 
+    minefield->tiles[rows/2][cols/2].visible = true;
+
     return minefield;
 }
 
@@ -67,12 +69,61 @@ void print_tile(Tile *tile) {
     }
 }
 
+void print_cursor_tile(Tile *tile) {
+    if (tile->flagged) {
+        attron(COLOR_PAIR(13));
+        printw(" F");
+        attroff(COLOR_PAIR(13));
+    } else if (tile->visible) {
+        if (tile->mine) {
+            attron(COLOR_PAIR(13));
+            printw(" X");
+            attroff(COLOR_PAIR(13));
+        } else {
+            attron(COLOR_PAIR(13));
+            printw(" %d", tile->surrounding);
+            attroff(COLOR_PAIR(13));
+        }
+    } else {
+        attron(COLOR_PAIR(13));
+        printw("  ");
+        attroff(COLOR_PAIR(13));
+    }
+}
+
 void print_minefield(Minefield *minefield) {
+    int cur_r = minefield->cur.row;
+    int cur_c = minefield->cur.col;
+
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             move(y, x*2);
-            print_tile(&minefield->tiles[y][x]);
+            if ((cur_r == y) && (cur_c == x))
+                print_cursor_tile(&minefield->tiles[y][x]);
+            else
+                print_tile(&minefield->tiles[y][x]);
             printw("\n");
+        }
+    }
+}
+
+bool reveal_tile(Minefield *minefield, int row, int col) {
+    Tile *tile = &minefield->tiles[row][col];
+    if (tile->mine) {
+        reveal_mines(minefield);
+        return false;
+    } else {
+        tile->visible = true;
+        return true;
+    }
+}
+
+void reveal_mines(Minefield *minefield) {
+    for (int r = 0; r < minefield->rows; r++) {
+        for (int c = 0; c < minefield->cols; c++) {
+            if (minefield->tiles[r][c].mine) {
+                minefield->tiles[r][c].visible = true;
+            }
         }
     }
 }

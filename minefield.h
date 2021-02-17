@@ -27,8 +27,11 @@ typedef struct {
 } Minefield;
 
 Minefield *init_minefield(int, int, int);
+void generate_surrounding(Minefield *);
 int getcolorforsurround(int);
 void print_tile(Tile *);
+void print_cursor_tile(Tile *);
 void print_minefield(Minefield *);
-void generate_surrounding(Minefield *);
+bool reveal_tile(Minefield *, int, int);
+void reveal_mines(Minefield *);
 int getsurround(Minefield *, int, int);
