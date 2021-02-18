@@ -26,6 +26,22 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     return minefield;
 }
 
+void populate_mines(Minefield *minefield, int mines) {
+    int i, r, c;
+    Tile *t = NULL;
+    for (i = 0; i < minefield->mines;) {
+        r = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
+        c = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
+        t = &minefield->tiles[r][c];
+        if (!t->mine) {
+            t->mine = true;
+            //t->visible = true; /* TODO remove this */
+            i++;
+        }
+    }
+}
+
+
 void generate_surrounding(Minefield *minefield) {
     Tile *t = NULL;
     for (int c = 0; c < minefield->cols; c++) {
