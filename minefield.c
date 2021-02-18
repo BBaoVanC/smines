@@ -131,22 +131,6 @@ int getsurround(Minefield *minefield, int row, int col) {
     int r, c;
     int surrounding = 0;
     Tile *current_tile = NULL;
-#if 0
-    int rstart = 0;
-    int rend = 0;
-    int cstart = 0;
-    int cend = 0;
-
-    if (row > 0)
-        rstart = row - 1;
-    if (row < minefield->rows - 1)
-        rend = row + 1;
-
-    if (col > 0)
-        cstart = col - 1;
-    if (col < minefield->rows - 1)
-        cend = col + 1;
-#endif
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {

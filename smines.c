@@ -9,10 +9,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-void death(Minefield *minefield) {
-    reveal_mines(minefield);
-}
-
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
 
@@ -45,10 +41,12 @@ int main() {
     /* done with ncurses setup */
 
 
-    Minefield *minefield = init_minefield(MROWS, MCOLS, MINES);
-
+    Minefield *minefield = NULL;
     int i, x, y;
     Tile *t = NULL;
+
+game:
+    minefield = init_minefield(MROWS, MCOLS, MINES);
     for (i = 0; i < minefield->mines;) {
         y = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
         x = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
@@ -65,15 +63,15 @@ int main() {
     print_minefield(minefield);
     refresh();
 
-    bool keeprunning = true;
     int ch;
     int cur_r, cur_c;
     Tile *cur_tile = NULL;
-    while (keeprunning) {
+    int c;
+    while (true) {
         ch = getch(); /* wait for a character press */
         switch (ch) {
             case 'q': /* quit */
-                keeprunning = false;
+                goto quit;
                 break;
 
             /* movement keys */
@@ -99,8 +97,23 @@ int main() {
                 break;
 
             case ' ':
-                if (!reveal_tile(minefield, minefield->cur.row, minefield->cur.col))
-                    death(minefield);
+                if (!reveal_tile(minefield, minefield->cur.row, minefield->cur.col)) {
+                    reveal_mines(minefield);
+                    move(minefield->rows, minefield->cols); /* go to the line just below the field */
+                    printw("GAME OVER! Press `r` to play again.");
+                    while (true) {
+                        c = getch();
+                        switch(c) {
+                            case 'r':
+                                goto game;
+                                break;
+                            case 'q':
+                                goto quit;
+                                break;
+                        }
+                    }
+                    goto game;
+                }
                 break;
 
             case 'f':
@@ -116,6 +129,7 @@ int main() {
         refresh();
     }
 
+quit:
     endwin();
     free(minefield);
 }
