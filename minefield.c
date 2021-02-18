@@ -110,7 +110,6 @@ void print_minefield(Minefield *minefield) {
 bool reveal_tile(Minefield *minefield, int row, int col) {
     Tile *tile = &minefield->tiles[row][col];
     if (tile->mine) {
-        reveal_mines(minefield);
         return false;
     } else {
         tile->visible = true;

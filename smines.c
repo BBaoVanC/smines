@@ -9,49 +9,19 @@
 #include <stdlib.h>
 #include <time.h>
 
+void death(Minefield *minefield) {
+    reveal_mines(minefield);
+}
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
-    FILE *logfile = fopen("full.log", "w+");
 
-    fprintf(logfile, "debug: Setting up the minefield");
-    Minefield *minefield = init_minefield(MROWS, MCOLS, MINES);
-
-    int i, x, y;
-    Tile *t = NULL;
-    for (i = 0; i < minefield->mines;) {
-        fprintf(logfile, "debug: for loop");
-        y = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
-        x = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
-        t = &minefield->tiles[y][x];
-        if (!t->mine) {
-            t->mine = true;
-            //t->visible = true; /* TODO remove this */
-            i++;
-        }
-    }
-
-#if 0 /* TODO remove this */
-    for (y = 0; y < minefield->rows; y++) {
-        for (x = 0; x < minefield->cols; x++) {
-            minefield->tiles[y][x].visible = true;
-        }
-    }
-#endif
-
-    generate_surrounding(minefield); /* set the surrounding value in each tile */
-
-
-    fprintf(logfile, "debug: Initializing screen\n");
+    /* ncurses setup */
     initscr(); /* start ncurses */
-    fprintf(logfile, "debug: Enabling extra keys with keypad()\n");
     keypad(stdscr, TRUE); /* more keys */
-    fprintf(logfile, "debug: Hiding key output\n");
     noecho(); /* hide keys when pressed */
 
-    fprintf(logfile, "debug: Setting up color\n");
     start_color(); /* start color */
-    fprintf(logfile, "debug: Initializing color pairs\n");
 
     init_pair(10, COLOR_WHITE, COLOR_BLACK);    /* 0 */
     init_pair(9, COLOR_BLACK, COLOR_RED);       /* mine */
@@ -66,18 +36,39 @@ int main() {
     init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
     init_pair(11, COLOR_BLACK, COLOR_BLACK);    /* hidden tile */
-    init_pair(12, COLOR_WHITE, COLOR_YELLOW);   /* flag */
+    init_pair(12, COLOR_BLACK, COLOR_YELLOW);   /* flag */
     init_pair(13, COLOR_BLACK, COLOR_WHITE);    /* cursor */
 
     /* 100 is for errors */
     init_pair(100, COLOR_WHITE, COLOR_RED);
 
+    /* done with ncurses setup */
+
+
+    Minefield *minefield = init_minefield(MROWS, MCOLS, MINES);
+
+    int i, x, y;
+    Tile *t = NULL;
+    for (i = 0; i < minefield->mines;) {
+        y = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
+        x = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
+        t = &minefield->tiles[y][x];
+        if (!t->mine) {
+            t->mine = true;
+            //t->visible = true; /* TODO remove this */
+            i++;
+        }
+    }
+
+    generate_surrounding(minefield); /* set the surrounding value in each tile */
 
     print_minefield(minefield);
     refresh();
 
     bool keeprunning = true;
     int ch;
+    int cur_r, cur_c;
+    Tile *cur_tile = NULL;
     while (keeprunning) {
         ch = getch(); /* wait for a character press */
         switch (ch) {
@@ -108,8 +99,16 @@ int main() {
                 break;
 
             case ' ':
-                reveal_tile(minefield, minefield->cur.row, minefield->cur.col);
+                if (!reveal_tile(minefield, minefield->cur.row, minefield->cur.col))
+                    death(minefield);
                 break;
+
+            case 'f':
+                cur_r = minefield->cur.row;
+                cur_c = minefield->cur.col;
+                cur_tile = &minefield->tiles[cur_r][cur_c];
+                if (!cur_tile->visible)
+                    cur_tile->flagged = !cur_tile->flagged;
         }
 
         clear();
