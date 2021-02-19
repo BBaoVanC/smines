@@ -114,13 +114,13 @@ void print_minefield(Minefield *minefield) {
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             move(y, x*2);
-            if ((cur_r == y) && (cur_c == x))
-                print_cursor_tile(&minefield->tiles[y][x]);
-            else
-                print_tile(&minefield->tiles[y][x]);
+            print_tile(&minefield->tiles[y][x]);
             printw("\n");
         }
     }
+
+    move(cur_r, cur_c*2);
+    print_cursor_tile(&minefield->tiles[cur_r][cur_c]);
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
