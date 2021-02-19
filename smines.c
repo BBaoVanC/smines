@@ -99,12 +99,12 @@ game:
             case ' ':
                 if (!reveal_tile(minefield, minefield->cur.row, minefield->cur.col)) {
                     reveal_mines(minefield);
-                    move(minefield->rows, minefield->cols); /* go to the line just below the field */
-                    printw("GAME OVER! Press `r` to play again.");
+                    mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
                     while (true) {
                         c = getch();
                         switch(c) {
                             case 'r':
+                                clear();
                                 goto game;
                                 break;
                             case 'q':
@@ -112,7 +112,6 @@ game:
                                 break;
                         }
                     }
-                    goto game;
                 }
                 break;
 
