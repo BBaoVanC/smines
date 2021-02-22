@@ -97,19 +97,23 @@ game:
                 break;
 
             case ' ':
-                if (!reveal_tile(minefield, minefield->cur.row, minefield->cur.col)) {
-                    reveal_mines(minefield);
-                    mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
-                    while (true) {
-                        c = getch();
-                        switch(c) {
-                            case 'r':
-                                clear();
-                                goto game;
-                                break;
-                            case 'q':
-                                goto quit;
-                                break;
+                cur_r = minefield->cur.row;
+                cur_c = minefield->cur.col;
+                if (!minefield->tiles[cur_r][cur_c].flagged) {
+                    if (!reveal_tile(minefield, cur_r, cur_c)) {
+                        reveal_mines(minefield);
+                        mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
+                        while (true) {
+                            c = getch();
+                            switch(c) {
+                                case 'r':
+                                    clear();
+                                    goto game;
+                                    break;
+                                case 'q':
+                                    goto quit;
+                                    break;
+                            }
                         }
                     }
                 }
