@@ -124,11 +124,36 @@ void print_minefield(Minefield *minefield) {
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
+    FILE *logf = fopen("reveal_tile.log", "w+");
     Tile *tile = &minefield->tiles[row][col];
     if (tile->mine) {
         return false;
     } else {
+        fprintf(logf, "\n");
+        fprintf(logf, "Tile was not a mine!\n");
+        fflush(logf);
         tile->visible = true;
+        int r, c;
+        if (tile->surrounding != 0)
+            return true;
+
+        for (r = row - 1; r < row + 2; r++) {
+            for (c = col - 1; c < col + 2; c++) {
+                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) {
+                    fprintf(logf, "r = %i; c = %i\n", r, c);
+                    fflush(logf);
+                    if (!minefield->tiles[r][c].visible) {
+                        fprintf(logf, "mine is not visible\n");
+                        fflush(logf);
+                        if (minefield->tiles[r][c].surrounding == 0 || 1) {
+                            fprintf(logf, "surrounding tiles is 0, recursing\n");
+                            fflush(logf);
+                            reveal_tile(minefield, r, c);
+                        }
+                    }
+                }
+            }
+        }
         return true;
     }
 }
