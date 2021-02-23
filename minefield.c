@@ -21,8 +21,6 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     minefield->cur.col = cols / 2;
     minefield->cur.row = rows / 2;
 
-    minefield->tiles[rows/2][cols/2].visible = true;
-
     return minefield;
 }
 

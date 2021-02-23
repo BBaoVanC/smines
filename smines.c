@@ -59,6 +59,7 @@ game:
     }
 
     generate_surrounding(minefield); /* set the surrounding value in each tile */
+    reveal_tile(minefield, minefield->rows/2, minefield->cols/2);
 
     print_minefield(minefield);
     refresh();
