@@ -24,7 +24,7 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     return minefield;
 }
 
-void populate_mines(Minefield *minefield, int mines) {
+void populate_mines(Minefield *minefield) {
     int i, r, c;
     Tile *t = NULL;
     for (i = 0; i < minefield->mines;) {

@@ -42,21 +42,10 @@ int main() {
 
 
     Minefield *minefield = NULL;
-    int i, x, y;
-    Tile *t = NULL;
 
 game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
-    for (i = 0; i < minefield->mines;) {
-        y = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
-        x = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
-        t = &minefield->tiles[y][x];
-        if (!t->mine) {
-            t->mine = true;
-            //t->visible = true; /* TODO remove this */
-            i++;
-        }
-    }
+    populate_mines(minefield);
 
     generate_surrounding(minefield); /* set the surrounding value in each tile */
     reveal_tile(minefield, minefield->rows/2, minefield->cols/2);
