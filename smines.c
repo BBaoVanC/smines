@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "morecolor.h"
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
@@ -16,10 +17,11 @@ int main() {
     initscr(); /* start ncurses */
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
+    curs_set(0); /* make the cursor invisible */
 
     start_color(); /* enable color */
 
-    init_pair(10, COLOR_WHITE, COLOR_BLACK);    /* 0 */
+    init_pair(10, COLOR_WHITE, COLOR_LIGHT_BLACK);    /* 0 */
     init_pair(9, COLOR_BLACK, COLOR_RED);       /* mine */
 
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
