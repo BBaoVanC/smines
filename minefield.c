@@ -53,7 +53,7 @@ void generate_surrounding(Minefield *minefield) {
 int getcolorforsurround(int surrounding) {
     if (surrounding == 0) {
         return COLOR_PAIR(10);
-    } else if ((surrounding <= 8) && (surrounding >= 1)) {
+    } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
         return COLOR_PAIR(surrounding);
     } else {
         return COLOR_PAIR(100);

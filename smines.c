@@ -17,7 +17,7 @@ int main() {
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
 
-    start_color(); /* start color */
+    start_color(); /* enable color */
 
     init_pair(10, COLOR_WHITE, COLOR_BLACK);    /* 0 */
     init_pair(9, COLOR_BLACK, COLOR_RED);       /* mine */
@@ -35,10 +35,7 @@ int main() {
     init_pair(12, COLOR_BLACK, COLOR_YELLOW);   /* flag */
     init_pair(13, COLOR_BLACK, COLOR_WHITE);    /* cursor */
 
-    /* 100 is for errors */
-    init_pair(100, COLOR_WHITE, COLOR_RED);
-
-    /* done with ncurses setup */
+    init_pair(100, COLOR_WHITE, COLOR_RED);     /* errors (currently unused) */
 
 
     Minefield *minefield = NULL;
@@ -47,16 +44,16 @@ game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
     populate_mines(minefield);
 
-    generate_surrounding(minefield); /* set the surrounding value in each tile */
-    reveal_tile(minefield, minefield->rows/2, minefield->cols/2);
+    generate_surrounding(minefield);
+    reveal_tile(minefield, minefield->rows/2, minefield->cols/2); /* reveal the center tileA */
 
     print_minefield(minefield);
     refresh();
 
-    int ch;
     int cur_r, cur_c;
     Tile *cur_tile = NULL;
     int c;
+    int ch;
     while (true) {
         ch = getch(); /* wait for a character press */
         switch (ch) {
@@ -86,16 +83,16 @@ game:
                     minefield->cur.col++;
                 break;
 
-            case ' ':
+            case ' ': /* reveal tile */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
                 if (!minefield->tiles[cur_r][cur_c].flagged) {
                     if (!reveal_tile(minefield, cur_r, cur_c)) {
                         reveal_mines(minefield);
                         mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
-                        while (true) {
+                        while (true) { /* wait for either 'q' to quit or 'r' to restart */
                             c = getch();
-                            switch(c) {
+                            switch (c) {
                                 case 'r':
                                     clear();
                                     goto game;
@@ -109,7 +106,7 @@ game:
                 }
                 break;
 
-            case 'f':
+            case 'f': /* toggle flag */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
                 cur_tile = &minefield->tiles[cur_r][cur_c];
