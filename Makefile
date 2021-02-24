@@ -1,10 +1,13 @@
+CFLAGS = -Wall -g
+LDFLAGS = -lncurses
+
 all: clean smines
 
 run: clean smines
 	./smines
 
 smines:
-	gcc -o smines smines.c -lncurses minefield.c -Wall -g
+	$(CC) $(CFLAGS) $(LDFLAGS) smines.c minefield.c -o smines
 
 clean:
 	rm -f smines
