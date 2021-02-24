@@ -60,11 +60,24 @@ int getcolorforsurround(int surrounding) {
     }
 }
 
-void print_tile(Tile *tile) {
+void print_tile(Tile *tile, bool check_flag) {
     if (tile->flagged) {
-        attron(COLOR_PAIR(12));
-        printw(" F");
-        attroff(COLOR_PAIR(12));
+        if (check_flag) {
+            if (tile->mine) {
+                attron(COLOR_PAIR(12));
+                printw(" F");
+                attroff(COLOR_PAIR(12));
+            } else {
+                attron(COLOR_PAIR(9));
+                printw(" F");
+                attroff(COLOR_PAIR(9));
+            }
+        } else {
+            attron(COLOR_PAIR(12));
+            printw(" F");
+            attroff(COLOR_PAIR(12));
+        }
+
     } else if (tile->visible) {
         if (tile->mine) {
             attron(COLOR_PAIR(9));
@@ -79,6 +92,7 @@ void print_tile(Tile *tile) {
                 printw(" %d", tile->surrounding);
             attroff(color);
         }
+
     } else {
         attron(COLOR_PAIR(11));
         printw("  ");
@@ -111,14 +125,14 @@ void print_cursor_tile(Tile *tile) {
     }
 }
 
-void print_minefield(Minefield *minefield) {
+void print_minefield(Minefield *minefield, bool check_flag) {
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
 
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             move(y, x*2);
-            print_tile(&minefield->tiles[y][x]);
+            print_tile(&minefield->tiles[y][x], check_flag);
             printw("\n");
         }
     }

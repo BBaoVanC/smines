@@ -41,7 +41,7 @@ int main() {
 
 
     Minefield *minefield = NULL;
-    int r, c;
+    int /* r ,*/ c;
 
 game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
@@ -50,7 +50,7 @@ game:
     generate_surrounding(minefield);
     reveal_tile(minefield, minefield->rows/2, minefield->cols/2); /* reveal the center tileA */
 
-    print_minefield(minefield);
+    print_minefield(minefield, false);
     refresh();
 
     int cur_r, cur_c;
@@ -93,7 +93,7 @@ game:
                         reveal_mines(minefield);
 
                         clear();
-                        print_minefield(minefield);
+                        print_minefield(minefield, true);
                         refresh();
 
                         mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
@@ -122,7 +122,7 @@ game:
         }
 
         clear();
-        print_minefield(minefield);
+        print_minefield(minefield, false);
         refresh();
     }
 
