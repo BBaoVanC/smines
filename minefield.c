@@ -73,7 +73,10 @@ void print_tile(Tile *tile) {
         } else {
             int color = getcolorforsurround(tile->surrounding);
             attron(color);
-            printw(" %d", tile->surrounding);
+            if (tile->surrounding == 0)
+                printw("  ", tile->surrounding);
+            else
+                printw(" %d", tile->surrounding);
             attroff(color);
         }
     } else {
@@ -95,7 +98,10 @@ void print_cursor_tile(Tile *tile) {
             attroff(COLOR_PAIR(13));
         } else {
             attron(COLOR_PAIR(13));
-            printw(" %d", tile->surrounding);
+            if (tile->surrounding == 0)
+                printw("  ", tile->surrounding);
+            else
+                printw(" %d", tile->surrounding);
             attroff(COLOR_PAIR(13));
         }
     } else {
