@@ -42,13 +42,18 @@ int main() {
 
     Minefield *minefield = NULL;
     int /* r ,*/ c;
+    int start_r, start_c;
 
 game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
-    populate_mines(minefield);
+
+    start_r = minefield->rows/2;
+    start_c = minefield->cols/2;
+
+    populate_mines(minefield, start_r, start_c);
 
     generate_surrounding(minefield);
-    reveal_tile(minefield, minefield->rows/2, minefield->cols/2); /* reveal the center tileA */
+    reveal_tile(minefield, start_r, start_c); /* reveal the center tileA */
 
     print_minefield(minefield, false);
     refresh();

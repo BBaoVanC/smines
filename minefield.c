@@ -24,17 +24,18 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     return minefield;
 }
 
-void populate_mines(Minefield *minefield) {
+void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
     int i, r, c;
     Tile *t = NULL;
-    for (i = 0; i < minefield->mines;) {
-        r = (rand() % (minefield->rows - 1 + 1)); /* generate random y */
-        c = (rand() % (minefield->cols - 1 + 1)); /* generate random x */
+    for (i = 0; i < minefield->mines;) { /* don't increment i here because it's incremented later if it's an acceptable place */
+        r = (rand() % (minefield->rows - 1 + 1)); /* generate random row */
+        c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
-        if (!t->mine) {
-            t->mine = true;
-            //t->visible = true; /* TODO remove this */
-            i++;
+        if (!t->mine) { /* prevent overlapping of mines */
+            if ((r != excl_r) && (c != excl_c)) {
+                t->mine = true;
+                i++; /* since it's not incremented by the for loop */
+            }
         }
     }
 }
