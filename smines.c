@@ -41,6 +41,7 @@ int main() {
 
 
     Minefield *minefield = NULL;
+    int r, c;
 
 game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
@@ -54,7 +55,6 @@ game:
 
     int cur_r, cur_c;
     Tile *cur_tile = NULL;
-    int c;
     int ch;
     while (true) {
         ch = getch(); /* wait for a character press */
