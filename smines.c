@@ -91,6 +91,11 @@ game:
                 if (!minefield->tiles[cur_r][cur_c].flagged) {
                     if (!reveal_tile(minefield, cur_r, cur_c)) {
                         reveal_mines(minefield);
+
+                        clear();
+                        print_minefield(minefield);
+                        refresh();
+
                         mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
                         while (true) { /* wait for either 'q' to quit or 'r' to restart */
                             c = getch();
