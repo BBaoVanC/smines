@@ -70,7 +70,7 @@ void print_tile(Tile *tile, bool check_flag) {
                 attroff(COLOR_PAIR(12));
             } else {
                 attron(COLOR_PAIR(9));
-                printw(" F");
+                printw("!F");
                 attroff(COLOR_PAIR(9));
             }
         } else {

@@ -21,17 +21,18 @@ int main() {
 
     start_color(); /* enable color */
 
-    init_pair(10, COLOR_WHITE, COLOR_LIGHT_BLACK);    /* 0 */
-    init_pair(9, COLOR_BLACK, COLOR_RED);       /* mine */
+    /* init_pair(id, fg, bg); */
+    init_pair(10, COLOR_WHITE, COLOR_LIGHT_BLACK);  /* 0 */
+    init_pair(9, COLOR_BLACK, COLOR_RED);           /* mine */
 
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
     init_pair(2, COLOR_WHITE, COLOR_GREEN);
     init_pair(3, COLOR_WHITE, COLOR_RED);
-    init_pair(4, COLOR_WHITE, COLOR_MAGENTA);
-    init_pair(5, COLOR_WHITE, COLOR_YELLOW);
-    init_pair(6, COLOR_WHITE, COLOR_CYAN);
+    init_pair(4, COLOR_WHITE, COLOR_BLUE);
+    init_pair(5, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(6, COLOR_BLACK, COLOR_MAGENTA);
     init_pair(7, COLOR_WHITE, COLOR_BLACK);
-    init_pair(8, COLOR_BLACK, COLOR_WHITE);
+    init_pair(8, COLOR_WHITE, COLOR_LIGHT_BLACK);
 
     init_pair(11, COLOR_BLACK, COLOR_BLACK);    /* hidden tile */
     init_pair(12, COLOR_BLACK, COLOR_YELLOW);   /* flag */
@@ -54,6 +55,20 @@ game:
 
     generate_surrounding(minefield);
     reveal_tile(minefield, start_r, start_c); /* reveal the center tileA */
+
+#if 0
+    for (int i = 0; i < 9; i++)
+        minefield->tiles[i][0].visible = true;
+    minefield->tiles[0][0].surrounding = 0;
+    minefield->tiles[1][0].surrounding = 1;
+    minefield->tiles[2][0].surrounding = 2;
+    minefield->tiles[3][0].surrounding = 3;
+    minefield->tiles[4][0].surrounding = 4;
+    minefield->tiles[5][0].surrounding = 5;
+    minefield->tiles[6][0].surrounding = 6;
+    minefield->tiles[7][0].surrounding = 7;
+    minefield->tiles[8][0].surrounding = 8;
+#endif
 
     print_minefield(minefield, false);
     refresh();
