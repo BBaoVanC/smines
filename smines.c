@@ -15,6 +15,12 @@ int main() {
 
     /* ncurses setup */
     initscr(); /* start ncurses */
+    if ((COLS < MCOLS) || (LINES < MROWS + 1)) {
+        endwin();
+        printf("Your terminal is too small for this minefield size.\n");
+        printf("Your terminal is %i cols by %i rows, but %i cols and %i rows is required.\n", COLS, LINES, MCOLS, MROWS + 1);
+        return 1;
+    }
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
     curs_set(0); /* make the cursor invisible */
