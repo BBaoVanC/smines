@@ -193,7 +193,7 @@ int getsurround(Minefield *minefield, int row, int col) {
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if (r >= 0 && c >= 0) {
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
                 current_tile = &minefield->tiles[r][c];
                 if (current_tile->mine) {
                     surrounding++;
