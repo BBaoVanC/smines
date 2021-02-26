@@ -31,10 +31,19 @@ void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
         r = (rand() % (minefield->rows - 1 + 1)); /* generate random row */
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
-        if (!t->mine) { /* prevent overlapping of mines */
-            if ((r != excl_r) && (c != excl_c)) {
-                t->mine = true;
-                i++; /* since it's not incremented by the for loop */
+
+        /* the following abomination makes sure the 8 surrounding mines
+         * around the cursor aren't mines
+         */
+        if (!((r >= minefield->cur.row - 1) &&
+             (c >= minefield->cur.col - 1) &&
+             (r <= minefield->cur.row + 1) &&
+             (r <= minefield->cur.col + 1))) {
+            if (!t->mine) { /* prevent overlapping of mines */
+                if ((r != excl_r) && (c != excl_c)) {
+                    t->mine = true;
+                    i++; /* since it's not incremented by the for loop */
+                }
             }
         }
     }
