@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "morecolor.h"
+#include "colornames.h"
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
@@ -28,23 +29,23 @@ int main() {
     start_color(); /* enable color */
 
     /* init_pair(id, fg, bg); */
-    init_pair(10, COLOR_WHITE, COLOR_LIGHT_BLACK);  /* 0 */
-    init_pair(9, COLOR_BLACK, COLOR_RED);           /* mine */
+    init_pair(TILE_ZERO, COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_MINE, COLOR_BLACK, COLOR_RED);
 
-    init_pair(1, COLOR_WHITE, COLOR_BLUE);
-    init_pair(2, COLOR_WHITE, COLOR_GREEN);
-    init_pair(3, COLOR_WHITE, COLOR_RED);
-    init_pair(4, COLOR_WHITE, COLOR_CYAN);
-    init_pair(5, COLOR_BLACK, COLOR_YELLOW);
-    init_pair(6, COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(7, COLOR_WHITE, COLOR_BLACK);
-    init_pair(8, COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_ONE, COLOR_WHITE, COLOR_BLUE);
+    init_pair(TILE_TWO, COLOR_WHITE, COLOR_GREEN);
+    init_pair(TILE_THREE, COLOR_WHITE, COLOR_RED);
+    init_pair(TILE_FOUR, COLOR_WHITE, COLOR_CYAN);
+    init_pair(TILE_FIVE, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(TILE_SIX, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(TILE_SEVEN, COLOR_WHITE, COLOR_BLACK);
+    init_pair(TILE_EIGHT, COLOR_WHITE, COLOR_LIGHT_BLACK);
 
-    init_pair(11, COLOR_BLACK, COLOR_BLACK);    /* hidden tile */
-    init_pair(12, COLOR_BLACK, COLOR_YELLOW);   /* flag */
-    init_pair(13, COLOR_BLACK, COLOR_WHITE);    /* cursor */
+    init_pair(TILE_HIDDEN, COLOR_BLACK, COLOR_BLACK);
+    init_pair(TILE_FLAG, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(TILE_CURSOR, COLOR_BLACK, COLOR_WHITE);
 
-    init_pair(100, COLOR_WHITE, COLOR_RED);     /* errors (currently unused) */
+    init_pair(TILE_ERROR, COLOR_WHITE, COLOR_RED);
 
 
     Minefield *minefield = NULL;

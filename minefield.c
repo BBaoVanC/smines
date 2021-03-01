@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
+#include "colornames.h"
 #include "minefield.h"
 #include "config.h"
 
@@ -74,25 +75,25 @@ void print_tile(Tile *tile, bool check_flag) {
     if (tile->flagged) {
         if (check_flag) {
             if (tile->mine) {
-                attron(COLOR_PAIR(12));
+                attron(COLOR_PAIR(TILE_FLAG));
                 printw(" F");
-                attroff(COLOR_PAIR(12));
+                attroff(COLOR_PAIR(TILE_FLAG));
             } else {
-                attron(COLOR_PAIR(9));
+                attron(COLOR_PAIR(TILE_MINE));
                 printw("!F");
-                attroff(COLOR_PAIR(9));
+                attroff(COLOR_PAIR(TILE_MINE));
             }
         } else {
-            attron(COLOR_PAIR(12));
+            attron(COLOR_PAIR(TILE_FLAG));
             printw(" F");
-            attroff(COLOR_PAIR(12));
+            attroff(COLOR_PAIR(TILE_FLAG));
         }
 
     } else if (tile->visible) {
         if (tile->mine) {
-            attron(COLOR_PAIR(9));
+            attron(COLOR_PAIR(TILE_MINE));
             printw(" X");
-            attroff(COLOR_PAIR(9));
+            attroff(COLOR_PAIR(TILE_MINE));
         } else {
             int color = getcolorforsurround(tile->surrounding);
             attron(color);
@@ -104,34 +105,34 @@ void print_tile(Tile *tile, bool check_flag) {
         }
 
     } else {
-        attron(COLOR_PAIR(11));
+        attron(COLOR_PAIR(TILE_HIDDEN));
         printw("  ");
-        attroff(COLOR_PAIR(11));
+        attroff(COLOR_PAIR(TILE_HIDDEN));
     }
 }
 
 void print_cursor_tile(Tile *tile) {
     if (tile->flagged) {
-        attron(COLOR_PAIR(13));
+        attron(COLOR_PAIR(TILE_CURSOR));
         printw(" F");
-        attroff(COLOR_PAIR(13));
+        attroff(COLOR_PAIR(TILE_CURSOR));
     } else if (tile->visible) {
         if (tile->mine) {
-            attron(COLOR_PAIR(13));
+            attron(COLOR_PAIR(TILE_CURSOR));
             printw(" X");
-            attroff(COLOR_PAIR(13));
+            attroff(COLOR_PAIR(TILE_CURSOR));
         } else {
-            attron(COLOR_PAIR(13));
+            attron(COLOR_PAIR(TILE_CURSOR));
             if (tile->surrounding == 0)
                 printw("  ", tile->surrounding);
             else
                 printw(" %d", tile->surrounding);
-            attroff(COLOR_PAIR(13));
+            attroff(COLOR_PAIR(TILE_CURSOR));
         }
     } else {
-        attron(COLOR_PAIR(13));
+        attron(COLOR_PAIR(TILE_CURSOR));
         printw("  ");
-        attroff(COLOR_PAIR(13));
+        attroff(COLOR_PAIR(TILE_CURSOR));
     }
 }
 
