@@ -29,23 +29,23 @@ int main() {
     start_color(); /* enable color */
 
     /* init_pair(id, fg, bg); */
-    init_pair(TILE_ZERO, COLOR_WHITE, COLOR_LIGHT_BLACK);
-    init_pair(TILE_MINE, COLOR_BLACK, COLOR_RED);
+    init_pair(TILE_ZERO,    COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_MINE,    COLOR_BLACK, COLOR_RED);
 
-    init_pair(TILE_ONE, COLOR_WHITE, COLOR_BLUE);
-    init_pair(TILE_TWO, COLOR_WHITE, COLOR_GREEN);
-    init_pair(TILE_THREE, COLOR_WHITE, COLOR_RED);
-    init_pair(TILE_FOUR, COLOR_WHITE, COLOR_CYAN);
-    init_pair(TILE_FIVE, COLOR_BLACK, COLOR_YELLOW);
-    init_pair(TILE_SIX, COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(TILE_SEVEN, COLOR_WHITE, COLOR_BLACK);
-    init_pair(TILE_EIGHT, COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_ONE,     COLOR_WHITE, COLOR_BLUE);
+    init_pair(TILE_TWO,     COLOR_BLACK, COLOR_GREEN);
+    init_pair(TILE_THREE,   COLOR_WHITE, COLOR_RED);
+    init_pair(TILE_FOUR,    COLOR_BLACK, COLOR_CYAN);
+    init_pair(TILE_FIVE,    COLOR_WHITE, 94);
+    init_pair(TILE_SIX,     COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(TILE_SEVEN,   COLOR_WHITE, COLOR_BLACK);
+    init_pair(TILE_EIGHT,   COLOR_WHITE, COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN, COLOR_BLACK, COLOR_BLACK);
-    init_pair(TILE_FLAG, COLOR_BLACK, COLOR_YELLOW);
-    init_pair(TILE_CURSOR, COLOR_BLACK, COLOR_WHITE);
+    init_pair(TILE_HIDDEN,  COLOR_BLACK, COLOR_BLACK);
+    init_pair(TILE_FLAG,    COLOR_BLACK, COLOR_YELLOW);
+    init_pair(TILE_CURSOR,  COLOR_BLACK, COLOR_WHITE);
 
-    init_pair(TILE_ERROR, COLOR_WHITE, COLOR_RED);
+    init_pair(TILE_ERROR,   COLOR_WHITE, COLOR_RED);
 
 
     Minefield *minefield = NULL;
@@ -63,7 +63,7 @@ game:
     generate_surrounding(minefield);
     reveal_tile(minefield, start_r, start_c); /* reveal the center tileA */
 
-#if 0
+#ifdef TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++)
         minefield->tiles[i][0].visible = true;
     minefield->tiles[0][0].surrounding = 0;
