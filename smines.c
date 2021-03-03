@@ -16,15 +16,19 @@ int main() {
 
     /* ncurses setup */
     initscr(); /* start ncurses */
+
+#if 0
     if ((COLS < MCOLS) || (LINES < MROWS + 1)) {
         endwin();
         printf("Your terminal is too small for this minefield size.\n");
         printf("Your terminal is %i cols by %i rows, but %i cols and %i rows is required.\n", COLS, LINES, MCOLS, MROWS + 1);
         return 1;
     }
+#endif
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
     curs_set(0); /* make the cursor invisible */
+    refresh(); /* if I don't do this, the window doesn't appear until a key press */
 
     start_color(); /* enable color */
 
@@ -47,6 +51,12 @@ int main() {
 
     init_pair(TILE_ERROR,   COLOR_WHITE, COLOR_RED);
 
+
+    WINDOW *fieldwin = newwin(MROWS, MCOLS * 2, 5, 10);
+    //box(fieldwin, 0, 0);
+    wrefresh(fieldwin);
+
+    getch(); /* TODO: remove */
 
     Minefield *minefield = NULL;
     int /* r ,*/ c;
@@ -77,7 +87,7 @@ game:
     minefield->tiles[8][0].surrounding = 8;
 #endif
 
-    print_minefield(minefield, false);
+    print_minefield(fieldwin, minefield, false);
     refresh();
 
     int cur_r, cur_c;
@@ -120,7 +130,7 @@ game:
                         reveal_mines(minefield);
 
                         clear();
-                        print_minefield(minefield, true);
+                        print_minefield(fieldwin, minefield, true);
                         refresh();
 
                         mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
@@ -149,7 +159,7 @@ game:
         }
 
         clear();
-        print_minefield(minefield, false);
+        print_minefield(fieldwin, minefield, false);
         refresh();
     }
 

@@ -71,85 +71,85 @@ int getcolorforsurround(int surrounding) {
     }
 }
 
-void print_tile(Tile *tile, bool check_flag) {
+void print_tile(WINDOW *win, Tile *tile, bool check_flag) {
     if (tile->flagged) {
         if (check_flag) {
             if (tile->mine) {
                 attron(COLOR_PAIR(TILE_FLAG));
-                printw(" F");
+                wprintw(win, " F");
                 attroff(COLOR_PAIR(TILE_FLAG));
             } else {
                 attron(COLOR_PAIR(TILE_MINE));
-                printw("!F");
+                wprintw(win, "!F");
                 attroff(COLOR_PAIR(TILE_MINE));
             }
         } else {
             attron(COLOR_PAIR(TILE_FLAG));
-            printw(" F");
+            wprintw(win, " F");
             attroff(COLOR_PAIR(TILE_FLAG));
         }
 
     } else if (tile->visible) {
         if (tile->mine) {
             attron(COLOR_PAIR(TILE_MINE));
-            printw(" X");
+            wprintw(win, " X");
             attroff(COLOR_PAIR(TILE_MINE));
         } else {
             int color = getcolorforsurround(tile->surrounding);
             attron(color);
             if (tile->surrounding == 0)
-                printw("  ", tile->surrounding);
+                wprintw(win, "  ", tile->surrounding);
             else
-                printw(" %d", tile->surrounding);
+                wprintw(win, " %d", tile->surrounding);
             attroff(color);
         }
 
     } else {
         attron(COLOR_PAIR(TILE_HIDDEN));
-        printw("  ");
+        wprintw(win, "  ");
         attroff(COLOR_PAIR(TILE_HIDDEN));
     }
 }
 
-void print_cursor_tile(Tile *tile) {
+void print_cursor_tile(WINDOW *win, Tile *tile) {
     if (tile->flagged) {
         attron(COLOR_PAIR(TILE_CURSOR));
-        printw(" F");
+        wprintw(win, " F");
         attroff(COLOR_PAIR(TILE_CURSOR));
     } else if (tile->visible) {
         if (tile->mine) {
             attron(COLOR_PAIR(TILE_CURSOR));
-            printw(" X");
+            wprintw(win, " X");
             attroff(COLOR_PAIR(TILE_CURSOR));
         } else {
             attron(COLOR_PAIR(TILE_CURSOR));
             if (tile->surrounding == 0)
-                printw("  ", tile->surrounding);
+                wprintw(win, "  ", tile->surrounding);
             else
-                printw(" %d", tile->surrounding);
+                wprintw(win, " %d", tile->surrounding);
             attroff(COLOR_PAIR(TILE_CURSOR));
         }
     } else {
         attron(COLOR_PAIR(TILE_CURSOR));
-        printw("  ");
+        wprintw(win, "  ");
         attroff(COLOR_PAIR(TILE_CURSOR));
     }
 }
 
-void print_minefield(Minefield *minefield, bool check_flag) {
+void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
 
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
-            move(y, x*2);
-            print_tile(&minefield->tiles[y][x], check_flag);
-            printw("\n");
+            wmove(win, y, x*2);
+            print_tile(win, &minefield->tiles[y][x], check_flag);
+            wprintw(win, "\n");
         }
     }
 
-    move(cur_r, cur_c*2);
-    print_cursor_tile(&minefield->tiles[cur_r][cur_c]);
+    wmove(win, cur_r, cur_c*2);
+    print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
