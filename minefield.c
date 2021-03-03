@@ -75,64 +75,64 @@ void print_tile(WINDOW *win, Tile *tile, bool check_flag) {
     if (tile->flagged) {
         if (check_flag) {
             if (tile->mine) {
-                attron(COLOR_PAIR(TILE_FLAG));
+                wattron(win, COLOR_PAIR(TILE_FLAG));
                 wprintw(win, " F");
-                attroff(COLOR_PAIR(TILE_FLAG));
+                wattroff(win, COLOR_PAIR(TILE_FLAG));
             } else {
-                attron(COLOR_PAIR(TILE_MINE));
+                wattron(win, COLOR_PAIR(TILE_MINE));
                 wprintw(win, "!F");
-                attroff(COLOR_PAIR(TILE_MINE));
+                wattroff(win, COLOR_PAIR(TILE_MINE));
             }
         } else {
-            attron(COLOR_PAIR(TILE_FLAG));
+            wattron(win, COLOR_PAIR(TILE_FLAG));
             wprintw(win, " F");
-            attroff(COLOR_PAIR(TILE_FLAG));
+            wattroff(win, COLOR_PAIR(TILE_FLAG));
         }
 
     } else if (tile->visible) {
         if (tile->mine) {
-            attron(COLOR_PAIR(TILE_MINE));
+            wattron(win, COLOR_PAIR(TILE_MINE));
             wprintw(win, " X");
-            attroff(COLOR_PAIR(TILE_MINE));
+            wattroff(win, COLOR_PAIR(TILE_MINE));
         } else {
             int color = getcolorforsurround(tile->surrounding);
-            attron(color);
+            wattron(win, color);
             if (tile->surrounding == 0)
                 wprintw(win, "  ", tile->surrounding);
             else
                 wprintw(win, " %d", tile->surrounding);
-            attroff(color);
+            wattroff(win, color);
         }
 
     } else {
-        attron(COLOR_PAIR(TILE_HIDDEN));
+        wattron(win, COLOR_PAIR(TILE_HIDDEN));
         wprintw(win, "  ");
-        attroff(COLOR_PAIR(TILE_HIDDEN));
+        wattroff(win, COLOR_PAIR(TILE_HIDDEN));
     }
 }
 
 void print_cursor_tile(WINDOW *win, Tile *tile) {
     if (tile->flagged) {
-        attron(COLOR_PAIR(TILE_CURSOR));
+        wattron(win, COLOR_PAIR(TILE_CURSOR));
         wprintw(win, " F");
-        attroff(COLOR_PAIR(TILE_CURSOR));
+        wattroff(win, COLOR_PAIR(TILE_CURSOR));
     } else if (tile->visible) {
         if (tile->mine) {
-            attron(COLOR_PAIR(TILE_CURSOR));
+            wattron(win, COLOR_PAIR(TILE_CURSOR));
             wprintw(win, " X");
-            attroff(COLOR_PAIR(TILE_CURSOR));
+            wattroff(win, COLOR_PAIR(TILE_CURSOR));
         } else {
-            attron(COLOR_PAIR(TILE_CURSOR));
+            wattron(win, COLOR_PAIR(TILE_CURSOR));
             if (tile->surrounding == 0)
                 wprintw(win, "  ", tile->surrounding);
             else
                 wprintw(win, " %d", tile->surrounding);
-            attroff(COLOR_PAIR(TILE_CURSOR));
+            wattroff(win, COLOR_PAIR(TILE_CURSOR));
         }
     } else {
-        attron(COLOR_PAIR(TILE_CURSOR));
+        wattron(win, COLOR_PAIR(TILE_CURSOR));
         wprintw(win, "  ");
-        attroff(COLOR_PAIR(TILE_CURSOR));
+        wattroff(win, COLOR_PAIR(TILE_CURSOR));
     }
 }
 

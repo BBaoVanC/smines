@@ -56,7 +56,7 @@ int main() {
     //box(fieldwin, 0, 0);
     wrefresh(fieldwin);
 
-    getch(); /* TODO: remove */
+    //getch(); /* TODO: remove */
 
     Minefield *minefield = NULL;
     int /* r ,*/ c;
@@ -88,7 +88,7 @@ game:
 #endif
 
     print_minefield(fieldwin, minefield, false);
-    refresh();
+    wrefresh(fieldwin);
 
     int cur_r, cur_c;
     Tile *cur_tile = NULL;
@@ -129,11 +129,10 @@ game:
                     if (!reveal_tile(minefield, cur_r, cur_c)) {
                         reveal_mines(minefield);
 
-                        clear();
                         print_minefield(fieldwin, minefield, true);
-                        refresh();
+                        wrefresh(fieldwin);
 
-                        mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
+                        mvwprintw(fieldwin, minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
                         while (true) { /* wait for either 'q' to quit or 'r' to restart */
                             c = getch();
                             switch (c) {
@@ -158,9 +157,12 @@ game:
                     cur_tile->flagged = !cur_tile->flagged;
         }
 
-        clear();
+        //wclear(fieldwin);
+        //box(fieldwin, 0, 0);
+        //wrefresh(fieldwin);
         print_minefield(fieldwin, minefield, false);
-        refresh();
+        wrefresh(fieldwin);
+        //refresh();
     }
 
 quit:
