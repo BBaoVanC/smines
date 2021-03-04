@@ -142,13 +142,12 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
 
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
-            wmove(win, y, x*2);
+            wmove(win, y + 1, x*2 + 1);
             print_tile(win, &minefield->tiles[y][x], check_flag);
-            wprintw(win, "\n");
         }
     }
 
-    wmove(win, cur_r, cur_c*2);
+    wmove(win, cur_r + 1, cur_c*2 + 1);
     print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
 }
 

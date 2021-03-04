@@ -52,8 +52,7 @@ int main() {
     init_pair(TILE_ERROR,   COLOR_WHITE, COLOR_RED);
 
 
-    WINDOW *fieldwin = newwin(MROWS, MCOLS * 2, 5, 10);
-    //box(fieldwin, 0, 0);
+    WINDOW *fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, 5, 10);
     wrefresh(fieldwin);
 
     //getch(); /* TODO: remove */
@@ -88,6 +87,7 @@ game:
 #endif
 
     print_minefield(fieldwin, minefield, false);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
     int cur_r, cur_c;
@@ -130,6 +130,7 @@ game:
                         reveal_mines(minefield);
 
                         print_minefield(fieldwin, minefield, true);
+                        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
                         wrefresh(fieldwin);
 
                         while (true) { /* wait for either 'q' to quit or 'r' to restart */
@@ -156,6 +157,7 @@ game:
         }
 
         print_minefield(fieldwin, minefield, false);
+        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
     }
 
