@@ -31,9 +31,10 @@ int main() {
     refresh(); /* if I don't do this, the window doesn't appear until a key press */
 
     start_color(); /* enable color */
+    use_default_colors();
 
     /* init_pair(id, fg, bg); */
-    init_pair(TILE_ZERO,    COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_ZERO,    COLOR_WHITE, COLOR_BLACK);
     init_pair(TILE_MINE,    COLOR_BLACK, COLOR_RED);
 
     init_pair(TILE_ONE,     COLOR_WHITE, COLOR_BLUE);
@@ -45,7 +46,7 @@ int main() {
     init_pair(TILE_SEVEN,   COLOR_WHITE, COLOR_BLACK);
     init_pair(TILE_EIGHT,   COLOR_WHITE, COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN,  COLOR_BLACK, COLOR_BLACK);
+    init_pair(TILE_HIDDEN,  COLOR_BLACK, -1);
     init_pair(TILE_FLAG,    COLOR_BLACK, COLOR_YELLOW);
     init_pair(TILE_CURSOR,  COLOR_BLACK, COLOR_WHITE);
 
