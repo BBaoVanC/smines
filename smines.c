@@ -132,12 +132,10 @@ game:
                         print_minefield(fieldwin, minefield, true);
                         wrefresh(fieldwin);
 
-                        mvwprintw(fieldwin, minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
                         while (true) { /* wait for either 'q' to quit or 'r' to restart */
                             c = getch();
                             switch (c) {
                                 case 'r':
-                                    clear();
                                     goto game;
                                     break;
                                 case 'q':
@@ -157,12 +155,8 @@ game:
                     cur_tile->flagged = !cur_tile->flagged;
         }
 
-        //wclear(fieldwin);
-        //box(fieldwin, 0, 0);
-        //wrefresh(fieldwin);
         print_minefield(fieldwin, minefield, false);
         wrefresh(fieldwin);
-        //refresh();
     }
 
 quit:
