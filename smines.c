@@ -52,10 +52,14 @@ int main() {
     init_pair(TILE_ERROR,   COLOR_WHITE, COLOR_RED);
 
 
-    WINDOW *fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, 5, 10);
+    /* add 2 to each dimension on every window to fit the
+     * borders (since they are inside borders) */
+    WINDOW *fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, ORIGIN_Y + 4, ORIGIN_X);
+    /* add 6 to starting y make space for scoreboard */
     wrefresh(fieldwin);
 
-    //getch(); /* TODO: remove */
+    WINDOW *scorewin = newwin(4, MCOLS*2, ORIGIN_Y, ORIGIN_X);
+    wrefresh(scorewin);
 
     Minefield *minefield = NULL;
     int /* r ,*/ c;
@@ -89,6 +93,9 @@ game:
     print_minefield(fieldwin, minefield, false);
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
+
+    print_scoreboard(scorewin, minefield);
+    wrefresh(scorewin);
 
     int cur_r, cur_c;
     Tile *cur_tile = NULL;

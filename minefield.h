@@ -34,6 +34,7 @@ int getcolorforsurround(int);
 void print_tile(WINDOW *, Tile *, bool);
 void print_cursor_tile(WINDOW *, Tile *);
 void print_minefield(WINDOW *, Minefield *, bool);
+void print_scoreboard(WINDOW *, Minefield *);
 bool reveal_tile(Minefield *, int, int);
 void reveal_mines(Minefield *);
 int getsurround(Minefield *, int, int);

@@ -151,6 +151,10 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
     print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
 }
 
+void print_scoreboard(WINDOW *win, Minefield *minefield) {
+    mvwprintw(win, 3, 0, "Mines: %i/%i", 12345, minefield->mines);
+}
+
 bool reveal_tile(Minefield *minefield, int row, int col) {
     Tile *tile = &minefield->tiles[row][col];
     if (tile->mine) {

@@ -4,6 +4,9 @@
  */
 
 
+#define ORIGIN_X 1
+#define ORIGIN_Y 1
+
 /* define `EASY`, `INTERMEDIATE`, or `HARD` */
 #define INTERMEDIATE
 
