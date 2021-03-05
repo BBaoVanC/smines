@@ -23,6 +23,7 @@ typedef struct {
     int rows;
     int cols;
     int mines;
+    int placed_flags;
     Coordinate cur;
     Tile tiles[MROWS][MCOLS];
 } Minefield;
@@ -38,3 +39,7 @@ void print_scoreboard(WINDOW *, Minefield *);
 bool reveal_tile(Minefield *, int, int);
 void reveal_mines(Minefield *);
 int getsurround(Minefield *, int, int);
+
+bool check_victory(Minefield *);
+bool victory(Minefield *, WINDOW *, WINDOW *);
+bool death(Minefield *, WINDOW *, WINDOW *);

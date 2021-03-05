@@ -18,6 +18,7 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     minefield->rows = rows;
     minefield->cols = cols;
     minefield->mines = mines;
+    minefield->placed_flags = 0;
 
     minefield->cur.col = cols / 2;
     minefield->cur.row = rows / 2;
@@ -145,6 +146,7 @@ void print_cursor_tile(WINDOW *win, Tile *tile) {
 }
 
 void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
+    //wclear(win);
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
 
@@ -160,7 +162,9 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
 }
 
 void print_scoreboard(WINDOW *win, Minefield *minefield) {
-    mvwprintw(win, 3, 0, "Mines: %i/%i", 12345, minefield->mines);
+    wclear(win);
+    mvwprintw(win, 2, 0, "Total Flags: %i", minefield->placed_flags);
+    mvwprintw(win, 3, 0, "Mines: %i/%i", minefield->mines - minefield->placed_flags, minefield->mines);
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
@@ -215,4 +219,86 @@ int getsurround(Minefield *minefield, int row, int col) {
     }
 
     return surrounding;
+}
+
+bool check_victory(Minefield *minefield) {
+    if (minefield->placed_flags != minefield->mines)
+        return false;
+
+    int r, c;
+    for (r = 0; r < minefield->rows; r++) {
+        for (c = 0; c < minefield->cols; c++) {
+            if (minefield->tiles[r][c].mine != minefield->tiles[r][c].flagged) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
+    int r, c;
+    for (r = 0; r < minefield->rows; r++) {
+        for (c = 0; c < minefield->cols; c++) {
+            minefield->tiles[r][c].visible = true;
+        }
+    }
+
+    print_minefield(fieldwin, minefield, true);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(fieldwin);
+
+    print_scoreboard(scorewin, minefield);
+    wrefresh(scorewin);
+
+    wattron(scorewin, A_BOLD);
+    wattron(scorewin, COLOR_PAIR(MSG_WIN));
+    mvwprintw(scorewin, 0, 0, "YOU WIN!");
+    wattroff(scorewin, COLOR_PAIR(MSG_WIN));
+    wattroff(scorewin, A_BOLD);
+    wrefresh(scorewin);
+
+    int ch;
+    while (true) { /* wait for either 'q' to quit or 'r' to restart */
+        ch = getch();
+        switch (ch) {
+            case 'r':
+                return true;
+                break;
+            case 'q':
+                return false;
+                break;
+        }
+    }
+}
+
+bool death(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
+    reveal_mines(minefield);
+
+    print_minefield(fieldwin, minefield, true);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(fieldwin);
+
+    print_scoreboard(scorewin, minefield);
+    wrefresh(scorewin);
+
+    wattron(scorewin, A_BOLD);
+    wattron(scorewin, COLOR_PAIR(MSG_DEATH));
+    mvwprintw(scorewin, 0, 0, "YOU DIED!");
+    wattroff(scorewin, COLOR_PAIR(MSG_DEATH));
+    wattroff(scorewin, A_BOLD);
+    wrefresh(scorewin);
+
+    int c;
+    while (true) { /* wait for either 'q' to quit or 'r' to restart */
+        c = getch();
+        switch (c) {
+            case 'r':
+                return true;
+                break;
+            case 'q':
+                return false;
+                break;
+        }
+    }
 }
