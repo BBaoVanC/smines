@@ -75,25 +75,33 @@ void print_tile(WINDOW *win, Tile *tile, bool check_flag) {
     if (tile->flagged) {
         if (check_flag) {
             if (tile->mine) {
+                wattron(win, A_BOLD);
                 wattron(win, COLOR_PAIR(TILE_FLAG));
                 wprintw(win, " F");
                 wattroff(win, COLOR_PAIR(TILE_FLAG));
+                wattroff(win, A_BOLD);
             } else {
+                wattron(win, A_BOLD);
                 wattron(win, COLOR_PAIR(TILE_MINE));
                 wprintw(win, "!F");
                 wattroff(win, COLOR_PAIR(TILE_MINE));
+                wattroff(win, A_BOLD);
             }
         } else {
+            wattron(win, A_BOLD);
             wattron(win, COLOR_PAIR(TILE_FLAG));
             wprintw(win, " F");
             wattroff(win, COLOR_PAIR(TILE_FLAG));
+            wattroff(win, A_BOLD);
         }
 
     } else if (tile->visible) {
         if (tile->mine) {
+            wattron(win, A_BOLD);
             wattron(win, COLOR_PAIR(TILE_MINE));
             wprintw(win, " X");
             wattroff(win, COLOR_PAIR(TILE_MINE));
+            wattroff(win, A_BOLD);
         } else {
             int color = getcolorforsurround(tile->surrounding);
             wattron(win, color);
