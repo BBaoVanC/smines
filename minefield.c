@@ -115,7 +115,7 @@ void print_tile(WINDOW *win, Tile *tile, bool check_flag) {
 
     } else {
         wattron(win, COLOR_PAIR(TILE_HIDDEN));
-        wprintw(win, "  ");
+        wprintw(win, " ?");
         wattroff(win, COLOR_PAIR(TILE_HIDDEN));
     }
 }
@@ -140,7 +140,7 @@ void print_cursor_tile(WINDOW *win, Tile *tile) {
         }
     } else {
         wattron(win, COLOR_PAIR(TILE_CURSOR));
-        wprintw(win, "  ");
+        wprintw(win, " ?");
         wattroff(win, COLOR_PAIR(TILE_CURSOR));
     }
 }

@@ -46,7 +46,7 @@ int main() {
     init_pair(TILE_SEVEN,   COLOR_WHITE,    COLOR_BLACK);
     init_pair(TILE_EIGHT,   COLOR_WHITE,    COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN,  COLOR_BLACK,    -1);
+    init_pair(TILE_HIDDEN,  COLOR_LIGHT_BLACK,    -1);
     init_pair(TILE_FLAG,    COLOR_YELLOW,   COLOR_BLACK);
     init_pair(TILE_CURSOR,  COLOR_BLACK,    COLOR_WHITE);
 
