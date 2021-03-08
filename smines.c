@@ -101,6 +101,7 @@ game:
     wrefresh(scorewin);
 
     int cur_r, cur_c;
+    int r, c;
     Tile *cur_tile = NULL;
     int ch;
     while (true) {
@@ -135,7 +136,22 @@ game:
             case ' ': /* reveal tile */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
-                if (!minefield->tiles[cur_r][cur_c].flagged) {
+                cur_tile = &minefield->tiles[cur_r][cur_c];
+                if (cur_tile->visible) {
+                    if (getflagsurround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
+                        for (r = cur_r - 1; r < cur_r + 2; r++) {
+                            for (c = cur_c - 1; c < cur_c + 2; c++) {
+                                if (!minefield->tiles[r][c].flagged)
+                                    if (!reveal_tile(minefield, r, c)) {
+                                        if (death(minefield, fieldwin, scorewin))
+                                            goto game;
+                                        else
+                                            goto quit;
+                                    }
+                            }
+                        }
+                    }
+                } else if (!cur_tile->flagged) {
                     if (!reveal_tile(minefield, cur_r, cur_c)) {
                         if (death(minefield, fieldwin, scorewin))
                             goto game;

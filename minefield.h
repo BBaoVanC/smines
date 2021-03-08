@@ -39,6 +39,7 @@ void print_scoreboard(WINDOW *, Minefield *);
 bool reveal_tile(Minefield *, int, int);
 void reveal_mines(Minefield *);
 int getsurround(Minefield *, int, int);
+int getflagsurround(Minefield *, int, int);
 
 bool check_victory(Minefield *);
 bool victory(Minefield *, WINDOW *, WINDOW *);

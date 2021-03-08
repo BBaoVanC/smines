@@ -221,6 +221,25 @@ int getsurround(Minefield *minefield, int row, int col) {
     return surrounding;
 }
 
+int getflagsurround(Minefield *minefield, int row, int col) {
+    int r, c;
+    int surrounding = 0;
+    Tile *current_tile = NULL;
+
+    for (r = row - 1; r < row + 2; r++) {
+        for (c = col - 1; c < col + 2; c++) {
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+                current_tile = &minefield->tiles[r][c];
+                if (current_tile->flagged) {
+                    surrounding++;
+                }
+            }
+        }
+    }
+
+    return surrounding;
+}
+
 bool check_victory(Minefield *minefield) {
     if (minefield->placed_flags != minefield->mines)
         return false;
