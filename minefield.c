@@ -163,8 +163,10 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
 
 void print_scoreboard(WINDOW *win, Minefield *minefield) {
     wclear(win);
-    mvwprintw(win, 2, 0, "Total Flags: %i", minefield->placed_flags);
-    mvwprintw(win, 3, 0, "Mines: %i/%i", minefield->mines - minefield->placed_flags, minefield->mines);
+    int mines = minefield->mines;
+    int placed = minefield->placed_flags;
+    mvwprintw(win, 2, 0, "Flags: %i", placed);
+    mvwprintw(win, 3, 0, "Mines: %i/%i", mines - placed, mines);
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
