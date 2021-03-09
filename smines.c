@@ -160,12 +160,13 @@ game:
                             goto game;
                         else
                             goto quit;
-                    } else if (check_victory(minefield)) {
-                        if (victory(minefield, fieldwin, scorewin))
-                            goto game;
-                        else
-                            goto quit;
                     }
+                }
+                if (check_victory(minefield)) {
+                    if (victory(minefield, fieldwin, scorewin))
+                        goto game;
+                    else
+                        goto quit;
                 }
                 break;
 

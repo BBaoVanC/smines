@@ -241,18 +241,20 @@ int getflagsurround(Minefield *minefield, int row, int col) {
 }
 
 bool check_victory(Minefield *minefield) {
-    if (minefield->placed_flags != minefield->mines)
-        return false;
-
+    /* this function feels too inefficient */
     int r, c;
+    int hidden = 0;
     for (r = 0; r < minefield->rows; r++) {
         for (c = 0; c < minefield->cols; c++) {
-            if (minefield->tiles[r][c].mine != minefield->tiles[r][c].flagged) {
-                return false;
-            }
+            if (!minefield->tiles[r][c].visible)
+                hidden++;
         }
     }
-    return true;
+
+    if (hidden == minefield->mines)
+        return true;
+    else
+        return false;
 }
 
 bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
