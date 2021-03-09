@@ -19,3 +19,6 @@
 #define TILE_CURSOR     13
 
 #define TILE_ERROR      100
+
+#define MSG_DEATH       14
+#define MSG_WIN         15

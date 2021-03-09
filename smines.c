@@ -16,40 +16,56 @@ int main() {
 
     /* ncurses setup */
     initscr(); /* start ncurses */
+
+#if 0
     if ((COLS < MCOLS) || (LINES < MROWS + 1)) {
         endwin();
         printf("Your terminal is too small for this minefield size.\n");
         printf("Your terminal is %i cols by %i rows, but %i cols and %i rows is required.\n", COLS, LINES, MCOLS, MROWS + 1);
         return 1;
     }
+#endif
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
     curs_set(0); /* make the cursor invisible */
+    refresh(); /* if I don't do this, the window doesn't appear until a key press */
 
     start_color(); /* enable color */
+    use_default_colors();
 
     /* init_pair(id, fg, bg); */
-    init_pair(TILE_ZERO,    COLOR_WHITE, COLOR_LIGHT_BLACK);
-    init_pair(TILE_MINE,    COLOR_BLACK, COLOR_RED);
+    init_pair(TILE_ZERO,    COLOR_WHITE,    COLOR_BLACK);
+    init_pair(TILE_MINE,    COLOR_RED,      COLOR_BLACK);
 
-    init_pair(TILE_ONE,     COLOR_WHITE, COLOR_BLUE);
-    init_pair(TILE_TWO,     COLOR_BLACK, COLOR_GREEN);
-    init_pair(TILE_THREE,   COLOR_WHITE, COLOR_RED);
-    init_pair(TILE_FOUR,    COLOR_BLACK, COLOR_CYAN);
-    init_pair(TILE_FIVE,    COLOR_WHITE, 94);
-    init_pair(TILE_SIX,     COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(TILE_SEVEN,   COLOR_WHITE, COLOR_BLACK);
-    init_pair(TILE_EIGHT,   COLOR_WHITE, COLOR_LIGHT_BLACK);
+    init_pair(TILE_ONE,     COLOR_WHITE,    COLOR_BLUE);
+    init_pair(TILE_TWO,     COLOR_BLACK,    COLOR_GREEN);
+    init_pair(TILE_THREE,   COLOR_WHITE,    COLOR_RED);
+    init_pair(TILE_FOUR,    COLOR_BLACK,    COLOR_CYAN);
+    init_pair(TILE_FIVE,    COLOR_WHITE,    94);
+    init_pair(TILE_SIX,     COLOR_BLACK,    COLOR_MAGENTA);
+    init_pair(TILE_SEVEN,   COLOR_WHITE,    COLOR_BLACK);
+    init_pair(TILE_EIGHT,   COLOR_WHITE,    COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN,  COLOR_BLACK, COLOR_BLACK);
-    init_pair(TILE_FLAG,    COLOR_BLACK, COLOR_YELLOW);
-    init_pair(TILE_CURSOR,  COLOR_BLACK, COLOR_WHITE);
+    init_pair(TILE_HIDDEN,  COLOR_LIGHT_BLACK,    -1);
+    init_pair(TILE_FLAG,    COLOR_YELLOW,   COLOR_BLACK);
+    init_pair(TILE_CURSOR,  COLOR_BLACK,    COLOR_WHITE);
 
-    init_pair(TILE_ERROR,   COLOR_WHITE, COLOR_RED);
+    init_pair(TILE_ERROR,   COLOR_WHITE,    COLOR_RED);
 
+    init_pair(MSG_DEATH,    COLOR_RED,      -1);
+    init_pair(MSG_WIN,      COLOR_GREEN,    -1);
+
+
+    /* add 2 to each dimension on every window to fit the
+     * borders (since they are inside borders) */
+    WINDOW *fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, ORIGIN_Y + 4, ORIGIN_X);
+    /* add 6 to starting y make space for scoreboard */
+    wrefresh(fieldwin);
+
+    WINDOW *scorewin = newwin(4, MCOLS*2, ORIGIN_Y, ORIGIN_X);
+    wrefresh(scorewin);
 
     Minefield *minefield = NULL;
-    int /* r ,*/ c;
     int start_r, start_c;
 
 game:
@@ -77,10 +93,15 @@ game:
     minefield->tiles[8][0].surrounding = 8;
 #endif
 
-    print_minefield(minefield, false);
-    refresh();
+    print_minefield(fieldwin, minefield, false);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(fieldwin);
+
+    print_scoreboard(scorewin, minefield);
+    wrefresh(scorewin);
 
     int cur_r, cur_c;
+    int r, c;
     Tile *cur_tile = NULL;
     int ch;
     while (true) {
@@ -115,28 +136,37 @@ game:
             case ' ': /* reveal tile */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
-                if (!minefield->tiles[cur_r][cur_c].flagged) {
-                    if (!reveal_tile(minefield, cur_r, cur_c)) {
-                        reveal_mines(minefield);
-
-                        clear();
-                        print_minefield(minefield, true);
-                        refresh();
-
-                        mvprintw(minefield->rows, minefield->cols, "GAME OVER! Press `r` to play again.");
-                        while (true) { /* wait for either 'q' to quit or 'r' to restart */
-                            c = getch();
-                            switch (c) {
-                                case 'r':
-                                    clear();
-                                    goto game;
-                                    break;
-                                case 'q':
-                                    goto quit;
-                                    break;
+                cur_tile = &minefield->tiles[cur_r][cur_c];
+                if (cur_tile->visible) {
+                    if (getflagsurround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
+                        for (r = cur_r - 1; r < cur_r + 2; r++) {
+                            for (c = cur_c - 1; c < cur_c + 2; c++) {
+                                if (!minefield->tiles[r][c].flagged) {
+                                    if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+                                        if (!reveal_tile(minefield, r, c)) {
+                                            if (death(minefield, fieldwin, scorewin))
+                                                goto game;
+                                            else
+                                                goto quit;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+                } else if (!cur_tile->flagged) {
+                    if (!reveal_tile(minefield, cur_r, cur_c)) {
+                        if (death(minefield, fieldwin, scorewin))
+                            goto game;
+                        else
+                            goto quit;
+                    }
+                }
+                if (check_victory(minefield)) {
+                    if (victory(minefield, fieldwin, scorewin))
+                        goto game;
+                    else
+                        goto quit;
                 }
                 break;
 
@@ -144,13 +174,28 @@ game:
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
                 cur_tile = &minefield->tiles[cur_r][cur_c];
-                if (!cur_tile->visible)
+                if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
+                    if (cur_tile->flagged)
+                        minefield->placed_flags++;
+                    else
+                        minefield->placed_flags--;
+                }
+
+                if (check_victory(minefield)) {
+                    if (victory(minefield, fieldwin, scorewin))
+                        goto game;
+                    else
+                        goto quit;
+                }
         }
 
-        clear();
-        print_minefield(minefield, false);
-        refresh();
+        print_minefield(fieldwin, minefield, false);
+        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+        wrefresh(fieldwin);
+
+        print_scoreboard(scorewin, minefield);
+        wrefresh(scorewin);
     }
 
 quit:
