@@ -19,6 +19,9 @@ debug: clean smines.out
 dbgrun: debug
 	./smines.out
 
+valgrind: clean smines.out
+	valgrind --leak-check=full --log-file=vgdump ./smines.out
+
 
 smines: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o smines
@@ -33,4 +36,4 @@ clean:
 	rm -f *.o
 	rm -f smines smines.out
 
-.PHONY: all run debug dbgrun clean
+.PHONY: all run debug dbgrun valgrind clean
