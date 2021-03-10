@@ -18,8 +18,8 @@ dbgrun: debug
 smines: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o smines
 
-smines.out: $(OBJECTS)
-	$(CC) $(CFLAGS) -g -Og $(LDFLAGS) $(OBJECTS) -o smines.out
+smines.out:
+	$(CC) $(CFLAGS) -g -Og $(LDFLAGS) $(SOURCES) -o smines.out
 
 $(OBJECTS):
 	$(CC) $(CFLAGS) -c $(SOURCES)
