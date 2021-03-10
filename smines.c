@@ -37,7 +37,6 @@ void set_origin() {
 }
 
 void redraw_screen() {
-    mvwprintw(scorewin, 1, 0, "cols: %i, rows: %i", COLS, LINES);
     wrefresh(scorewin);
 
     wclear(fieldwin);
