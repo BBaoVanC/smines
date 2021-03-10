@@ -161,10 +161,11 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
     print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
 }
 
-void print_scoreboard(WINDOW *win, Minefield *minefield) {
+void print_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
     wclear(win);
     int mines = minefield->mines;
     int placed = minefield->placed_flags;
+    mvwprintw(win, 1, 0, "Game #%i", game_number);
     mvwprintw(win, 2, 0, "Flags: %i", placed);
     mvwprintw(win, 3, 0, "Mines: %i/%i", mines - placed, mines);
 }
@@ -259,7 +260,7 @@ bool check_victory(Minefield *minefield) {
         return false;
 }
 
-bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
+bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_number) {
     int r, c;
     for (r = 0; r < minefield->rows; r++) {
         for (c = 0; c < minefield->cols; c++) {
@@ -271,7 +272,7 @@ bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield);
+    print_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 
     wattron(scorewin, A_BOLD);
@@ -295,14 +296,14 @@ bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
     }
 }
 
-bool death(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin) {
+bool death(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_number) {
     reveal_mines(minefield);
 
     print_minefield(fieldwin, minefield, true);
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield);
+    print_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 
     wattron(scorewin, A_BOLD);

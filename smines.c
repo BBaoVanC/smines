@@ -20,6 +20,7 @@ Minefield *minefield = NULL;
 WINDOW *fieldwin = NULL;
 WINDOW *scorewin = NULL;
 int origin_x, origin_y;
+int game_number = 0; /* start at 0 because it's incremented before each game */
 
 void set_origin() {
     int rows, cols;
@@ -63,7 +64,7 @@ void redraw_screen() {
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield);
+    print_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 }
 
@@ -136,6 +137,10 @@ int main() {
     int start_r, start_c;
 
 game:
+    if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
+                             * also might as well increment game_number while we're here */
+        free(minefield);
+
     minefield = init_minefield(MROWS, MCOLS, MINES);
 
     start_r = minefield->rows/2;
@@ -164,7 +169,7 @@ game:
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield);
+    print_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 
     int cur_r, cur_c;
@@ -215,7 +220,7 @@ game:
                                 if (!minefield->tiles[r][c].flagged) {
                                     if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
                                         if (!reveal_tile(minefield, r, c)) {
-                                            if (death(minefield, fieldwin, scorewin))
+                                            if (death(minefield, fieldwin, scorewin, game_number))
                                                 goto game;
                                             else
                                                 goto quit;
@@ -227,14 +232,14 @@ game:
                     }
                 } else if (!cur_tile->flagged) {
                     if (!reveal_tile(minefield, cur_r, cur_c)) {
-                        if (death(minefield, fieldwin, scorewin))
+                        if (death(minefield, fieldwin, scorewin, game_number))
                             goto game;
                         else
                             goto quit;
                     }
                 }
                 if (check_victory(minefield)) {
-                    if (victory(minefield, fieldwin, scorewin))
+                    if (victory(minefield, fieldwin, scorewin, game_number))
                         goto game;
                     else
                         goto quit;
@@ -254,7 +259,7 @@ game:
                 }
 
                 if (check_victory(minefield)) {
-                    if (victory(minefield, fieldwin, scorewin))
+                    if (victory(minefield, fieldwin, scorewin, game_number))
                         goto game;
                     else
                         goto quit;
@@ -266,11 +271,10 @@ game:
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
-        print_scoreboard(scorewin, minefield);
+        print_scoreboard(scorewin, minefield, game_number);
         wrefresh(scorewin);
     }
 
 quit:
     endwin();
-    free(minefield);
 }
