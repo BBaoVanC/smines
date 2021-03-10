@@ -8,8 +8,69 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <signal.h>
 #include "morecolor.h"
 #include "colornames.h"
+
+#define SCOREBOARD_ROWS 4
+
+Minefield *minefield = NULL;
+WINDOW *fieldwin = NULL;
+WINDOW *scorewin = NULL;
+int origin_x, origin_y;
+
+void set_origin() {
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    int height = MROWS + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
+    int width = MCOLS*2 + 2; /* add 2 because we're adding 1 to each side to fit borders */
+
+    origin_x = (cols - width) / 2;
+    origin_y = (rows - height) / 2;
+
+    if (origin_x < 0)
+        origin_x = 0;
+    if (origin_y < 0)
+        origin_y = 0;
+}
+
+void redraw_screen() {
+    mvwprintw(scorewin, 1, 0, "cols: %i, rows: %i", COLS, LINES);
+    wrefresh(scorewin);
+
+    wclear(fieldwin);
+    wborder(fieldwin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+    wrefresh(fieldwin);
+    delwin(fieldwin);
+
+    wclear(scorewin);
+    wborder(scorewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+    wrefresh(scorewin);
+    delwin(scorewin);
+
+    endwin();
+    set_origin();
+
+    fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    wrefresh(fieldwin);
+
+    scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
+    wrefresh(scorewin);
+
+
+    print_minefield(fieldwin, minefield, false);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(fieldwin);
+
+    print_scoreboard(scorewin, minefield);
+    wrefresh(scorewin);
+}
+
+void handle_winch(int sig) {
+    redraw_screen();
+}
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
@@ -25,6 +86,14 @@ int main() {
         return 1;
     }
 #endif
+
+    /* receive window resize signal */
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(struct sigaction));
+    sa.sa_handler = handle_winch;
+    sigaction(SIGWINCH, &sa, NULL);
+
+
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
     curs_set(0); /* make the cursor invisible */
@@ -56,16 +125,15 @@ int main() {
     init_pair(MSG_WIN,      COLOR_GREEN,    -1);
 
 
+    set_origin(); /* find what coordinate to start at */
     /* add 2 to each dimension on every window to fit the
      * borders (since they are inside borders) */
-    WINDOW *fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, ORIGIN_Y + 4, ORIGIN_X);
-    /* add 6 to starting y make space for scoreboard */
+    fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
     wrefresh(fieldwin);
 
-    WINDOW *scorewin = newwin(4, MCOLS*2, ORIGIN_Y, ORIGIN_X);
+    scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
     wrefresh(scorewin);
 
-    Minefield *minefield = NULL;
     int start_r, start_c;
 
 game:
@@ -133,6 +201,10 @@ game:
                     minefield->cur.col++;
                 break;
 
+            case 'L':
+                redraw_screen();
+                break;
+
             case ' ': /* reveal tile */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
@@ -188,6 +260,7 @@ game:
                     else
                         goto quit;
                 }
+                break;
         }
 
         print_minefield(fieldwin, minefield, false);
