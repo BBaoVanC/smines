@@ -205,6 +205,19 @@ game:
                     minefield->cur.col++;
                 break;
 
+            case '0':
+            case '^':
+                minefield->cur.col = 0;
+                break;
+            case '$':
+                minefield->cur.col = minefield->cols - 1;
+                break;
+            case 'g':
+                minefield->cur.row = 0;
+                break;
+            case 'G':
+                minefield->cur.row = minefield->rows - 1;
+
             case 'L':
                 redraw_screen();
                 break;
