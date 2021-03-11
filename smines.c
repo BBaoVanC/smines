@@ -51,12 +51,23 @@ void resize_screen() {
 }
 
 void draw_screen() {
-    print_minefield(fieldwin, minefield, false);
-    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
-    wrefresh(fieldwin);
+    int min_rows = SCOREBOARD_ROWS + MROWS + 2;
+    int min_cols = MCOLS*2 + 2;
+    if ((LINES >= min_rows) && (COLS >= min_cols)) {
+        erase();
+        refresh();
+        print_minefield(fieldwin, minefield, false);
+        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+        wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield, game_number);
-    wrefresh(scorewin);
+        print_scoreboard(scorewin, minefield, game_number);
+        wrefresh(scorewin);
+    } else {
+        clear();
+        mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
+        printw("Current size: %i cols by %i rows", COLS, LINES);
+        refresh();
+    }
 }
 
 int main() {
@@ -64,16 +75,6 @@ int main() {
 
     /* ncurses setup */
     initscr(); /* start ncurses */
-
-#if 0
-    if ((COLS < MCOLS) || (LINES < MROWS + 1)) {
-        endwin();
-        printf("Your terminal is too small for this minefield size.\n");
-        printf("Your terminal is %i cols by %i rows, but %i cols and %i rows is required.\n", COLS, LINES, MCOLS, MROWS + 1);
-        return 1;
-    }
-#endif
-
 
     keypad(stdscr, TRUE); /* more keys */
     noecho(); /* hide keys when pressed */
