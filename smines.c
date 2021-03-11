@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <signal.h>
 #include "morecolor.h"
 #include "colornames.h"
 #include "window.h"
@@ -38,9 +35,7 @@ void set_origin() {
         origin_y = 0;
 }
 
-void redraw_screen() {
-    wrefresh(scorewin);
-
+void resize_screen() {
     destroy_win(fieldwin);
     destroy_win(scorewin);
 
@@ -53,17 +48,15 @@ void redraw_screen() {
 
     scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
     wrefresh(scorewin);
+}
 
-
+void draw_screen() {
     print_minefield(fieldwin, minefield, false);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
     print_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
-}
-
-void handle_winch(int sig) {
-    redraw_screen();
 }
 
 int main() {
@@ -80,12 +73,6 @@ int main() {
         return 1;
     }
 #endif
-
-    /* receive window resize signal */
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(struct sigaction));
-    sa.sa_handler = handle_winch;
-    sigaction(SIGWINCH, &sa, NULL);
 
 
     keypad(stdscr, TRUE); /* more keys */
@@ -159,12 +146,7 @@ game:
     minefield->tiles[8][0].surrounding = 8;
 #endif
 
-    print_minefield(fieldwin, minefield, false);
-    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
-    wrefresh(fieldwin);
-
-    print_scoreboard(scorewin, minefield, game_number);
-    wrefresh(scorewin);
+    draw_screen();
 
     int cur_r, cur_c;
     int r, c;
@@ -172,7 +154,20 @@ game:
     int ch;
     while (true) {
         ch = getch(); /* wait for a character press */
+        if (ch == KEY_RESIZE) {
+            nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
+            resize_screen();
+            draw_screen();
+            continue;
+        }
+
+        nodelay(stdscr, 0); /* we want to wait until a key is pressed */
         switch (ch) {
+            case 'L':
+                resize_screen();
+                draw_screen();
+                break;
+
             case 'q': /* quit */
                 goto quit;
                 break;
@@ -211,9 +206,6 @@ game:
                 break;
             case 'G':
                 minefield->cur.row = minefield->rows - 1;
-
-            case 'L':
-                redraw_screen();
                 break;
 
             case ' ': /* reveal tile */
@@ -274,12 +266,7 @@ game:
                 break;
         }
 
-        print_minefield(fieldwin, minefield, false);
-        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
-        wrefresh(fieldwin);
-
-        print_scoreboard(scorewin, minefield, game_number);
-        wrefresh(scorewin);
+        draw_screen();
     }
 
 quit:
