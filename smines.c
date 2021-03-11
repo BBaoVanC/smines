@@ -13,6 +13,7 @@
 #include <signal.h>
 #include "morecolor.h"
 #include "colornames.h"
+#include "window.h"
 
 #define SCOREBOARD_ROWS 4
 
@@ -40,20 +41,14 @@ void set_origin() {
 void redraw_screen() {
     wrefresh(scorewin);
 
-    wclear(fieldwin);
-    wborder(fieldwin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-    wrefresh(fieldwin);
-    delwin(fieldwin);
-
-    wclear(scorewin);
-    wborder(scorewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-    wrefresh(scorewin);
-    delwin(scorewin);
+    destroy_win(fieldwin);
+    destroy_win(scorewin);
 
     endwin();
     set_origin();
 
     fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
     scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
@@ -61,7 +56,6 @@ void redraw_screen() {
 
 
     print_minefield(fieldwin, minefield, false);
-    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
     print_scoreboard(scorewin, minefield, game_number);
