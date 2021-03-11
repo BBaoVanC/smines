@@ -13,7 +13,7 @@
 
 Minefield *init_minefield(int rows, int cols, int mines) {
     /* Allocate memory for minefield */
-    Minefield *minefield = (Minefield*)calloc(1, sizeof(Minefield));
+    Minefield *minefield = (Minefield *)calloc(1, sizeof(Minefield));
 
     minefield->rows = rows;
     minefield->cols = cols;
@@ -23,7 +23,13 @@ Minefield *init_minefield(int rows, int cols, int mines) {
     minefield->cur.col = cols / 2;
     minefield->cur.row = rows / 2;
 
+    minefield->tiles = (Tile *)calloc(rows * cols, sizeof(Tile));
+
     return minefield;
+}
+
+Tile *get_tile_at(Minefield *minefield, int row, int col) {
+    return (minefield->tiles + row * minefield->cols + col);
 }
 
 void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
@@ -32,7 +38,7 @@ void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
     for (i = 0; i < minefield->mines;) { /* don't increment i here because it's incremented later if it's an acceptable place */
         r = (rand() % (minefield->rows - 1 + 1)); /* generate random row */
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
-        t = &minefield->tiles[r][c];
+        t = get_tile_at(minefield, r, c);
 
         /* the following abomination makes sure the 8 surrounding mines
          * around the cursor aren't mines
@@ -56,7 +62,7 @@ void generate_surrounding(Minefield *minefield) {
     Tile *t = NULL;
     for (int c = 0; c < minefield->cols; c++) {
         for (int r = 0; r < minefield->rows; r++) {
-            t = &minefield->tiles[r][c];
+            t = get_tile_at(minefield, r, c);
             t->surrounding = getsurround(minefield, r, c);
         }
     }
@@ -153,12 +159,12 @@ void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             wmove(win, y + 1, x*2 + 1);
-            print_tile(win, &minefield->tiles[y][x], check_flag);
+            print_tile(win, get_tile_at(minefield, y, x), check_flag);
         }
     }
 
     wmove(win, cur_r + 1, cur_c*2 + 1);
-    print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
+    print_cursor_tile(win, get_tile_at(minefield, cur_r, cur_c));
 }
 
 void print_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
@@ -171,7 +177,7 @@ void print_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
-    Tile *tile = &minefield->tiles[row][col];
+    Tile *tile = get_tile_at(minefield, row, col);
     if (tile->mine) {
         return false;
     } else {
@@ -183,8 +189,8 @@ bool reveal_tile(Minefield *minefield, int row, int col) {
         for (r = row - 1; r < row + 2; r++) {
             for (c = col - 1; c < col + 2; c++) {
                 if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) {
-                    if (!minefield->tiles[r][c].visible) {
-                        if (minefield->tiles[r][c].surrounding == 0 || 1) {
+                    if (!get_tile_at(minefield, r, c)->visible) {
+                        if (get_tile_at(minefield, r, c)->surrounding == 0 || 1) {
                             reveal_tile(minefield, r, c);
                         }
                     }
@@ -198,8 +204,8 @@ bool reveal_tile(Minefield *minefield, int row, int col) {
 void reveal_mines(Minefield *minefield) {
     for (int r = 0; r < minefield->rows; r++) {
         for (int c = 0; c < minefield->cols; c++) {
-            if (minefield->tiles[r][c].mine) {
-                minefield->tiles[r][c].visible = true;
+            if (get_tile_at(minefield, r, c)->mine) {
+                get_tile_at(minefield, r, c)->visible = true;
             }
         }
     }
@@ -213,7 +219,7 @@ int getsurround(Minefield *minefield, int row, int col) {
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
             if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
-                current_tile = &minefield->tiles[r][c];
+                current_tile = get_tile_at(minefield, r, c);
                 if (current_tile->mine) {
                     surrounding++;
                 }
@@ -232,7 +238,7 @@ int getflagsurround(Minefield *minefield, int row, int col) {
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
             if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
-                current_tile = &minefield->tiles[r][c];
+                current_tile = get_tile_at(minefield, r, c);
                 if (current_tile->flagged) {
                     surrounding++;
                 }
@@ -249,7 +255,7 @@ bool check_victory(Minefield *minefield) {
     int hidden = 0;
     for (r = 0; r < minefield->rows; r++) {
         for (c = 0; c < minefield->cols; c++) {
-            if (!minefield->tiles[r][c].visible)
+            if (!get_tile_at(minefield, r, c)->visible)
                 hidden++;
         }
     }
@@ -264,7 +270,7 @@ bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_
     int r, c;
     for (r = 0; r < minefield->rows; r++) {
         for (c = 0; c < minefield->cols; c++) {
-            minefield->tiles[r][c].visible = true;
+            get_tile_at(minefield, r, c)->visible = true;
         }
     }
 

@@ -131,9 +131,11 @@ int main() {
     int start_r, start_c;
 
 game:
-    if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
-                             * also might as well increment game_number while we're here */
+    if (++game_number != 1) { /* we don't need to free the first game because we haven't started yet
+                               * also might as well increment game_number while we're here */
+        free(minefield->tiles);
         free(minefield);
+    }
 
     minefield = init_minefield(MROWS, MCOLS, MINES);
 
@@ -219,12 +221,12 @@ game:
             case ' ': /* reveal tile */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
-                cur_tile = &minefield->tiles[cur_r][cur_c];
+                cur_tile = get_tile_at(minefield, cur_r, cur_c);
                 if (cur_tile->visible) {
                     if (getflagsurround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
                         for (r = cur_r - 1; r < cur_r + 2; r++) {
                             for (c = cur_c - 1; c < cur_c + 2; c++) {
-                                if (!minefield->tiles[r][c].flagged) {
+                                if (!get_tile_at(minefield, r, c)->flagged) {
                                     if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
                                         if (!reveal_tile(minefield, r, c)) {
                                             if (death(minefield, fieldwin, scorewin, game_number))
@@ -256,7 +258,7 @@ game:
             case 'f': /* toggle flag */
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
-                cur_tile = &minefield->tiles[cur_r][cur_c];
+                cur_tile = get_tile_at(minefield, cur_r, cur_c);
                 if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
                     if (cur_tile->flagged)

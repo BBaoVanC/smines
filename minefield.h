@@ -25,10 +25,11 @@ typedef struct {
     int mines;
     int placed_flags;
     Coordinate cur;
-    Tile tiles[MROWS][MCOLS];
+    Tile *tiles;
 } Minefield;
 
 Minefield *init_minefield(int, int, int);
+Tile *get_tile_at(Minefield *, int, int);
 void populate_mines(Minefield *, int, int);
 void generate_surrounding(Minefield *);
 int getcolorforsurround(int);
