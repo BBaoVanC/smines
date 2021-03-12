@@ -88,9 +88,7 @@ bool reveal_tile(Minefield *minefield, int row, int col) {
             for (c = col - 1; c < col + 2; c++) {
                 if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) {
                     if (!minefield->tiles[r][c].visible) {
-                        if (minefield->tiles[r][c].surrounding == 0 || 1) {
-                            reveal_tile(minefield, r, c);
-                        }
+                        reveal_tile(minefield, r, c);
                     }
                 }
             }
