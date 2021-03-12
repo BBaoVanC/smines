@@ -3,14 +3,16 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include "minefield.h"
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "minefield.h"
 #include "morecolor.h"
 #include "colornames.h"
 #include "window.h"
+#include "types.h"
+#include "draw.h"
 
 #define SCOREBOARD_ROWS 4
 
@@ -59,11 +61,11 @@ void draw_screen() {
             clear();
             screen_too_small = FALSE;
         }
-        print_minefield(fieldwin, minefield, false);
+        draw_minefield(fieldwin, minefield, false);
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
-        print_scoreboard(scorewin, minefield, game_number);
+        draw_scoreboard(scorewin, minefield, game_number);
         wrefresh(scorewin);
     } else {
         screen_too_small = TRUE;
@@ -120,8 +122,6 @@ int main() {
     scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
     wrefresh(scorewin);
 
-    int start_r, start_c;
-
 game:
     if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
                              * also might as well increment game_number while we're here */
@@ -129,8 +129,8 @@ game:
 
     minefield = init_minefield(MROWS, MCOLS, MINES);
 
-    start_r = minefield->rows/2;
-    start_c = minefield->cols/2;
+    int start_r = minefield->rows/2;
+    int start_c = minefield->cols/2;
 
     populate_mines(minefield, start_r, start_c);
 

@@ -9,6 +9,8 @@
 
 #include "colornames.h"
 #include "minefield.h"
+#include "draw.h"
+#include "types.h"
 #include "config.h"
 
 Minefield *init_minefield(int rows, int cols, int mines) {
@@ -70,104 +72,6 @@ int getcolorforsurround(int surrounding) {
     } else {
         return COLOR_PAIR(100);
     }
-}
-
-void print_tile(WINDOW *win, Tile *tile, bool check_flag) {
-    if (tile->flagged) {
-        if (check_flag) {
-            if (tile->mine) {
-                wattron(win, A_BOLD);
-                wattron(win, COLOR_PAIR(TILE_FLAG));
-                wprintw(win, " F");
-                wattroff(win, COLOR_PAIR(TILE_FLAG));
-                wattroff(win, A_BOLD);
-            } else {
-                wattron(win, A_BOLD);
-                wattron(win, COLOR_PAIR(TILE_MINE));
-                wprintw(win, "!F");
-                wattroff(win, COLOR_PAIR(TILE_MINE));
-                wattroff(win, A_BOLD);
-            }
-        } else {
-            wattron(win, A_BOLD);
-            wattron(win, COLOR_PAIR(TILE_FLAG));
-            wprintw(win, " F");
-            wattroff(win, COLOR_PAIR(TILE_FLAG));
-            wattroff(win, A_BOLD);
-        }
-
-    } else if (tile->visible) {
-        if (tile->mine) {
-            wattron(win, A_BOLD);
-            wattron(win, COLOR_PAIR(TILE_MINE));
-            wprintw(win, " X");
-            wattroff(win, COLOR_PAIR(TILE_MINE));
-            wattroff(win, A_BOLD);
-        } else {
-            int color = getcolorforsurround(tile->surrounding);
-            wattron(win, color);
-            if (tile->surrounding == 0)
-                wprintw(win, "  ", tile->surrounding);
-            else
-                wprintw(win, " %d", tile->surrounding);
-            wattroff(win, color);
-        }
-
-    } else {
-        wattron(win, COLOR_PAIR(TILE_HIDDEN));
-        wprintw(win, " ?");
-        wattroff(win, COLOR_PAIR(TILE_HIDDEN));
-    }
-}
-
-void print_cursor_tile(WINDOW *win, Tile *tile) {
-    if (tile->flagged) {
-        wattron(win, COLOR_PAIR(TILE_CURSOR));
-        wprintw(win, " F");
-        wattroff(win, COLOR_PAIR(TILE_CURSOR));
-    } else if (tile->visible) {
-        if (tile->mine) {
-            wattron(win, COLOR_PAIR(TILE_CURSOR));
-            wprintw(win, " X");
-            wattroff(win, COLOR_PAIR(TILE_CURSOR));
-        } else {
-            wattron(win, COLOR_PAIR(TILE_CURSOR));
-            if (tile->surrounding == 0)
-                wprintw(win, "  ", tile->surrounding);
-            else
-                wprintw(win, " %d", tile->surrounding);
-            wattroff(win, COLOR_PAIR(TILE_CURSOR));
-        }
-    } else {
-        wattron(win, COLOR_PAIR(TILE_CURSOR));
-        wprintw(win, " ?");
-        wattroff(win, COLOR_PAIR(TILE_CURSOR));
-    }
-}
-
-void print_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
-    //wclear(win);
-    int cur_r = minefield->cur.row;
-    int cur_c = minefield->cur.col;
-
-    for (int y = 0; y < minefield->rows; y++) {
-        for (int x = 0; x < minefield->cols; x++) {
-            wmove(win, y + 1, x*2 + 1);
-            print_tile(win, &minefield->tiles[y][x], check_flag);
-        }
-    }
-
-    wmove(win, cur_r + 1, cur_c*2 + 1);
-    print_cursor_tile(win, &minefield->tiles[cur_r][cur_c]);
-}
-
-void print_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
-    wclear(win);
-    int mines = minefield->mines;
-    int placed = minefield->placed_flags;
-    mvwprintw(win, 1, 0, "Game #%i", game_number);
-    mvwprintw(win, 2, 0, "Flags: %i", placed);
-    mvwprintw(win, 3, 0, "Mines: %i/%i", mines - placed, mines);
 }
 
 bool reveal_tile(Minefield *minefield, int row, int col) {
@@ -268,11 +172,11 @@ bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_
         }
     }
 
-    print_minefield(fieldwin, minefield, true);
+    draw_minefield(fieldwin, minefield, true);
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield, game_number);
+    draw_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 
     wattron(scorewin, A_BOLD);
@@ -299,11 +203,11 @@ bool victory(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_
 bool death(Minefield *minefield, WINDOW *fieldwin, WINDOW *scorewin, int game_number) {
     reveal_mines(minefield);
 
-    print_minefield(fieldwin, minefield, true);
+    draw_minefield(fieldwin, minefield, true);
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    print_scoreboard(scorewin, minefield, game_number);
+    draw_scoreboard(scorewin, minefield, game_number);
     wrefresh(scorewin);
 
     wattron(scorewin, A_BOLD);
