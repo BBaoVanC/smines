@@ -3,4 +3,6 @@
  * https://github.com/BBaoVanc/smines
  */
 
-void setup_minefield();
+void set_origin();
+void resize_screen();
+void draw_screen();
