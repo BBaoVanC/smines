@@ -1,11 +1,6 @@
 CFLAGS = -Wall -std=c99
 LDFLAGS = -lncurses
 
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S), Linux)
-	CFLAGS += -D_POSIX_C_SOURCE
-endif
-
 SOURCES=smines.c minefield.c window.c
 OBJECTS=smines.o minefield.o window.c
 
