@@ -16,13 +16,13 @@
 #include "types.h"
 #include "draw.h"
 
-extern const int SCOREBOARD_ROWS;
-extern Minefield *minefield;
-extern WINDOW *fieldwin;
-extern WINDOW *scorewin;
-extern int origin_x, origin_y;
-extern int game_number; /* start at 0 because it's incremented before each game */
-extern bool screen_too_small;
+const int SCOREBOARD_ROWS = 4;
+Minefield *minefield = NULL;
+WINDOW *fieldwin = NULL;
+WINDOW *scorewin = NULL;
+int origin_x, origin_y;
+int game_number = 0; /* start at 0 because it's incremented before each game */
+bool screen_too_small = FALSE;
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */

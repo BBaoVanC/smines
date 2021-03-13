@@ -4,7 +4,6 @@
  */
 
 #include "draw.h"
-#include "global.h"
 #include "colornames.h"
 
 void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
