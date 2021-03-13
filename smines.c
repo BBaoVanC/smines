@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "smines.h"
 
 #include "minefield.h"
 #include "morecolor.h"
@@ -15,8 +14,9 @@
 #include "window.h"
 #include "types.h"
 #include "draw.h"
+#include "helper.h"
 
-const int SCOREBOARD_ROWS = 4;
+int SCOREBOARD_ROWS = 4;
 Minefield *minefield = NULL;
 WINDOW *fieldwin = NULL;
 WINDOW *scorewin = NULL;
@@ -226,34 +226,4 @@ game:
 
 quit:
     endwin();
-}
-
-void set_origin() {
-    int rows, cols;
-    getmaxyx(stdscr, rows, cols);
-    int height = MROWS + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
-    int width = MCOLS*2 + 2; /* add 2 because we're adding 1 to each side to fit borders */
-
-    origin_x = (cols - width) / 2;
-    origin_y = (rows - height) / 2;
-
-    if (origin_x < 0)
-        origin_x = 0;
-    if (origin_y < 0)
-        origin_y = 0;
-}
-
-void resize_screen() {
-    destroy_win(fieldwin);
-    destroy_win(scorewin);
-
-    endwin();
-    set_origin();
-
-    fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
-    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
-    wrefresh(fieldwin);
-
-    scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
-    wrefresh(scorewin);
 }
