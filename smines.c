@@ -16,6 +16,8 @@
 #include "draw.h"
 #include "helper.h"
 
+#include "global.h"
+
 int SCOREBOARD_ROWS = 4;
 Minefield *minefield = NULL;
 WINDOW *fieldwin = NULL;

@@ -6,14 +6,9 @@
 #include "draw.h"
 #include "window.h"
 
-void draw_screen() {
-    extern int SCOREBOARD_ROWS;
-    extern WINDOW *fieldwin;
-    extern WINDOW *scorewin;
-    extern Minefield *minefield;
-    extern bool screen_too_small;
-    extern int game_number;
+#include "global.h"
 
+void draw_screen() {
     int min_rows = SCOREBOARD_ROWS + MROWS + 2;
     int min_cols = MCOLS*2 + 2;
     if ((LINES >= min_rows) && (COLS >= min_cols)) {
@@ -37,9 +32,6 @@ void draw_screen() {
 }
 
 void set_origin() {
-    extern int SCOREBOARD_ROWS;
-    extern int origin_x, origin_y;
-
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
     int height = MROWS + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
