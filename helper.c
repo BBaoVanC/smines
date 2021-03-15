@@ -47,11 +47,6 @@ void set_origin() {
 }
 
 void resize_screen() {
-    extern WINDOW *fieldwin;
-    extern WINDOW *scorewin;
-    extern int SCOREBOARD_ROWS;
-    extern int origin_x, origin_y;
-
     destroy_win(fieldwin);
     destroy_win(scorewin);
 
