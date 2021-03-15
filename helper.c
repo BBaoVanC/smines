@@ -23,7 +23,11 @@ void draw_screen() {
             clear();
             screen_too_small = FALSE;
         }
-        draw_minefield(fieldwin, minefield, false);
+
+        bool check_flag = false;
+        if (game_state == STATE_DEAD)
+            check_flag = true;
+        draw_minefield(fieldwin, minefield, check_flag);
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
