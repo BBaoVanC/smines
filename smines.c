@@ -13,6 +13,7 @@
 #include "colornames.h"
 #include "window.h"
 #include "types.h"
+#include "states.h"
 #include "draw.h"
 #include "helper.h"
 
@@ -25,6 +26,7 @@ WINDOW *scorewin = NULL;
 int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
+int game_state;
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
@@ -73,6 +75,8 @@ int main() {
     wrefresh(scorewin);
 
 game:
+    game_state = STATE_ALIVE;
+
     if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
                              * also might as well increment game_number while we're here */
         free(minefield);
@@ -127,6 +131,10 @@ game:
                 goto quit;
                 break;
 
+            case 'r': /* restart */
+                goto game;
+                break;
+
             /* movement keys */
             case 'h':
             case KEY_LEFT:
@@ -175,30 +183,14 @@ game:
                                                                         * could be fixed by moving this under the
                                                                         * range check (the if statement below) */
                                     if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
-                                        if (!reveal_tile(minefield, r, c)) {
-                                            if (death(minefield, fieldwin, scorewin, game_number))
-                                                goto game;
-                                            else
-                                                goto quit;
-                                        }
+                                        reveal_check_state(r, c);
                                     }
                                 }
                             }
                         }
                     }
                 } else if (!cur_tile->flagged) {
-                    if (!reveal_tile(minefield, cur_r, cur_c)) {
-                        if (death(minefield, fieldwin, scorewin, game_number))
-                            goto game;
-                        else
-                            goto quit;
-                    }
-                }
-                if (check_victory(minefield)) {
-                    if (victory(minefield, fieldwin, scorewin, game_number))
-                        goto game;
-                    else
-                        goto quit;
+                    reveal_check_state(cur_r, cur_c);
                 }
                 break;
 
@@ -212,13 +204,6 @@ game:
                         minefield->placed_flags++;
                     else
                         minefield->placed_flags--;
-                }
-
-                if (check_victory(minefield)) {
-                    if (victory(minefield, fieldwin, scorewin, game_number))
-                        goto game;
-                    else
-                        goto quit;
                 }
                 break;
         }

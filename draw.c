@@ -5,6 +5,7 @@
 
 #include "draw.h"
 #include "colornames.h"
+#include "states.h"
 
 void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
     int color_pair;
@@ -93,7 +94,7 @@ void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
     draw_tile(win, &minefield->tiles[cur_r][cur_c], true, check_flag);
 }
 
-void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
+void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int state) {
     wclear(win);
     int mines = minefield->mines;
     int placed = minefield->placed_flags;
@@ -101,4 +102,24 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
     mvwprintw(win, 1, 0, "Game #%i (%ix%i)", game_number, minefield->cols, minefield->rows);
     mvwprintw(win, 2, 0, "Flags: %i", placed);
     mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
+
+    switch (state) {
+        case STATE_VICTORY:
+            wattron(win, A_BOLD);
+            wattron(win, COLOR_PAIR(MSG_WIN));
+            mvwprintw(win, 0, 0, "YOU WIN!");
+            wattroff(win, COLOR_PAIR(MSG_WIN));
+            wattroff(win, A_BOLD);
+            break;
+
+        case STATE_DEAD:
+            wattron(win, A_BOLD);
+            wattron(win, COLOR_PAIR(MSG_DEATH));
+            mvwprintw(win, 0, 0, "YOU DIED!");
+            wattroff(win, COLOR_PAIR(MSG_DEATH));
+            wattroff(win, A_BOLD);
+            break;
+    }
+
+    wrefresh(win);
 }

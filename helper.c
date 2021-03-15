@@ -5,13 +5,20 @@
 
 #include "draw.h"
 #include "window.h"
+#include "states.h"
 
 #include "global.h"
 
 void draw_screen() {
     int min_rows = SCOREBOARD_ROWS + MROWS + 2;
     int min_cols = MCOLS*2 + 2;
-    if ((LINES >= min_rows) && (COLS >= min_cols)) {
+    if ((LINES < min_rows) || (COLS < min_cols)) {
+        screen_too_small = TRUE;
+        clear();
+        mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
+        printw("Current size: %i cols by %i rows", COLS, LINES);
+        refresh();
+    } else {
         if (screen_too_small) {
             clear();
             screen_too_small = FALSE;
@@ -20,14 +27,8 @@ void draw_screen() {
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
-        draw_scoreboard(scorewin, minefield, game_number);
+        draw_scoreboard(scorewin, minefield, game_number, game_state);
         wrefresh(scorewin);
-    } else {
-        screen_too_small = TRUE;
-        clear();
-        mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
-        printw("Current size: %i cols by %i rows", COLS, LINES);
-        refresh();
     }
 }
 
@@ -59,4 +60,20 @@ void resize_screen() {
 
     scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
     wrefresh(scorewin);
+}
+
+void reveal_check_state(int row, int col) {
+    if (!reveal_tile(minefield, row, col)) {
+        game_state = STATE_DEAD;
+        reveal_mines(minefield);
+    } else if (check_victory(minefield)) {
+        game_state = STATE_VICTORY;
+        int r, c;
+        for (r = 0; r < minefield->rows; r++) {
+            for (c = 0; c < minefield->cols; c++) {
+                minefield->tiles[r][c].visible = true;
+            }
+        }
+    }
+    draw_screen();
 }

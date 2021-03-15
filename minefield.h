@@ -18,5 +18,3 @@ int getsurround(Minefield *, int, int);
 int getflagsurround(Minefield *, int, int);
 
 bool check_victory(Minefield *);
-bool victory(Minefield *, WINDOW *, WINDOW *, int);
-bool death(Minefield *, WINDOW *, WINDOW *, int);
