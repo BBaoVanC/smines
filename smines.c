@@ -176,7 +176,7 @@ game:
                 cur_c = minefield->cur.col;
                 cur_tile = &minefield->tiles[cur_r][cur_c];
                 if (cur_tile->visible) {
-                    if (getflagsurround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
+                    if (get_flag_surround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
                         for (r = cur_r - 1; r < cur_r + 2; r++) {
                             for (c = cur_c - 1; c < cur_c + 2; c++) {
                                 if (!minefield->tiles[r][c].flagged) { /* in rare cases this causes an invalid read error

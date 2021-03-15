@@ -59,7 +59,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
             if (is_cursor)
                 color_pair = COLOR_PAIR(TILE_CURSOR);
             else
-                color_pair = getcolorforsurround(tile->surrounding);
+                color_pair = get_surround_color(tile->surrounding);
             wattron(win, color_pair);
             if (tile->surrounding == 0)
                 wprintw(win, "  ", tile->surrounding);

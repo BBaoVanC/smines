@@ -59,12 +59,12 @@ void generate_surrounding(Minefield *minefield) {
     for (int c = 0; c < minefield->cols; c++) {
         for (int r = 0; r < minefield->rows; r++) {
             t = &minefield->tiles[r][c];
-            t->surrounding = getsurround(minefield, r, c);
+            t->surrounding = get_surround(minefield, r, c);
         }
     }
 }
 
-int getcolorforsurround(int surrounding) {
+int get_surround_color(int surrounding) {
     if (surrounding == 0) {
         return COLOR_PAIR(10);
     } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
@@ -107,7 +107,7 @@ void reveal_mines(Minefield *minefield) {
     }
 }
 
-int getsurround(Minefield *minefield, int row, int col) {
+int get_surround(Minefield *minefield, int row, int col) {
     int r, c;
     int surrounding = 0;
     Tile *current_tile = NULL;
@@ -126,7 +126,7 @@ int getsurround(Minefield *minefield, int row, int col) {
     return surrounding;
 }
 
-int getflagsurround(Minefield *minefield, int row, int col) {
+int get_flag_surround(Minefield *minefield, int row, int col) {
     int r, c;
     int surrounding = 0;
     Tile *current_tile = NULL;
