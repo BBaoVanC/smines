@@ -100,5 +100,5 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number) {
     int found_percentage = ((float)placed / (float)mines) * 100;
     mvwprintw(win, 1, 0, "Game #%i (%ix%i)", game_number, minefield->cols, minefield->rows);
     mvwprintw(win, 2, 0, "Flags: %i", placed);
-    mvwprintw(win, 3, 0, "Mines: %i/%i (%i%)", mines - placed, mines, found_percentage);
+    mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
 }
