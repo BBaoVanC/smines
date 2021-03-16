@@ -24,10 +24,7 @@ void draw_screen() {
             screen_too_small = FALSE;
         }
 
-        bool check_flag = false;
-        if (game_state == STATE_DEAD)
-            check_flag = true;
-        draw_minefield(fieldwin, minefield, check_flag);
+        draw_minefield(fieldwin, minefield, (game_state == STATE_DEAD));
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
