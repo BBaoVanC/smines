@@ -7,7 +7,7 @@
 #include "colornames.h"
 #include "states.h"
 
-void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
+void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool green_mines) {
     int color_pair;
     if (tile->flagged) {
         if (check_flag) {
@@ -25,7 +25,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
                 if (is_cursor)
                     color_pair = COLOR_PAIR(TILE_CURSOR);
                 else
-                    color_pair = COLOR_PAIR(TILE_MINE);
+                    color_pair = COLOR_PAIR(TILE_FLAG_WRONG);
                 wattron(win, A_BOLD);
                 wattron(win, color_pair);
                 wprintw(win, "!F");
@@ -48,6 +48,8 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
         if (tile->mine) {
             if (is_cursor)
                 color_pair = COLOR_PAIR(TILE_CURSOR);
+            else if (green_mines)
+                color_pair = COLOR_PAIR(TILE_MINE_SAFE);
             else
                 color_pair = COLOR_PAIR(TILE_MINE);
             wattron(win, A_BOLD);
@@ -79,19 +81,19 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag) {
     }
 }
 
-void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag) {
+void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool green_mines) {
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
 
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             wmove(win, y + 1, x*2 + 1);
-            draw_tile(win, &minefield->tiles[y][x], false, check_flag);
+            draw_tile(win, &minefield->tiles[y][x], false, check_flag, green_mines);
         }
     }
 
     wmove(win, cur_r + 1, cur_c*2 + 1);
-    draw_tile(win, &minefield->tiles[cur_r][cur_c], true, check_flag);
+    draw_tile(win, &minefield->tiles[cur_r][cur_c], true, check_flag, green_mines);
 }
 
 void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int state) {

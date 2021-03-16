@@ -14,8 +14,10 @@
 #define TILE_EIGHT      8
 
 #define TILE_MINE       9
+#define TILE_MINE_SAFE  16
 #define TILE_HIDDEN     11
 #define TILE_FLAG       12
+#define TILE_FLAG_WRONG 17
 #define TILE_CURSOR     13
 
 #define TILE_ERROR      100

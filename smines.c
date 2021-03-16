@@ -43,26 +43,28 @@ int main() {
     use_default_colors();
 
     /* init_pair(id, fg, bg); */
-    init_pair(TILE_ZERO,    COLOR_WHITE,    COLOR_BLACK);
-    init_pair(TILE_MINE,    COLOR_RED,      COLOR_BLACK);
+    init_pair(TILE_ZERO,            COLOR_WHITE,            COLOR_BLACK);
+    init_pair(TILE_MINE,            COLOR_RED,              COLOR_BLACK);
+    init_pair(TILE_MINE_SAFE,       COLOR_GREEN,            COLOR_BLACK);
 
-    init_pair(TILE_ONE,     COLOR_WHITE,    COLOR_BLUE);
-    init_pair(TILE_TWO,     COLOR_BLACK,    COLOR_GREEN);
-    init_pair(TILE_THREE,   COLOR_WHITE,    COLOR_RED);
-    init_pair(TILE_FOUR,    COLOR_BLACK,    COLOR_CYAN);
-    init_pair(TILE_FIVE,    COLOR_WHITE,    94);
-    init_pair(TILE_SIX,     COLOR_BLACK,    COLOR_MAGENTA);
-    init_pair(TILE_SEVEN,   COLOR_WHITE,    COLOR_BLACK);
-    init_pair(TILE_EIGHT,   COLOR_WHITE,    COLOR_LIGHT_BLACK);
+    init_pair(TILE_ONE,             COLOR_WHITE,            COLOR_BLUE);
+    init_pair(TILE_TWO,             COLOR_BLACK,            COLOR_GREEN);
+    init_pair(TILE_THREE,           COLOR_WHITE,            COLOR_RED);
+    init_pair(TILE_FOUR,            COLOR_BLACK,            COLOR_CYAN);
+    init_pair(TILE_FIVE,            COLOR_WHITE,            94);
+    init_pair(TILE_SIX,             COLOR_BLACK,            COLOR_MAGENTA);
+    init_pair(TILE_SEVEN,           COLOR_WHITE,            COLOR_BLACK);
+    init_pair(TILE_EIGHT,           COLOR_WHITE,            COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN,  COLOR_LIGHT_BLACK,    -1);
-    init_pair(TILE_FLAG,    COLOR_YELLOW,   COLOR_BLACK);
-    init_pair(TILE_CURSOR,  COLOR_BLACK,    COLOR_WHITE);
+    init_pair(TILE_HIDDEN,          COLOR_LIGHT_BLACK,      -1);
+    init_pair(TILE_FLAG,            COLOR_YELLOW,           COLOR_BLACK);
+    init_pair(TILE_FLAG_WRONG,      COLOR_BLUE,             COLOR_BLACK);
+    init_pair(TILE_CURSOR,          COLOR_BLACK,            COLOR_WHITE);
 
-    init_pair(TILE_ERROR,   COLOR_WHITE,    COLOR_RED);
+    init_pair(TILE_ERROR,           COLOR_WHITE,            COLOR_RED);
 
-    init_pair(MSG_DEATH,    COLOR_RED,      -1);
-    init_pair(MSG_WIN,      COLOR_GREEN,    -1);
+    init_pair(MSG_DEATH,            COLOR_RED,              -1);
+    init_pair(MSG_WIN,              COLOR_GREEN,            -1);
 
 
     set_origin(); /* find what coordinate to start at */
