@@ -76,5 +76,4 @@ void reveal_check_state(int row, int col) {
             }
         }
     }
-    draw_screen();
 }

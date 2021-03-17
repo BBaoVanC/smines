@@ -126,7 +126,6 @@ game:
         switch (ch) {
             case 'L':
                 resize_screen();
-                draw_screen();
                 break;
 
             case 'q': /* quit */
