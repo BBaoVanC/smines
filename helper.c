@@ -6,6 +6,7 @@
 #include "draw.h"
 #include "window.h"
 #include "states.h"
+#include "help.h"
 
 #include "global.h"
 
@@ -17,6 +18,9 @@ void draw_screen() {
         clear();
         mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
         printw("Current size: %i cols by %i rows", COLS, LINES);
+        refresh();
+    } else if (help_visible) {
+        draw_help(stdscr);
         refresh();
     } else {
         if (screen_too_small) {
@@ -30,6 +34,7 @@ void draw_screen() {
 
         draw_scoreboard(scorewin, minefield, game_number, game_state);
         wrefresh(scorewin);
+
     }
 }
 

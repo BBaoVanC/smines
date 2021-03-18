@@ -14,3 +14,5 @@ extern int origin_x, origin_y;
 extern int game_number; /* start at 0 because it's incremented before each game */
 extern bool screen_too_small;
 extern int game_state; /* see states.h */
+
+extern bool help_visible; /* if true, draw help page **instead of** everything else */

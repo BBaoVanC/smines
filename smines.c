@@ -16,6 +16,7 @@
 #include "states.h"
 #include "draw.h"
 #include "helper.h"
+#include "help.h"
 
 #include "global.h"
 
@@ -27,6 +28,8 @@ int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
 int game_state;
+
+bool help_visible = false;
 
 int main() {
     srand((unsigned) time(NULL)); /* create seed */
@@ -117,12 +120,31 @@ game:
         ch = getch(); /* wait for a character press */
         if (ch == KEY_RESIZE) {
             nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
-            resize_screen();
-            draw_screen();
+            if (help_visible) {
+                clear();
+                draw_help(stdscr);
+            } else {
+                resize_screen();
+                draw_screen();
+            }
             continue;
         }
 
         nodelay(stdscr, 0); /* we want to wait until a key is pressed */
+        if (help_visible) {
+            switch(ch) {
+                case 'H': /* close help */
+                case 'q':
+                    clear();
+                    refresh();
+                    help_visible = !help_visible;
+                    draw_screen();
+                    break;
+            }
+            continue; /* then I don't need to use else below and
+                         add an entire level of indentation to
+                         everything */
+        }
         switch (ch) {
             case 'L':
                 resize_screen();
@@ -134,6 +156,12 @@ game:
 
             case 'r': /* restart */
                 goto game;
+                break;
+
+            case 'H': /* toggle help, only checked here if not visible already */
+                clear();
+                refresh();
+                help_visible = !help_visible;
                 break;
 
             /* movement keys */

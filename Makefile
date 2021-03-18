@@ -1,8 +1,8 @@
 CFLAGS = -Wall -std=c99
 LDFLAGS = -lncurses
 
-SOURCES=smines.c minefield.c window.c draw.c helper.c
-OBJECTS=smines.o minefield.o window.o draw.o helper.o
+SOURCES=smines.c minefield.c window.c draw.c helper.c help.c
+OBJECTS=smines.o minefield.o window.o draw.o helper.o help.o
 
 all: smines
 
