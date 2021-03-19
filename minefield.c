@@ -13,7 +13,7 @@
 #include "types.h"
 #include "config.h"
 
-Minefield *init_minefield(int rows, int cols, int mines) {
+Minefield *init_minefield(int rows, int cols, int mines) { /* remember to populate_mines() since this won't do it automatically */
     /* Allocate memory for minefield */
     Minefield *minefield = (Minefield*)calloc(1, sizeof(Minefield));
 
@@ -54,7 +54,7 @@ void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
 }
 
 
-void generate_surrounding(Minefield *minefield) {
+void generate_surrounding(Minefield *minefield) { /* calculate the surrounding mines for every single tile */
     Tile *t = NULL;
     for (int c = 0; c < minefield->cols; c++) {
         for (int r = 0; r < minefield->rows; r++) {
@@ -64,7 +64,7 @@ void generate_surrounding(Minefield *minefield) {
     }
 }
 
-int get_surround_color(int surrounding) {
+int get_surround_color(int surrounding) { /* figure out what color to use based on surrounding tiles */
     if (surrounding == 0) {
         return COLOR_PAIR(10);
     } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
@@ -74,7 +74,7 @@ int get_surround_color(int surrounding) {
     }
 }
 
-bool reveal_tile(Minefield *minefield, int row, int col) {
+bool reveal_tile(Minefield *minefield, int row, int col) { /* returns a bool: false if dead */
     Tile *tile = &minefield->tiles[row][col];
     if (tile->mine) {
         return false;
@@ -97,7 +97,7 @@ bool reveal_tile(Minefield *minefield, int row, int col) {
     }
 }
 
-void reveal_mines(Minefield *minefield) {
+void reveal_mines(Minefield *minefield) { /* find every tile and make it visible */
     for (int r = 0; r < minefield->rows; r++) {
         for (int c = 0; c < minefield->cols; c++) {
             if (minefield->tiles[r][c].mine) {
@@ -107,14 +107,14 @@ void reveal_mines(Minefield *minefield) {
     }
 }
 
-int get_surround(Minefield *minefield, int row, int col) {
+int get_surround(Minefield *minefield, int row, int col) { /* count surrounding mines of a single tile */
     int r, c;
     int surrounding = 0;
     Tile *current_tile = NULL;
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* make sure we are in bounds */
                 current_tile = &minefield->tiles[r][c];
                 if (current_tile->mine) {
                     surrounding++;
@@ -126,14 +126,14 @@ int get_surround(Minefield *minefield, int row, int col) {
     return surrounding;
 }
 
-int get_flag_surround(Minefield *minefield, int row, int col) {
+int get_flag_surround(Minefield *minefield, int row, int col) { /* count the surrounding flags, this is get_surround but with flags instead */
     int r, c;
     int surrounding = 0;
     Tile *current_tile = NULL;
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* makes ure we are in bounds */
                 current_tile = &minefield->tiles[r][c];
                 if (current_tile->flagged) {
                     surrounding++;
@@ -145,7 +145,7 @@ int get_flag_surround(Minefield *minefield, int row, int col) {
     return surrounding;
 }
 
-bool check_victory(Minefield *minefield) {
+bool check_victory(Minefield *minefield) { /* check if the plauer won yet */
     /* this function feels too inefficient */
     int r, c;
     int hidden = 0;

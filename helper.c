@@ -10,12 +10,13 @@
 
 #include "global.h"
 
-void draw_screen() {
-    int min_rows = SCOREBOARD_ROWS + MROWS + 2;
-    int min_cols = MCOLS*2 + 2;
+void draw_screen() { /* draw everything */
+    int min_rows = SCOREBOARD_ROWS + MROWS + 2; /* add 2 to fit the minefield borders */
+    int min_cols = MCOLS*2 + 2; /* multiply cols by 2 because each tile is 2 cols wide */
+
     if ((LINES < min_rows) || (COLS < min_cols)) {
         screen_too_small = TRUE;
-        clear();
+        clear(); /* we don't want any leftover pieces of the minefield */
         mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
         printw("Current size: %i cols by %i rows", COLS, LINES);
         refresh();
@@ -47,6 +48,7 @@ void set_origin() {
     origin_x = (cols - width) / 2;
     origin_y = (rows - height) / 2;
 
+    /* make sure we don't try and start drawing past the top and left sides */
     if (origin_x < 0)
         origin_x = 0;
     if (origin_y < 0)
@@ -57,7 +59,7 @@ void resize_screen() {
     destroy_win(fieldwin);
     destroy_win(scorewin);
 
-    endwin();
+    endwin(); /* this makes ncurses recalculate things, such as the global variables LINES and COLS */
     set_origin();
 
     fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
@@ -68,7 +70,7 @@ void resize_screen() {
     wrefresh(scorewin);
 }
 
-void reveal_check_state(int row, int col) {
+void reveal_check_state(int row, int col) { /* reveal a tile, check for win/loss, and update game_state */
     if (!reveal_tile(minefield, row, col)) {
         game_state = STATE_DEAD;
         reveal_mines(minefield);

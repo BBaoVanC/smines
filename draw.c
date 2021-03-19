@@ -21,7 +21,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
                 wprintw(win, " F");
                 wattroff(win, color_pair);
                 wattroff(win, A_BOLD);
-            } else {
+            } else { /* if not (tile->mine) */
                 if (is_cursor)
                     color_pair = COLOR_PAIR(TILE_CURSOR);
                 else
@@ -32,7 +32,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
                 wattroff(win, color_pair);
                 wattroff(win, A_BOLD);
             }
-        } else {
+        } else { /* if not (check_flag) */
             if (is_cursor)
                 color_pair = COLOR_PAIR(TILE_CURSOR);
             else
@@ -44,7 +44,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
             wattroff(win, A_BOLD);
         }
 
-    } else if (tile->visible) {
+    } else if (tile->visible) { /* if not (tile->flagged) */
         if (tile->mine) {
             if (is_cursor)
                 color_pair = COLOR_PAIR(TILE_CURSOR);
@@ -57,7 +57,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
             wprintw(win, " X");
             wattroff(win, color_pair);
             wattroff(win, A_BOLD);
-        } else {
+        } else { /* if not (tile->mine) */
             if (is_cursor)
                 color_pair = COLOR_PAIR(TILE_CURSOR);
             else
@@ -70,7 +70,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
             wattroff(win, color_pair);
         }
 
-    } else {
+    } else { /* if neither (tile->flagged) nor (tile->visible) */
         if (is_cursor)
             color_pair = COLOR_PAIR(TILE_CURSOR);
         else
@@ -82,6 +82,7 @@ void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool gr
 }
 
 void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool green_mines) {
+    /* remember: multiply x by 2 because each tile is 2 cols wide */
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
 
@@ -97,7 +98,8 @@ void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool gre
 }
 
 void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int state) {
-    wclear(win);
+    wclear(win); /* if we don't clear, then if the new text is shorter than the old
+                    text, characters are left on screen */
     int mines = minefield->mines;
     int placed = minefield->placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
@@ -105,7 +107,7 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int sta
     mvwprintw(win, 2, 0, "Flags: %i", placed);
     mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
 
-    switch (state) {
+    switch (state) { /* draw the top line */
         case STATE_ALIVE:
             wattron(win, A_BOLD);
             mvwprintw(win, 0, 0, "Press H or ? for help");

@@ -27,23 +27,23 @@ WINDOW *scorewin = NULL;
 int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
-int game_state;
+int game_state; /* see states.h */
 
-bool help_visible = false;
+bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
 int main() {
-    srand((unsigned) time(NULL)); /* create seed */
+    srand((unsigned) time(NULL)); /* seed the random number generator */
 
     /* ncurses setup */
     initscr(); /* start ncurses */
 
-    keypad(stdscr, TRUE); /* more keys */
-    noecho(); /* hide keys when pressed */
+    keypad(stdscr, TRUE); /* for the arrow keys */
+    noecho(); /* don't show the letters of pressed keys */
     curs_set(0); /* make the cursor invisible */
     refresh(); /* if I don't do this, the window doesn't appear until a key press */
 
     start_color(); /* enable color */
-    use_default_colors();
+    use_default_colors(); /* allows us to use colors like the terminal background */
 
     /* init_pair(id, fg, bg); */
     init_pair(TILE_ZERO,            COLOR_WHITE,            COLOR_BLACK);
@@ -147,7 +147,7 @@ game:
                          everything */
         }
         switch (ch) {
-            case 'L':
+            case 'L': /* redraw screen, just in case */
                 resize_screen();
                 break;
 
@@ -212,10 +212,8 @@ game:
                     if (get_flag_surround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
                         for (r = cur_r - 1; r < cur_r + 2; r++) {
                             for (c = cur_c - 1; c < cur_c + 2; c++) {
-                                if (!minefield->tiles[r][c].flagged) { /* in rare cases this causes an invalid read error
-                                                                        * could be fixed by moving this under the
-                                                                        * range check (the if statement below) */
-                                    if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+                                if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
+                                    if (!minefield->tiles[r][c].flagged) {
                                         reveal_check_state(r, c);
                                     }
                                 }
