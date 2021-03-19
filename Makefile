@@ -24,7 +24,7 @@ smines: $(OBJECTS)
 smines.out:
 	$(CC) $(CFLAGS) -g -Og $(LDFLAGS) $(SOURCES) -o smines.out
 
-$(OBJECTS):
+$(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) -c $(SOURCES)
 
 clean:
