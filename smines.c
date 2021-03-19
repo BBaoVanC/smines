@@ -134,6 +134,7 @@ game:
         if (help_visible) {
             switch(ch) {
                 case 'H': /* close help */
+                case '?':
                 case 'q':
                     clear();
                     refresh();
@@ -159,6 +160,7 @@ game:
                 break;
 
             case 'H': /* toggle help, only checked here if not visible already */
+            case '?':
                 clear();
                 refresh();
                 help_visible = !help_visible;

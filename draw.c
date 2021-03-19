@@ -106,6 +106,12 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int sta
     mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
 
     switch (state) {
+        case STATE_ALIVE:
+            wattron(win, A_BOLD);
+            mvwprintw(win, 0, 0, "Press H or ? for help");
+            wattroff(win, A_BOLD);
+            break;
+
         case STATE_VICTORY:
             wattron(win, A_BOLD);
             wattron(win, COLOR_PAIR(MSG_WIN));

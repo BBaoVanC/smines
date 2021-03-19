@@ -7,7 +7,7 @@
 #include <ncurses.h>
 
 const char helptxt[] =
-    "H: view this help page\n"
+    "H or ?: view this help page\n"
     "L: redraw screen (just in case)\n"
     "\n"
     "q: quit\n"
