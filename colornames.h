@@ -14,13 +14,13 @@
 #define TILE_EIGHT      8
 
 #define TILE_MINE       9
-#define TILE_MINE_SAFE  16
-#define TILE_HIDDEN     11
-#define TILE_FLAG       12
-#define TILE_FLAG_WRONG 17
-#define TILE_CURSOR     13
+#define TILE_MINE_SAFE  11
+#define TILE_HIDDEN     12
+#define TILE_FLAG       13
+#define TILE_FLAG_WRONG 14
+#define TILE_CURSOR     15
 
 #define TILE_ERROR      100
 
-#define MSG_DEATH       14
-#define MSG_WIN         15
+#define MSG_DEATH       16
+#define MSG_WIN         17
