@@ -1,7 +1,6 @@
 CFLAGS = -Wall -std=c99
 LDFLAGS = -lncurses
 
-SOURCES=smines.c minefield.c window.c draw.c helper.c help.c
 OBJECTS=smines.o minefield.o window.o draw.o helper.o help.o
 
 all: smines
@@ -24,8 +23,8 @@ smines: $(OBJECTS)
 smines.out:
 	$(CC) $(CFLAGS) -g -Og $(LDFLAGS) $(SOURCES) -o smines.out
 
-$(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) -c $(SOURCES)
+$(OBJECTS): %.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f *.o
