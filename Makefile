@@ -1,5 +1,5 @@
-CFLAGS = -Wall -std=c99
-LDFLAGS = -lncurses
+CFLAGS += -Wall -std=c99
+LDFLAGS += -lncurses
 
 OBJECTS=smines.o minefield.o window.o draw.o helper.o help.o
 
