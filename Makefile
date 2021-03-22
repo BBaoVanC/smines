@@ -8,20 +8,18 @@ all: smines
 run: clean smines
 	./smines
 
-debug: clean smines.out
+debug: CFLAGS += -g -Og
+debug: smines
 
 dbgrun: debug
-	./smines.out
+	./smines
 
-valgrind: clean smines.out
-	valgrind --leak-check=full --log-file=vgdump ./smines.out
+valgrind: debug
+	valgrind --leak-check=full --log-file=vgdump ./smines
 
 
 smines: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o smines
-
-smines.out:
-	$(CC) $(CFLAGS) -g -Og $(LDFLAGS) $(SOURCES) -o smines.out
 
 $(OBJECTS): %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
