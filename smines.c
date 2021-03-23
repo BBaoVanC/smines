@@ -226,6 +226,8 @@ game:
                 break;
 
             case 'f': /* toggle flag */
+                if (game_state != STATE_ALIVE)
+                    break;
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
                 cur_tile = &minefield->tiles[cur_r][cur_c];
