@@ -5,7 +5,6 @@
 
 #include "draw.h"
 #include "window.h"
-#include "states.h"
 #include "help.h"
 
 #include "global.h"
@@ -29,7 +28,7 @@ void draw_screen() {
             screen_too_small = FALSE;
         }
 
-        draw_minefield(fieldwin, minefield, (game_state == STATE_DEAD), (game_state == STATE_VICTORY));
+        draw_minefield(fieldwin, minefield, (game_state == dead), (game_state == victory));
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
@@ -72,10 +71,10 @@ void resize_screen() {
 
 void reveal_check_state(int row, int col) {
     if (!reveal_tile(minefield, row, col)) {
-        game_state = STATE_DEAD;
+        game_state = dead;
         reveal_mines(minefield);
     } else if (check_victory(minefield)) {
-        game_state = STATE_VICTORY;
+        game_state = victory;
         int r, c;
         for (r = 0; r < minefield->rows; r++) {
             for (c = 0; c < minefield->cols; c++) {

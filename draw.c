@@ -5,7 +5,6 @@
 
 #include "draw.h"
 #include "colornames.h"
-#include "states.h"
 
 void draw_tile(WINDOW *win, Tile *tile, bool is_cursor, bool check_flag, bool green_mines) {
     int color_pair;
@@ -97,7 +96,7 @@ void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool gre
     draw_tile(win, &minefield->tiles[cur_r][cur_c], true, check_flag, green_mines);
 }
 
-void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int state) {
+void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, enum States state) {
     wclear(win); /* if we don't clear, then if the new text is shorter than the old
                     text, characters are left on screen */
     int mines = minefield->mines;
@@ -108,13 +107,13 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int sta
     mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
 
     switch (state) { /* draw the top line */
-        case STATE_ALIVE:
+        case alive:
             wattron(win, A_BOLD);
             mvwprintw(win, 0, 0, "Press H or ? for help");
             wattroff(win, A_BOLD);
             break;
 
-        case STATE_VICTORY:
+        case victory:
             wattron(win, A_BOLD);
             wattron(win, COLOR_PAIR(MSG_WIN));
             mvwprintw(win, 0, 0, "YOU WIN!");
@@ -122,7 +121,7 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, int sta
             wattroff(win, A_BOLD);
             break;
 
-        case STATE_DEAD:
+        case dead:
             wattron(win, A_BOLD);
             wattron(win, COLOR_PAIR(MSG_DEATH));
             mvwprintw(win, 0, 0, "YOU DIED!");

@@ -13,7 +13,6 @@
 #include "colornames.h"
 #include "window.h"
 #include "types.h"
-#include "states.h"
 #include "draw.h"
 #include "helper.h"
 #include "help.h"
@@ -27,7 +26,7 @@ WINDOW *scorewin = NULL;
 int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
-int game_state; /* see states.h */
+enum States game_state;
 
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
@@ -81,7 +80,7 @@ int main() {
     wrefresh(scorewin);
 
 game:
-    game_state = STATE_ALIVE;
+    game_state = alive;
 
     if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
                              * also might as well increment game_number while we're here */
@@ -204,7 +203,7 @@ game:
                 break;
 
             case ' ': /* reveal tile */
-                if (game_state != STATE_ALIVE)
+                if (game_state != alive)
                     break;
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
@@ -233,7 +232,7 @@ game:
                 break;
 
             case 'f': /* toggle flag */
-                if (game_state != STATE_ALIVE)
+                if (game_state != alive)
                     break;
                 cur_r = minefield->cur.row;
                 cur_c = minefield->cur.col;
