@@ -26,6 +26,6 @@ $(OBJECTS): %.o: %.c
 
 clean:
 	rm -f *.o
-	rm -f smines smines.out
+	rm -f smines
 
 .PHONY: all run debug dbgrun valgrind clean
