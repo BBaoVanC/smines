@@ -5,5 +5,6 @@
 
 #include <ncurses.h>
 
-/* https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html */
+/* Remove a window and any remnants
+ * See https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html */
 void destroy_win(WINDOW *);

@@ -71,6 +71,7 @@ int main() {
 
 
     set_origin(); /* find what coordinate to start at */
+
     /* add 2 to each dimension on every window to fit the
      * borders (since they are inside borders) */
     fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
@@ -127,7 +128,7 @@ game:
                 resize_screen();
                 draw_screen();
             }
-            continue;
+            continue; /* immediately start reading another key press */
         }
 
         nodelay(stdscr, 0); /* we want to wait until a key is pressed */
@@ -210,6 +211,12 @@ game:
                 cur_tile = &minefield->tiles[cur_r][cur_c];
                 if (cur_tile->visible) {
                     if (get_flag_surround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
+                        /* If you have x flags surrounding an already revealed tile, and
+                         * that tile has x surrounding mines, then the other surrounding
+                         * tiles cannot be mines (assuming your flags are correct).
+                         * If any of the flags are incorrect, then you die.
+                         * Other versions seem to do it this way too, and it's easy to
+                         * program it this way. */
                         for (r = cur_r - 1; r < cur_r + 2; r++) {
                             for (c = cur_c - 1; c < cur_c + 2; c++) {
                                 if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {

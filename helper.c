@@ -10,7 +10,7 @@
 
 #include "global.h"
 
-void draw_screen() { /* draw everything */
+void draw_screen() {
     int min_rows = SCOREBOARD_ROWS + MROWS + 2; /* add 2 to fit the minefield borders */
     int min_cols = MCOLS*2 + 2; /* multiply cols by 2 because each tile is 2 cols wide */
 
@@ -70,7 +70,7 @@ void resize_screen() {
     wrefresh(scorewin);
 }
 
-void reveal_check_state(int row, int col) { /* reveal a tile, check for win/loss, and update game_state */
+void reveal_check_state(int row, int col) {
     if (!reveal_tile(minefield, row, col)) {
         game_state = STATE_DEAD;
         reveal_mines(minefield);
