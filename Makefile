@@ -9,7 +9,7 @@ run: clean smines
 	./smines
 
 debug: CFLAGS += -g -Og
-debug: smines
+debug: clean smines
 
 dbgrun: debug
 	./smines
