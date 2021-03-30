@@ -86,7 +86,7 @@ bool reveal_tile(Minefield *minefield, int row, int col) {
 
         for (r = row - 1; r < row + 2; r++) {
             for (c = col - 1; c < col + 2; c++) {
-                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) {
+                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { /* stay in bounds */
                     if (!minefield->tiles[r][c].visible) {
                         reveal_tile(minefield, r, c);
                     }
@@ -133,7 +133,7 @@ int get_flag_surround(Minefield *minefield, int row, int col) {
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* makes ure we are in bounds */
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* make sure we are in bounds */
                 current_tile = &minefield->tiles[r][c];
                 if (current_tile->flagged) {
                     surrounding++;
@@ -146,7 +146,7 @@ int get_flag_surround(Minefield *minefield, int row, int col) {
 }
 
 bool check_victory(Minefield *minefield) {
-    /* this function feels too inefficient */
+    /* this function feels too inefficient but it might not matter */
     int r, c;
     int hidden = 0;
     for (r = 0; r < minefield->rows; r++) {
