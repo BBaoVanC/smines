@@ -28,7 +28,7 @@ void draw_screen() {
             screen_too_small = FALSE;
         }
 
-        draw_minefield(fieldwin, minefield, (game_state == dead), (game_state == victory));
+        draw_minefield(fieldwin, minefield, (game_state == dead), (game_state == victory), game_state);
         wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
         wrefresh(fieldwin);
 
