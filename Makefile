@@ -5,7 +5,7 @@ OBJECTS=smines.o minefield.o window.o draw.o helper.o help.o
 
 all: smines
 
-run: clean smines
+run: smines
 	./smines
 
 debug: CFLAGS += -g -Og
