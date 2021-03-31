@@ -94,7 +94,7 @@ game:
     populate_mines(minefield, start_r, start_c);
 
     generate_surrounding(minefield);
-    reveal_tile(minefield, start_r, start_c); /* reveal the center tileA */
+    reveal_tile(minefield, start_r, start_c); /* reveal the center tile */
 
 #ifdef TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++)
@@ -112,12 +112,12 @@ game:
 
     draw_screen();
 
-    Tile *cur_tile = NULL;
+    Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
     Coordinate *cur_pos = &minefield->cur;
-    int ch;
+    int ch; /* key that was pressed */
     while (true) {
         cur_tile = &minefield->tiles[cur_pos->row][cur_pos->col];
-        ch = getch(); /* wait for a character press */
+        ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
             nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
             if (help_visible) {
