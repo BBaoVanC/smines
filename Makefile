@@ -1,9 +1,23 @@
 CFLAGS += -Wall -std=c99
 LDFLAGS += -lncurses
 
-OBJECTS=smines.o minefield.o window.o draw.o helper.o help.o
+SOURCES = smines.c minefield.c window.c draw.c helper.c help.c
+OBJECTS = $(SOURCES:.c=.o)
 
 all: smines
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+draw.o: colornames.h types.h
+helper.o: global.h
+minefield.o: colornames.h types.h config.h
+smines.o: morecolor.h colornames.h types.h global.h
+
+$(OBJECTS): config.h
+
+smines: $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
 
 run: smines
 	./smines
@@ -16,13 +30,6 @@ dbgrun: debug
 
 valgrind: debug
 	valgrind --leak-check=full --log-file=vgdump ./smines
-
-
-smines: $(OBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o smines
-
-$(OBJECTS): %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f *.o
