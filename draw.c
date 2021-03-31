@@ -10,9 +10,9 @@
 void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
     int color;
     if (tile->flagged) {
-        if (game_state == alive)
-            color = COLOR_PAIR(TILE_FLAG);
-        else if (!tile->mine)
+        if (game_state == victory)
+            color = COLOR_PAIR(TILE_MINE_SAFE);
+        else if ((game_state == dead) && (!tile->mine))
             color = COLOR_PAIR(TILE_FLAG_WRONG);
         else
             color = COLOR_PAIR(TILE_FLAG);
@@ -37,13 +37,12 @@ void draw_tile(WINDOW *win, Tile *tile, int color, enum States game_state) {
 
     if (tile->flagged) {
         wattron(win, A_BOLD);
-        if (game_state == alive) {
-            wprintw(win, " F");
-        } else if (!tile->mine) {
+
+        if ((game_state == dead) && (!tile->mine))
             wprintw(win, "!F");
-        } else {
+        else
             wprintw(win, " F");
-        }
+
         wattroff(win, A_BOLD);
     } else if (tile->visible) {
         if (tile->mine) {
