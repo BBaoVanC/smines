@@ -29,7 +29,7 @@ dbgrun: debug
 	./smines
 
 valgrind: debug
-	valgrind --leak-check=full --log-file=vgdump ./smines
+	valgrind $(VGFLAGS) --leak-check=full --log-file=vgdump ./smines
 
 clean:
 	rm -f *.o
