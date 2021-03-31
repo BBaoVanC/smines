@@ -112,11 +112,11 @@ game:
 
     draw_screen();
 
-    int cur_r, cur_c;
-    int r, c;
     Tile *cur_tile = NULL;
+    Coordinate *cur_pos = &minefield->cur;
     int ch;
     while (true) {
+        cur_tile = &minefield->tiles[cur_pos->row][cur_pos->col];
         ch = getch(); /* wait for a character press */
         if (ch == KEY_RESIZE) {
             nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
@@ -169,55 +169,52 @@ game:
             /* movement keys */
             case 'h':
             case KEY_LEFT:
-                if (minefield->cur.col > 0)
-                    minefield->cur.col--;
+                if (cur_pos->col > 0)
+                    cur_pos->col--;
                 break;
             case 'j':
             case KEY_DOWN:
-                if (minefield->cur.row < minefield->rows - 1)
-                    minefield->cur.row++;
+                if (cur_pos->row < minefield->rows - 1)
+                    cur_pos->row++;
                 break;
             case 'k':
             case KEY_UP:
-                if (minefield->cur.row > 0)
-                    minefield->cur.row--;
+                if (cur_pos->row > 0)
+                    cur_pos->row--;
                 break;
             case 'l':
             case KEY_RIGHT:
-                if (minefield->cur.col < minefield->cols - 1)
-                    minefield->cur.col++;
+                if (cur_pos->col < minefield->cols - 1)
+                    cur_pos->col++;
                 break;
 
             case '0':
             case '^':
-                minefield->cur.col = 0;
+                cur_pos->col = 0;
                 break;
             case '$':
-                minefield->cur.col = minefield->cols - 1;
+                cur_pos->col = minefield->cols - 1;
                 break;
             case 'g':
-                minefield->cur.row = 0;
+                cur_pos->row = 0;
                 break;
             case 'G':
-                minefield->cur.row = minefield->rows - 1;
+                cur_pos->row = minefield->rows - 1;
                 break;
 
             case ' ': /* reveal tile */
                 if (game_state != alive)
                     break;
-                cur_r = minefield->cur.row;
-                cur_c = minefield->cur.col;
-                cur_tile = &minefield->tiles[cur_r][cur_c];
                 if (cur_tile->visible) {
-                    if (get_flag_surround(minefield, cur_r, cur_c) == cur_tile->surrounding) {
+                    if (get_flag_surround(minefield, cur_pos->row, cur_pos->col) == cur_tile->surrounding) {
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
                          * If any of the flags are incorrect, then you die.
                          * Other versions seem to do it this way too, and it's easy to
                          * program it this way. */
-                        for (r = cur_r - 1; r < cur_r + 2; r++) {
-                            for (c = cur_c - 1; c < cur_c + 2; c++) {
+                        for (int r = cur_pos->row - 1; r < cur_pos->row + 2; r++) {
+                            for (int c = cur_pos->col - 1; c < cur_pos->col + 2; c++) {
                                 if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
                                     if (!minefield->tiles[r][c].flagged) {
                                         reveal_check_state(r, c);
@@ -227,16 +224,13 @@ game:
                         }
                     }
                 } else if (!cur_tile->flagged) {
-                    reveal_check_state(cur_r, cur_c);
+                    reveal_check_state(cur_pos->row, cur_pos->col);
                 }
                 break;
 
             case 'f': /* toggle flag */
                 if (game_state != alive)
                     break;
-                cur_r = minefield->cur.row;
-                cur_c = minefield->cur.col;
-                cur_tile = &minefield->tiles[cur_r][cur_c];
                 if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
                     if (cur_tile->flagged)
