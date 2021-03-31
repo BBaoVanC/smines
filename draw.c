@@ -7,10 +7,6 @@
 #include "colornames.h"
 #include "types.h"
 
-void draw_cursor(WINDOW *win, Tile *tile, enum States game_state) {
-    draw_tile(win, tile, COLOR_PAIR(TILE_CURSOR), game_state);
-}
-
 void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
     int color;
     if (tile->flagged) {
@@ -37,46 +33,34 @@ void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
 }
 
 void draw_tile(WINDOW *win, Tile *tile, int color, enum States game_state) {
-    bool use_surrounding = false;
-    bool bold_text = false;
-    char *tile_text = NULL;
+    wattron(win, color);
 
     if (tile->flagged) {
-        bold_text = true;
+        wattron(win, A_BOLD);
         if (game_state == alive) {
-            tile_text = " F";
+            wprintw(win, " F");
         } else if (!tile->mine) {
-            tile_text = "!F";
+            wprintw(win, "!F");
         } else {
-            tile_text = " F";
+            wprintw(win, " F");
         }
+        wattroff(win, A_BOLD);
     } else if (tile->visible) {
         if (tile->mine) {
-            bold_text = true;
-            tile_text = " X";
+            wattron(win, A_BOLD);
+            wprintw(win, " X");
+            wattroff(win, A_BOLD);
         } else {
-            use_surrounding = true;
+            if (tile->surrounding == 0)
+                wprintw(win, "  ");
+            else
+                wprintw(win, " %i", tile->surrounding);
         }
     } else {
-        tile_text = " ?";
+        wprintw(win, " ?");
     }
 
-
-    if (bold_text)
-        wattron(win, A_BOLD);
-
-    wattron(win, color);
-    if (!use_surrounding)
-        wprintw(win, tile_text);
-    else
-        if (tile->surrounding == 0)
-            wprintw(win, "  ");
-        else
-            wprintw(win, " %i", tile->surrounding);
     wattroff(win, color);
-
-    if (bold_text)
-        wattroff(win, A_BOLD);
 }
 
 void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool green_mines, enum States game_state) {
@@ -92,7 +76,7 @@ void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool gre
     }
 
     wmove(win, cur_r + 1, cur_c*2 + 1);
-    draw_cursor(win, &minefield->tiles[cur_r][cur_c], game_state);
+    draw_tile(win, &minefield->tiles[cur_r][cur_c], COLOR_PAIR(TILE_CURSOR), game_state);
 }
 
 void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, enum States state) {

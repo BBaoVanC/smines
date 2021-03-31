@@ -6,7 +6,6 @@
 #include <ncurses.h>
 #include "minefield.h"
 
-void draw_cursor(WINDOW *, Tile *, enum States);
 void draw_tile_color(WINDOW *, Tile *, enum States);
 void draw_tile(WINDOW *, Tile *, int, enum States);
 
