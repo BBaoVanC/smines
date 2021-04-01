@@ -16,6 +16,7 @@
 #include "draw.h"
 #include "helper.h"
 #include "help.h"
+#include "undo.h"
 
 #include "global.h"
 
@@ -29,6 +30,9 @@ bool screen_too_small = FALSE;
 enum States game_state;
 
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
+
+Minefield undo_minefield; /* the minefield before the last move */
+enum States undo_game_state; /* the game state before the last move */
 
 int main() {
     srand((unsigned) time(NULL)); /* seed the random number generator */
@@ -95,6 +99,8 @@ game:
 
     generate_surrounding(minefield);
     reveal_tile(minefield, start_r, start_c); /* reveal the center tile */
+
+    copy_undo();
 
 #ifdef TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++)
@@ -202,11 +208,17 @@ game:
                 cur_pos->row = minefield->rows - 1;
                 break;
 
+            case 'u': /* undo */
+                undo();
+                draw_screen();
+                break;
+
             case ' ': /* reveal tile */
                 if (game_state != alive)
                     break;
                 if (cur_tile->visible) {
                     if (get_flag_surround(minefield, cur_pos->row, cur_pos->col) == cur_tile->surrounding) {
+                        copy_undo();
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
@@ -224,6 +236,7 @@ game:
                         }
                     }
                 } else if (!cur_tile->flagged) {
+                    copy_undo();
                     reveal_check_state(cur_pos->row, cur_pos->col);
                 }
                 break;

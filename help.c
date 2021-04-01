@@ -14,6 +14,7 @@ const char helptxt[] =
     "r: new game\n"
     "space: reveal tile under cursor\n"
     "f: place flag\n"
+    "u: undo last move (undoing a second time will 'undo the undo')\n"
     "\n"
     "Use hjkl or arrow keys to move\n"
     "0 or ^: jump to left side\n"

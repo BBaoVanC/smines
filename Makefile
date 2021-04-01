@@ -1,7 +1,7 @@
 CFLAGS += -Wall -std=c99
 LDFLAGS += -lncurses
 
-SOURCES = smines.c minefield.c window.c draw.c helper.c help.c
+SOURCES = smines.c minefield.c window.c draw.c helper.c help.c undo.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: smines
@@ -13,6 +13,7 @@ draw.o: colornames.h types.h
 helper.o: global.h
 minefield.o: colornames.h types.h config.h
 smines.o: morecolor.h colornames.h types.h global.h
+undo.o: global.h
 
 $(OBJECTS): config.h
 

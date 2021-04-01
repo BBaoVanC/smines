@@ -17,3 +17,6 @@ extern bool screen_too_small;
 extern enum States game_state;
 
 extern bool help_visible; /* if true, draw help page **instead of** everything else */
+
+extern Minefield undo_minefield; /* the minefield before the last move */
+extern enum States undo_game_state; /* the game state before the last move */
