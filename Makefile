@@ -17,6 +17,7 @@ undo.o: global.h
 
 $(OBJECTS): config.h
 
+smines: CFLAGS += -O3
 smines: $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
 
