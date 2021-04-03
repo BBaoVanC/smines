@@ -3,6 +3,10 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#include "config.h"
+
+#if ALLOW_UNDO
+
 #include <string.h>
 
 #include "global.h"
@@ -25,3 +29,5 @@ void undo() {
     undo_minefield = buffer_minefield;
     undo_game_state = buffer_game_state;
 }
+
+#endif

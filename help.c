@@ -3,6 +3,8 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#include "config.h"
+
 #include "help.h"
 #include <ncurses.h>
 
@@ -14,7 +16,9 @@ const char helptxt[] =
     "r: new game\n"
     "space: reveal tile under cursor\n"
     "f: place flag\n"
+#if ALLOW_UNDO
     "u: undo last move (undoing a second time will 'undo the undo')\n"
+#endif
     "\n"
     "Use hjkl or arrow keys to move\n"
     "0 or ^: jump to left side\n"

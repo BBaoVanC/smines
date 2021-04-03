@@ -16,7 +16,12 @@
 #include "draw.h"
 #include "helper.h"
 #include "help.h"
+
+#include "config.h"
+
+#if ALLOW_UNDO
 #include "undo.h"
+#endif
 
 #include "global.h"
 
@@ -31,8 +36,10 @@ enum States game_state;
 
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
+#if ALLOW_UNDO
 Minefield undo_minefield; /* the minefield before the last move */
 enum States undo_game_state; /* the game state before the last move */
+#endif
 
 int main() {
     srand((unsigned) time(NULL)); /* seed the random number generator */
@@ -100,7 +107,9 @@ game:
     generate_surrounding(minefield);
     reveal_tile(minefield, start_r, start_c); /* reveal the center tile */
 
+    #if ALLOW_UNDO
     copy_undo();
+    #endif
 
 #ifdef TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++)
@@ -208,17 +217,21 @@ game:
                 cur_pos->row = minefield->rows - 1;
                 break;
 
+            #if ALLOW_UNDO
             case 'u': /* undo */
                 undo();
                 draw_screen();
                 break;
+            #endif
 
             case ' ': /* reveal tile */
                 if (game_state != alive)
                     break;
                 if (cur_tile->visible) {
                     if (get_flag_surround(minefield, cur_pos->row, cur_pos->col) == cur_tile->surrounding) {
+                        #if ALLOW_UNDO
                         copy_undo();
+                        #endif
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
@@ -236,7 +249,9 @@ game:
                         }
                     }
                 } else if (!cur_tile->flagged) {
+                    #if ALLOW_UNDO
                     copy_undo();
+                    #endif
                     reveal_check_state(cur_pos->row, cur_pos->col);
                 }
                 break;

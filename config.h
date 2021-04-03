@@ -16,3 +16,5 @@
 #define MCOLS 9
 #define MINES 10
 */
+
+#define ALLOW_UNDO 1 /* set to 0 to disable undoing (prevent cheating) */
