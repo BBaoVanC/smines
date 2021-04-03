@@ -18,3 +18,6 @@
 */
 
 #define ALLOW_UNDO 1 /* set to 0 to disable undoing (prevent cheating) */
+
+/* debugging options */
+#define TILE_COLOR_DEBUG 0

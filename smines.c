@@ -47,6 +47,12 @@ int main() {
     /* ncurses setup */
     initscr(); /* start ncurses */
 
+    if (!has_colors()) {
+        endwin();
+        printf("smines requires color support in your terminal to work properly.\n");
+        exit(1);
+    }
+
     keypad(stdscr, TRUE); /* for the arrow keys */
     noecho(); /* don't show the letters of pressed keys */
     curs_set(0); /* make the cursor invisible */
@@ -111,7 +117,7 @@ game:
     copy_undo();
     #endif
 
-#ifdef TILE_COLOR_DEBUG
+#if TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++)
         minefield->tiles[i][0].visible = true;
     minefield->tiles[0][0].surrounding = 0;
