@@ -17,13 +17,12 @@ void copy_undo() {
 }
 
 void undo() {
-    Minefield buffer_minefield;
-    enum States buffer_game_state;
-
-    buffer_minefield = *minefield;
-    buffer_game_state = game_state;
+    Minefield buffer_minefield = *minefield;
+    enum States buffer_game_state = game_state;
+    Coordinate buffer_cursor = minefield->cur;
 
     memcpy(minefield, &undo_minefield, sizeof(Minefield));
+    minefield->cur = buffer_cursor;
     game_state = undo_game_state;
 
     undo_minefield = buffer_minefield;
