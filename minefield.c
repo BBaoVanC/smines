@@ -146,7 +146,8 @@ int get_flag_surround(Minefield *minefield, int row, int col) {
 }
 
 bool check_victory(Minefield *minefield) {
-    /* this function feels too inefficient but it might not matter */
+    /* TODO: count up the hidden tiles as they are revealed so they
+     * don't have to be recounted every time this function runs */
     int r, c;
     int hidden = 0;
     for (r = 0; r < minefield->rows; r++) {
