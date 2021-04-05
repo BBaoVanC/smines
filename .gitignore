@@ -74,3 +74,4 @@ vgdump.core.*
 
 smines
 *.log
+config.h

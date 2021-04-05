@@ -6,6 +6,9 @@ OBJECTS = $(SOURCES:.c=.o)
 
 all: smines
 
+config.h: config.def.h
+	cp config.def.h config.h
+
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
