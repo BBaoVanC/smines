@@ -9,22 +9,23 @@
 
 void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
     int color;
+
     if (tile->flagged) {
+
         if (game_state == victory)
             color = COLOR_PAIR(TILE_MINE_SAFE);
         else if ((game_state == dead) && (!tile->mine))
             color = COLOR_PAIR(TILE_FLAG_WRONG);
         else
             color = COLOR_PAIR(TILE_FLAG);
+
     } else if (tile->visible) {
-        if (tile->mine) {
-            if (game_state == victory)
-                color = COLOR_PAIR(TILE_MINE_SAFE);
-            else
-                color = COLOR_PAIR(TILE_MINE);
-        } else {
+
+        if (tile->mine)
+            color = COLOR_PAIR( game_state == victory ? TILE_MINE_SAFE : TILE_MINE );
+        else
             color = get_surround_color(tile->surrounding);
-        }
+
     } else {
         color = COLOR_PAIR(TILE_HIDDEN);
     }

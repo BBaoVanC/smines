@@ -157,8 +157,5 @@ bool check_victory(Minefield *minefield) {
         }
     }
 
-    if (hidden == minefield->mines)
-        return true;
-    else
-        return false;
+    return hidden == minefield->mines;
 }

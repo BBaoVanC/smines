@@ -118,17 +118,10 @@ game:
     #endif
 
 #if TILE_COLOR_DEBUG
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) {
         minefield->tiles[i][0].visible = true;
-    minefield->tiles[0][0].surrounding = 0;
-    minefield->tiles[1][0].surrounding = 1;
-    minefield->tiles[2][0].surrounding = 2;
-    minefield->tiles[3][0].surrounding = 3;
-    minefield->tiles[4][0].surrounding = 4;
-    minefield->tiles[5][0].surrounding = 5;
-    minefield->tiles[6][0].surrounding = 6;
-    minefield->tiles[7][0].surrounding = 7;
-    minefield->tiles[8][0].surrounding = 8;
+        minefield->tiles[i][0].surrounding = i;
+    }
 #endif
 
     draw_screen();
