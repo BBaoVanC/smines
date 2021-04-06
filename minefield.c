@@ -51,9 +51,7 @@ void populate_mines(Minefield *minefield) {
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
 
-        /* the following abomination makes sure the 8 surrounding tiles
-         * around the cursor aren't mines
-         */
+        /* TODO: just check the 3x3 instead of this */
         if (!((r >= minefield->cur.row - 1) &&
              (c >= minefield->cur.col - 1) &&
              (r <= minefield->cur.row + 1) &&
@@ -72,6 +70,7 @@ void populate_mines(Minefield *minefield) {
  *  Minefield *minefield: minefield containing the tiles array to use
  */
 void generate_surrounding(Minefield *minefield) {
+    /* TODO: go to each mine and increment surrounding by 1 for the tiles in a circle */
     Tile *t = NULL;
     for (int c = 0; c < minefield->cols; c++) {
         for (int r = 0; r < minefield->rows; r++) {
