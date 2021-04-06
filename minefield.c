@@ -37,13 +37,13 @@ Minefield *init_minefield(int rows, int cols, int mines) {
 }
 
 /* populate_mines - randomly place mines throughout the minefield
+ * Note: automatically makes sure the tile the cursor is on is a zero tile
+ *       It's tradition to make the starting position a zero tile since it's the
+ *       most helpful start (getting anything else as your first tile is just a luck game)
  * inputs:
  *  Minefield *minefield: the minefield (amount of mines is read from here too)
- *  int excl_r and excl_c: the coordinate to make a zero tile
- *      It's tradition to make the starting position a zero tile since it's the
- *      most helpful start (getting a one as your first tile is pretty much just a luck game)
  */
-void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
+void populate_mines(Minefield *minefield) {
     int i, r, c;
     Tile *t = NULL;
     for (i = 0; i < minefield->mines;) { /* don't increment i here because it's incremented later if it's an acceptable place */
@@ -51,18 +51,16 @@ void populate_mines(Minefield *minefield, int excl_r, int excl_c) {
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
 
-        /* the following abomination makes sure the 8 surrounding mines
+        /* the following abomination makes sure the 8 surrounding tiles
          * around the cursor aren't mines
          */
         if (!((r >= minefield->cur.row - 1) &&
              (c >= minefield->cur.col - 1) &&
              (r <= minefield->cur.row + 1) &&
-             (r <= minefield->cur.col + 1))) {
+             (c <= minefield->cur.col + 1))) {
             if (!t->mine) { /* prevent overlapping of mines */
-                if ((r != excl_r) && (c != excl_c)) {
-                    t->mine = true;
-                    i++; /* since it's not incremented by the for loop */
-                }
+                t->mine = true;
+                i++; /* since it's not incremented by the for loop */
             }
         }
     }

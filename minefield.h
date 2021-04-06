@@ -11,7 +11,7 @@
 /* Create a minefield
  * remember to populate_mines() since this won't do it automatically */
 Minefield *init_minefield(int, int, int);
-void populate_mines(Minefield *, int, int);
+void populate_mines(Minefield *);
 /* Calculate the surrounding mines for every single tile */
 void generate_surrounding(Minefield *);
 /* Figure out what color to use based on surrounding tiles */

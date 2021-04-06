@@ -104,14 +104,7 @@ game:
         free(minefield);
 
     minefield = init_minefield(MROWS, MCOLS, MINES);
-
-    int start_r = minefield->rows/2;
-    int start_c = minefield->cols/2;
-
-    populate_mines(minefield, start_r, start_c);
-
-    generate_surrounding(minefield);
-    reveal_tile(minefield, start_r, start_c); /* reveal the center tile */
+    bool first_reveal = true;
 
     #if ALLOW_UNDO
     copy_undo();
@@ -224,6 +217,13 @@ game:
             #endif
 
             case ' ': /* reveal tile */
+                if (first_reveal) {
+                    populate_mines(minefield);
+                    generate_surrounding(minefield);
+                    reveal_tile(minefield, cur_pos->row, cur_pos->col);
+                    first_reveal = false;
+                    break;
+                }
                 if (game_state != alive)
                     break;
                 if (cur_tile->visible) {
