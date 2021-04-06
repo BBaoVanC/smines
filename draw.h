@@ -6,6 +6,7 @@
 #include <ncurses.h>
 #include "minefield.h"
 
+/* draw_tile with color */
 void draw_tile_color(WINDOW *, Tile *, Game_State);
 void draw_tile(WINDOW *, Tile *, int, Game_State);
 

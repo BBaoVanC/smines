@@ -13,8 +13,6 @@
  *  WINDOW *win: the window to draw into
  *  Tile *tile: the tile to draw
  *  Game_State game_state: the current game state
- * output:
- *  void
  */
 void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
     int color;
@@ -49,8 +47,6 @@ void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
  *  Tile *tile: the tile to draw
  *  int color: ncurses color pair to use
  *  Game_State game_state: the current game state
- * output:
- *  void
  */
 void draw_tile(WINDOW *win, Tile *tile, int color, Game_State game_state) {
     wattron(win, color);
@@ -87,8 +83,6 @@ void draw_tile(WINDOW *win, Tile *tile, int color, Game_State game_state) {
  *  WINDOW *win: the window to draw into
  *  Minefield *minefield: the minefield to draw
  *  Game_State game_state: the current gqme state
- * output:
- *  void
  */
 void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
     /* remember: multiply x by 2 because each tile is 2 cols wide */
@@ -113,8 +107,6 @@ void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
  *  Minefield *minefield: the current minefield (used for calculations)
  *  int game_number: the current game number
  *  Game_State state: the current game state
- * output:
- *  void
  */
 void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, Game_State state) {
     wclear(win); /* if we don't clear, then if the new text is shorter than the old

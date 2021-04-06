@@ -27,6 +27,10 @@ const char helptxt[] =
     "G: jump to bottom side\n"
     ;
 
+/* draw_help
+ * inputs:
+ *  WINDOW *win: the window to draw help into
+ */
 void draw_help(WINDOW *win) {
     wmove(win, 0, 0);
     wprintw(win, helptxt);

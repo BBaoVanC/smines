@@ -7,7 +7,11 @@
 
 #include "window.h"
 
-/* https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html */
+/* destroy_win - delete a window without leaving artifacts on screen
+ * Source: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html
+ * inputs:
+ *  WINDOW *local_win: the window to destroy
+ */
 void destroy_win(WINDOW *local_win) {
     wclear(local_win);
     /* box(local_win, ' ', ' '); : This won't produce the desired
