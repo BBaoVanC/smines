@@ -7,7 +7,7 @@
 #include "colornames.h"
 #include "types.h"
 
-void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
+void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
     int color;
 
     if (tile->flagged) {
@@ -33,7 +33,7 @@ void draw_tile_color(WINDOW *win, Tile *tile, enum States game_state) {
     draw_tile(win, tile, color, game_state);
 }
 
-void draw_tile(WINDOW *win, Tile *tile, int color, enum States game_state) {
+void draw_tile(WINDOW *win, Tile *tile, int color, Game_State game_state) {
     wattron(win, color);
 
     if (tile->flagged) {
@@ -63,7 +63,7 @@ void draw_tile(WINDOW *win, Tile *tile, int color, enum States game_state) {
     wattroff(win, color);
 }
 
-void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool green_mines, enum States game_state) {
+void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool green_mines, Game_State game_state) {
     /* remember: multiply x by 2 because each tile is 2 cols wide */
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
@@ -79,7 +79,7 @@ void draw_minefield(WINDOW *win, Minefield *minefield, bool check_flag, bool gre
     draw_tile(win, &minefield->tiles[cur_r][cur_c], COLOR_PAIR(TILE_CURSOR), game_state);
 }
 
-void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, enum States state) {
+void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, Game_State state) {
     wclear(win); /* if we don't clear, then if the new text is shorter than the old
                     text, characters are left on screen */
     int mines = minefield->mines;

@@ -29,10 +29,10 @@ typedef struct {
     Tile tiles[MROWS][MCOLS];
 } Minefield;
 
-enum States {
+typedef enum {
     alive,
     victory,
     dead
-};
+} Game_State;
 
 #endif

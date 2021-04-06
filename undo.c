@@ -18,7 +18,7 @@ void copy_undo() {
 
 void undo() {
     Minefield buffer_minefield = *minefield;
-    enum States buffer_game_state = game_state;
+    Game_State buffer_game_state = game_state;
     Coordinate buffer_cursor = minefield->cur;
 
     memcpy(minefield, &undo_minefield, sizeof(Minefield));

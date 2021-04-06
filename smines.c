@@ -32,13 +32,13 @@ WINDOW *scorewin = NULL;
 int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
-enum States game_state;
+Game_State game_state;
 
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
 #if ALLOW_UNDO
 Minefield undo_minefield; /* the minefield before the last move */
-enum States undo_game_state; /* the game state before the last move */
+Game_State undo_game_state; /* the game state before the last move */
 #endif
 
 int main() {
