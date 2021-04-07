@@ -51,11 +51,13 @@ void populate_mines(Minefield *minefield) {
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
 
-        /* TODO: just check the 3x3 instead of this */
+        /* When I first checked this I thoguht it was too complicated
+         * but reading it, now I realize that it is just checking the 3x3,
+         * but it looks bad because there's two dimensions */
         if (!((r >= minefield->cur.row - 1) &&
-             (c >= minefield->cur.col - 1) &&
-             (r <= minefield->cur.row + 1) &&
-             (c <= minefield->cur.col + 1))) {
+              (c >= minefield->cur.col - 1) &&
+              (r <= minefield->cur.row + 1) &&
+              (c <= minefield->cur.col + 1))) {
             if (!t->mine) { /* prevent overlapping of mines */
                 t->mine = true;
                 i++; /* since it's not incremented by the for loop */
@@ -70,12 +72,19 @@ void populate_mines(Minefield *minefield) {
  *  Minefield *minefield: minefield containing the tiles array to use
  */
 void generate_surrounding(Minefield *minefield) {
-    /* TODO: go to each mine and increment surrounding by 1 for the tiles in a circle */
-    Tile *t = NULL;
-    for (int c = 0; c < minefield->cols; c++) {
-        for (int r = 0; r < minefield->rows; r++) {
-            t = &minefield->tiles[r][c];
-            t->surrounding = get_surround(minefield, r, c);
+    for (int y = 0; y < minefield->rows; y++) {
+        for (int x = 0; x < minefield->cols; x++) {
+            if (minefield->tiles[y][x].mine) {
+                /* if the tile is a mine, increment `surrounding` on the nearby
+                 * tiles by one */
+                for (int r = y - 1; r <= y + 1; r++) {
+                    for (int c = x - 1; c <= x + 1; c++) {
+                        /* do a bounds check: */
+                        if ((c >= 0) && (r >= 0) && (c < minefield->cols) && (r < minefield->rows))
+                            minefield->tiles[r][c].surrounding++;
+                    }
+                }
+            }
         }
     }
 }
