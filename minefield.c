@@ -3,15 +3,15 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ncurses.h>
 
 #include "colornames.h"
-#include "minefield.h"
-#include "draw.h"
-#include "types.h"
 #include "config.h"
+#include "draw.h"
+#include "minefield.h"
+#include "types.h"
 
 /* init_minefield - create a pointer to a new minefield
  * inputs:
@@ -46,7 +46,7 @@ Minefield *init_minefield(int rows, int cols, int mines) {
 void populate_mines(Minefield *minefield) {
     int i, r, c;
     Tile *t = NULL;
-    for (i = 0; i < minefield->mines;) { /* don't increment i here because it's incremented later if it's an acceptable place */
+    for (i = 0; i < minefield->mines;) {          /* don't increment i here because it's incremented later if it's an acceptable place */
         r = (rand() % (minefield->rows - 1 + 1)); /* generate random row */
         c = (rand() % (minefield->cols - 1 + 1)); /* generate random col */
         t = &minefield->tiles[r][c];
@@ -65,7 +65,6 @@ void populate_mines(Minefield *minefield) {
         }
     }
 }
-
 
 /* generate_surrounding - generate the surrounding value for all tiles in a minefield
  * inputs:

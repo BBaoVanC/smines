@@ -18,7 +18,7 @@ void destroy_win(WINDOW *local_win) {
      * result of erasing the window. It will leave it's four corners
      * and so an ugly remnant of window.
      */
-    wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+    wborder(local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
     /* The parameters taken are
      * 1. win: the window on which to operate
      * 2. ls: character to be used for the left side of the window

@@ -3,10 +3,10 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <stdbool.h>
-#include <ncurses.h>
-#include "types.h"
 #include "config.h"
+#include "types.h"
+#include <ncurses.h>
+#include <stdbool.h>
 
 /* Create a minefield
  * remember to populate_mines() since this won't do it automatically */

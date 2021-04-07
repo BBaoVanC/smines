@@ -3,9 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <ncurses.h>
 #include "minefield.h"
 #include "types.h"
+#include <ncurses.h>
 
 extern int SCOREBOARD_ROWS;
 extern Minefield *minefield;
@@ -19,6 +19,6 @@ extern Game_State game_state;
 extern bool help_visible; /* if true, draw help page **instead of** everything else */
 
 #if ALLOW_UNDO
-extern Minefield undo_minefield; /* the minefield before the last move */
+extern Minefield undo_minefield;   /* the minefield before the last move */
 extern Game_State undo_game_state; /* the game state before the last move */
 #endif

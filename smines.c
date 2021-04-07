@@ -8,14 +8,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "colornames.h"
+#include "draw.h"
+#include "help.h"
+#include "helper.h"
 #include "minefield.h"
 #include "morecolor.h"
-#include "colornames.h"
-#include "window.h"
 #include "types.h"
-#include "draw.h"
-#include "helper.h"
-#include "help.h"
+#include "window.h"
 
 #include "config.h"
 
@@ -37,12 +37,12 @@ Game_State game_state;
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
 #if ALLOW_UNDO
-Minefield undo_minefield; /* the minefield before the last move */
+Minefield undo_minefield;   /* the minefield before the last move */
 Game_State undo_game_state; /* the game state before the last move */
 #endif
 
 int main() {
-    srand((unsigned) time(NULL)); /* seed the random number generator */
+    srand((unsigned)time(NULL)); /* seed the random number generator */
 
     /* ncurses setup */
     initscr(); /* start ncurses */
@@ -54,11 +54,11 @@ int main() {
     }
 
     keypad(stdscr, TRUE); /* for the arrow keys */
-    noecho(); /* don't show the letters of pressed keys */
-    curs_set(0); /* make the cursor invisible */
-    refresh(); /* if I don't do this, the window doesn't appear until a key press */
+    noecho();             /* don't show the letters of pressed keys */
+    curs_set(0);          /* make the cursor invisible */
+    refresh();            /* if I don't do this, the window doesn't appear until a key press */
 
-    start_color(); /* enable color */
+    start_color();        /* enable color */
     use_default_colors(); /* allows us to use colors like the terminal background */
 
     /* init_pair(id, fg, bg); */

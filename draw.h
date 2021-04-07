@@ -3,8 +3,8 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <ncurses.h>
 #include "minefield.h"
+#include <ncurses.h>
 
 /* draw_tile with color */
 void draw_tile_color(WINDOW *, Tile *, Game_State);

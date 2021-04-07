@@ -4,8 +4,8 @@
  */
 
 #include "draw.h"
-#include "window.h"
 #include "help.h"
+#include "window.h"
 
 #include "global.h"
 
@@ -34,7 +34,6 @@ void draw_screen() {
 
         draw_scoreboard(scorewin, minefield, game_number, game_state);
         wrefresh(scorewin);
-
     }
 }
 
