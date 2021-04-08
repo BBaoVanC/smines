@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "types.h"
+
 #include <ncurses.h>
 #include <stdbool.h>
 

@@ -3,12 +3,8 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include "colornames.h"
+#include "config.h"
 #include "draw.h"
 #include "help.h"
 #include "helper.h"
@@ -17,10 +13,13 @@
 #include "types.h"
 #include "window.h"
 
-#include "config.h"
+#include <ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #if ALLOW_UNDO
-#include "undo.h"
+    #include "undo.h"
 #endif
 
 #include "global.h"
@@ -62,38 +61,37 @@ int main() {
     use_default_colors(); /* allows us to use colors like the terminal background */
 
     /* init_pair(id, fg, bg); */
-    init_pair(TILE_ZERO,            COLOR_WHITE,            COLOR_BLACK);
-    init_pair(TILE_MINE,            COLOR_RED,              COLOR_BLACK);
-    init_pair(TILE_MINE_SAFE,       COLOR_GREEN,            COLOR_BLACK);
+    init_pair(TILE_ZERO, COLOR_WHITE, COLOR_BLACK);
+    init_pair(TILE_MINE, COLOR_RED, COLOR_BLACK);
+    init_pair(TILE_MINE_SAFE, COLOR_GREEN, COLOR_BLACK);
 
-    init_pair(TILE_ONE,             COLOR_WHITE,            COLOR_BLUE);
-    init_pair(TILE_TWO,             COLOR_BLACK,            COLOR_GREEN);
-    init_pair(TILE_THREE,           COLOR_WHITE,            COLOR_RED);
-    init_pair(TILE_FOUR,            COLOR_BLACK,            COLOR_CYAN);
-    init_pair(TILE_FIVE,            COLOR_WHITE,            94);
-    init_pair(TILE_SIX,             COLOR_BLACK,            COLOR_MAGENTA);
-    init_pair(TILE_SEVEN,           COLOR_WHITE,            COLOR_BLACK);
-    init_pair(TILE_EIGHT,           COLOR_WHITE,            COLOR_LIGHT_BLACK);
+    init_pair(TILE_ONE, COLOR_WHITE, COLOR_BLUE);
+    init_pair(TILE_TWO, COLOR_BLACK, COLOR_GREEN);
+    init_pair(TILE_THREE, COLOR_WHITE, COLOR_RED);
+    init_pair(TILE_FOUR, COLOR_BLACK, COLOR_CYAN);
+    init_pair(TILE_FIVE, COLOR_WHITE, 94);
+    init_pair(TILE_SIX, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(TILE_SEVEN, COLOR_WHITE, COLOR_BLACK);
+    init_pair(TILE_EIGHT, COLOR_WHITE, COLOR_LIGHT_BLACK);
 
-    init_pair(TILE_HIDDEN,          COLOR_LIGHT_BLACK,      -1);
-    init_pair(TILE_FLAG,            COLOR_YELLOW,           COLOR_BLACK);
-    init_pair(TILE_FLAG_WRONG,      COLOR_BLUE,             COLOR_BLACK);
-    init_pair(TILE_CURSOR,          COLOR_BLACK,            COLOR_WHITE);
+    init_pair(TILE_HIDDEN, COLOR_LIGHT_BLACK, -1);
+    init_pair(TILE_FLAG, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(TILE_FLAG_WRONG, COLOR_BLUE, COLOR_BLACK);
+    init_pair(TILE_CURSOR, COLOR_BLACK, COLOR_WHITE);
 
-    init_pair(TILE_ERROR,           COLOR_WHITE,            COLOR_RED);
+    init_pair(TILE_ERROR, COLOR_WHITE, COLOR_RED);
 
-    init_pair(MSG_DEATH,            COLOR_RED,              -1);
-    init_pair(MSG_WIN,              COLOR_GREEN,            -1);
-
+    init_pair(MSG_DEATH, COLOR_RED, -1);
+    init_pair(MSG_WIN, COLOR_GREEN, -1);
 
     set_origin(); /* find what coordinate to start at */
 
     /* add 2 to each dimension on every window to fit the
      * borders (since they are inside borders) */
-    fieldwin = newwin(MROWS + 2, MCOLS*2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    fieldwin = newwin(MROWS + 2, MCOLS * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
     wrefresh(fieldwin);
 
-    scorewin = newwin(SCOREBOARD_ROWS, MCOLS*2, origin_y, origin_x);
+    scorewin = newwin(SCOREBOARD_ROWS, MCOLS * 2, origin_y, origin_x);
     wrefresh(scorewin);
 
 game:
@@ -106,9 +104,9 @@ game:
     minefield = init_minefield(MROWS, MCOLS, MINES);
     bool first_reveal = true;
 
-    #if ALLOW_UNDO
+#if ALLOW_UNDO
     copy_undo();
-    #endif
+#endif
 
 #if TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++) {
@@ -139,7 +137,7 @@ game:
 
         nodelay(stdscr, 0); /* we want to wait until a key is pressed */
         if (help_visible) {
-            switch(ch) {
+            switch (ch) {
                 case 'H': /* close help */
                 case '?':
                 case 'q':
@@ -209,12 +207,12 @@ game:
                 cur_pos->row = minefield->rows - 1;
                 break;
 
-            #if ALLOW_UNDO
+#if ALLOW_UNDO
             case 'u': /* undo */
                 undo();
                 draw_screen();
                 break;
-            #endif
+#endif
 
             case ' ': /* reveal tile */
                 if (first_reveal) {
@@ -228,9 +226,9 @@ game:
                     break;
                 if (cur_tile->visible) {
                     if (get_flag_surround(minefield, cur_pos->row, cur_pos->col) == cur_tile->surrounding) {
-                        #if ALLOW_UNDO
+#if ALLOW_UNDO
                         copy_undo();
-                        #endif
+#endif
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
@@ -248,9 +246,9 @@ game:
                         }
                     }
                 } else if (!cur_tile->flagged) {
-                    #if ALLOW_UNDO
+#if ALLOW_UNDO
                     copy_undo();
-                    #endif
+#endif
                     reveal_check_state(cur_pos->row, cur_pos->col);
                 }
                 break;

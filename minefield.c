@@ -3,15 +3,16 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "minefield.h"
 
 #include "colornames.h"
 #include "config.h"
 #include "draw.h"
-#include "minefield.h"
 #include "types.h"
+
+#include <ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /* init_minefield - create a pointer to a new minefield
  * inputs:

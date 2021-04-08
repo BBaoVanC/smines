@@ -4,10 +4,9 @@
  */
 
 #include "draw.h"
+#include "global.h"
 #include "help.h"
 #include "window.h"
-
-#include "global.h"
 
 void draw_screen() {
     int min_rows = SCOREBOARD_ROWS + MROWS + 2; /* add 2 to fit the minefield borders */

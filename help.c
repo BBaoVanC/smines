@@ -3,9 +3,10 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#include "help.h"
+
 #include "config.h"
 
-#include "help.h"
 #include <ncurses.h>
 
 const char helptxt[] =

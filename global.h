@@ -5,6 +5,7 @@
 
 #include "minefield.h"
 #include "types.h"
+
 #include <ncurses.h>
 
 extern int SCOREBOARD_ROWS;

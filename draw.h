@@ -4,6 +4,7 @@
  */
 
 #include "minefield.h"
+
 #include <ncurses.h>
 
 /* draw_tile with color */

@@ -11,3 +11,4 @@ IndentCaseLabels: true
 IndentPPDirectives: BeforeHash
 BinPackArguments: false
 InsertTrailingCommas: Wrapped
+IncludeBlocks: Regroup

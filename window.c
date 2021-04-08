@@ -3,9 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include <ncurses.h>
-
 #include "window.h"
+
+#include <ncurses.h>
 
 /* destroy_win - delete a window without leaving artifacts on screen
  * Source: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html

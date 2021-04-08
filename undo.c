@@ -4,12 +4,11 @@
  */
 
 #include "config.h"
-
-#if ALLOW_UNDO
+#include "global.h"
 
 #include <string.h>
 
-#include "global.h"
+#if ALLOW_UNDO
 
 /* copy_undo - copy the current game to the undo buffer */
 void copy_undo() {
