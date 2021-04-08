@@ -220,6 +220,9 @@ game:
                     generate_surrounding(minefield);
                     reveal_tile(minefield, cur_pos->row, cur_pos->col);
                     first_reveal = false;
+#if ALLOW_UNDO
+                    copy_undo();
+#endif
                     break;
                 }
                 if (game_state != alive)
