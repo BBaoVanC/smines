@@ -29,7 +29,7 @@ void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
     } else if (tile->visible) {
 
         if (tile->mine)
-            color = COLOR_PAIR( game_state == victory ? TILE_MINE_SAFE : TILE_MINE );
+            color = COLOR_PAIR(game_state == victory ? TILE_MINE_SAFE : TILE_MINE);
         else
             color = get_surround_color(tile->surrounding);
 
@@ -91,12 +91,12 @@ void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
 
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
-            wmove(win, y + 1, x*2 + 1);
+            wmove(win, y + 1, x * 2 + 1);
             draw_tile_color(win, &minefield->tiles[y][x], game_state);
         }
     }
 
-    wmove(win, cur_r + 1, cur_c*2 + 1);
+    wmove(win, cur_r + 1, cur_c * 2 + 1);
     draw_tile(win, &minefield->tiles[cur_r][cur_c], COLOR_PAIR(TILE_CURSOR), game_state);
 }
 

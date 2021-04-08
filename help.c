@@ -24,8 +24,7 @@ const char helptxt[] =
     "0 or ^: jump to left side\n"
     "$: jump to right side\n"
     "g: jump to top side\n"
-    "G: jump to bottom side\n"
-    ;
+    "G: jump to bottom side\n";
 
 /* draw_help
  * inputs:
