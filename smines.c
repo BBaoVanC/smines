@@ -40,7 +40,7 @@ Minefield undo_minefield;   /* the minefield before the last move */
 Game_State undo_game_state; /* the game state before the last move */
 #endif
 
-int main() {
+int main(void) {
     srand((unsigned)time(NULL)); /* seed the random number generator */
 
     /* ncurses setup */

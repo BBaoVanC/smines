@@ -8,7 +8,7 @@
 #include "help.h"
 #include "window.h"
 
-void draw_screen() {
+void draw_screen(void) {
     int min_rows = SCOREBOARD_ROWS + MROWS + 2; /* add 2 to fit the minefield borders */
     int min_cols = MCOLS * 2 + 2;               /* multiply cols by 2 because each tile is 2 cols wide */
 
@@ -36,7 +36,7 @@ void draw_screen() {
     }
 }
 
-void set_origin() {
+void set_origin(void) {
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
     int height = MROWS + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
@@ -52,7 +52,7 @@ void set_origin() {
         origin_y = 0;
 }
 
-void resize_screen() {
+void resize_screen(void) {
     destroy_win(fieldwin);
     destroy_win(scorewin);
 
