@@ -122,7 +122,7 @@ void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, Game_St
     switch (state) { /* draw the top line */
         case alive:
             wattron(win, A_BOLD);
-            mvwprintw(win, 0, 0, "Press H or ? for help");
+            mvwprintw(win, 0, 0, "Press ? for help");
             wattroff(win, A_BOLD);
             break;
 
