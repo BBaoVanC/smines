@@ -4,7 +4,16 @@ LDFLAGS += -lncurses
 SOURCES = smines.c minefield.c window.c draw.c helper.c help.c undo.c
 OBJECTS = $(SOURCES:.c=.o)
 
+PREFIX ?= /usr
+
 all: smines
+
+install: smines
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	install -m 0755 smines $(DESTDIR)$(PREFIX)/bin/smines
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/smines
 
 config.h: config.def.h
 	cp config.def.h config.h
