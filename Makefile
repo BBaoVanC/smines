@@ -1,7 +1,7 @@
 CFLAGS += -Wall -std=c99
 LDFLAGS += -lncurses
 
-SOURCES = smines.c minefield.c window.c draw.c helper.c help.c undo.c
+SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 PREFIX ?= /usr
