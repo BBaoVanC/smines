@@ -1,0 +1,43 @@
+#[derive(Clone, Copy)]
+pub struct MinefieldConfig {
+    cols: usize,
+    rows: usize,
+    mines: usize,
+}
+
+pub struct Minefield {
+    config: MinefieldConfig,
+    tiles: Vec<Vec<Tile>>,
+    cursor: Cursor,
+}
+impl Minefield {
+    fn new(config: MinefieldConfig) -> Self {
+        Self {
+            config,
+            tiles: vec![vec![Tile::default(); config.rows]; config.cols],
+            cursor: Cursor::new(config.cols, config.rows),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct Tile {
+    is_mine: bool,
+    is_visible: bool,
+    is_flagged: bool,
+    surrounding_mines: u8,
+}
+
+pub struct Coordinate {
+    col: usize,
+    row: usize,
+}
+pub type Cursor = Coordinate;
+impl Cursor {
+    fn new(cols: usize, rows: usize) -> Self {
+        Self {
+            col: cols / 2,
+            row: rows / 2,
+        }
+    }
+}
