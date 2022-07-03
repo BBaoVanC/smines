@@ -31,37 +31,50 @@ struct Args {
     allow_undo: bool,
 }
 
+fn setup_terminal() {
+    execute!(
+        io::stdout(),
+        terminal::EnterAlternateScreen,
+        terminal::Clear(terminal::ClearType::All),
+        cursor::Hide,
+    ).unwrap();
+    terminal::enable_raw_mode().unwrap();
+}
+
+fn close_terminal() {
+    execute!(
+        io::stdout(),
+        cursor::MoveTo(0, 0),
+        terminal::Clear(terminal::ClearType::All),
+        terminal::LeaveAlternateScreen,
+        cursor::Show,
+    )
+    .unwrap();
+    terminal::disable_raw_mode().unwrap();
+}
+
 // Separate run() function to ensure that raw mode gets disabled even if there's an error
 fn main() {
     let settings = better_panic::Settings::auto()
         .most_recent_first(false)
         .backtrace_first(false);
     settings.clone().install();
-    let handler = settings.create_panic_handler();
 
     panic::set_hook(Box::new(move |ctx| {
-        execute!(
-            io::stdout(),
-            cursor::MoveTo(0, 0),
-            terminal::Clear(terminal::ClearType::All),
-            terminal::LeaveAlternateScreen,
-            cursor::Show,
-        )
-        .unwrap();
-        crossterm::terminal::disable_raw_mode().unwrap();
-        handler(ctx);
+        close_terminal();
+        settings.clone().create_panic_handler()(ctx);
     }));
+
 
     let args = Args::parse();
 
     let backend = CrosstermBackend::new(io::stdout());
     let mut terminal = Terminal::new(backend).expect("Failed to create terminal");
-    crossterm::terminal::enable_raw_mode().unwrap();
 
+
+    setup_terminal();
     terminal.draw(|f| ui(f, args)).expect("Failed to draw UI");
-
-    crossterm::terminal::disable_raw_mode().unwrap();
-    terminal.show_cursor().unwrap();
+    close_terminal();
 }
 
 fn ui<B: Backend, C: Borrow<Args>>(f: &mut Frame<B>, config: C) {
@@ -69,6 +82,11 @@ fn ui<B: Backend, C: Borrow<Args>>(f: &mut Frame<B>, config: C) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
+        .constraints([
+            Constraint::Length(4),
+            Constraint::Length(config.rows.try_into().unwrap()),
+            Constraint::Length(4),
+        ])
         .split(Rect {
             x: 0,
             y: 0,
