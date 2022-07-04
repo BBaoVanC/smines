@@ -37,7 +37,8 @@ fn setup_terminal() {
         terminal::EnterAlternateScreen,
         terminal::Clear(terminal::ClearType::All),
         cursor::Hide,
-    ).unwrap();
+    )
+    .unwrap();
     terminal::enable_raw_mode().unwrap();
 }
 
@@ -65,12 +66,10 @@ fn main() {
         settings.clone().create_panic_handler()(ctx);
     }));
 
-
     let args = Args::parse();
 
     let backend = CrosstermBackend::new(io::stdout());
     let mut terminal = Terminal::new(backend).expect("Failed to create terminal");
-
 
     setup_terminal();
     terminal.draw(|f| ui(f, args)).expect("Failed to draw UI");
