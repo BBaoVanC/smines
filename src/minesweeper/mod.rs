@@ -1,25 +1,9 @@
 //! Library that handles Minesweeper game logic
 
 use ndarray::Array2;
-use std::{hash::BuildHasher, num::TryFromIntError};
+use rand::Rng;
+use std::{num::TryFromIntError, fmt::{Display, self}};
 
-#[derive(Debug)]
-pub struct MinefieldBuilder {
-    width: Option<usize>,
-    height: Option<usize>,
-    mines: Option<usize>,
-    tiles: Option<Array2<TileSurroundingMines>>,
-}
-impl MinefieldBuilder {
-    pub fn new() -> Self {
-        Self {
-            width: None,
-            height: None,
-            mines: None,
-            tiles: None,
-        }
-    }
-}
 
 #[derive(Debug)]
 /// Object that holds a Minefield's layout/properties.
@@ -43,16 +27,54 @@ impl Minefield {
             width,
             height,
             mines: None,
-            // tiles: vec![vec![Tile::new(false); height]; width],
-            // tiles: Array2D::filled_with(Tile::new(false), height, width),
-            tiles: Array2::from_shape_simple_fn((width, height), Tile::default),
+            tiles: Array2::from_shape_simple_fn((width, height), || TileSurroundingMines::Tile(0)),
         }
     }
 
-    // pub fn generate_mines_simple(self, mines: usize) -> Self {
+    /// Distribute a total amount of mines randomy onto a minefield.
+    /// 
+    /// # TODO
+    /// 
+    /// - Prevent infinite loop when `mines` > the total amount of tiles in the minefield
+    /// - Consider 
+    pub fn generate_mines_simple(mut self, mines: usize) -> Self {
+        let mut placed_mines = 0;
+        // TODO: if self.mines is Some, clear all tiles
+        // TODO: prevent infinite loops where there's more mines than total tiles
+        while placed_mines < mines {
+            let mine_col = rand::thread_rng().gen_range(0..self.width);
+            let mine_row = rand::thread_rng().gen_range(0..self.height);
 
-    //     self
-    // }
+            // TODO: maybe prevent the center tile from being a mine, that's a future endeavor
+
+            let mine_tile = self.tiles.get_mut((mine_col, mine_row)).unwrap();
+            if let TileSurroundingMines::Tile(_) = mine_tile {
+                placed_mines += 1;
+                *mine_tile = TileSurroundingMines::Mine;
+
+                // Increment surrounding mines for the surrounding tiles
+                for col in (mine_col.saturating_sub(1))..=(mine_col.saturating_add(1)) {
+                    if col > self.width-1 {
+                        continue;
+                    }
+
+                    for row in (mine_row.saturating_sub(1))..=(mine_row.saturating_add(1)) {
+                        if row > self.height-1 {
+                            continue;
+                        }
+
+                        let tile = self.tiles.get_mut((col, row)).unwrap();
+                        if let TileSurroundingMines::Tile(surrounding) = tile {
+                            *surrounding += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        self.mines = Some(mines);
+        self
+    }
 
     /// Distribute mines in the minefield based on a percentage chance that each
     /// tile is a mine.
@@ -62,27 +84,19 @@ impl Minefield {
     /// caution, and prefer other distribution methods instead.
     ///
     /// TODO: add some example to test the logic of `... < chance`
+    ///
+    /// DO NOT USE -- INCOMPLETE
+    #[deprecated]
     pub fn generate_mines_by_percentage(mut self, chance: f64) -> Self {
         let mut mines: usize = 0;
-
+        // No need to check if self.tiles is Some since this function will clear all
+        // tiles completely anyways
         for tile in self.tiles.iter_mut() {
             if rand::random::<f64>() < chance {
-                tile.set_mine();
+                *tile = TileSurroundingMines::Mine;
                 mines += 1;
-            } else {
-                tile.unset_mine();
             }
         }
-        // for col in self.tiles.columns_iter() {
-        //     for tile in col {
-        //         if rand::random::<f64>() < chance {
-        //             tile.set_mine();
-        //             mines += 1;
-        //         } else {
-        //             tile.unset_mine();
-        //         }
-        //     }
-        // }
 
         self.mines = Some(mines);
         self
@@ -124,6 +138,23 @@ impl Minefield {
         (self.height).try_into()
     }
 }
+impl Display for Minefield {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Minefield:")?;
+        writeln!(f, "width: {},", self.width)?;
+        writeln!(f, "height: {},", self.height)?;
+        writeln!(f, "mines: {:?},", self.mines)?;
+        writeln!(f, "------------------------")?;
+        for row in self.tiles.rows() {
+            for tile in row {
+                write!(f, "{}", tile)?;
+            }
+            writeln!(f)?;
+        }
+        writeln!(f)?;
+        Ok(())
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default)]
 pub enum TileState {
@@ -137,6 +168,15 @@ pub enum TileState {
 pub enum TileSurroundingMines {
     Mine,
     Tile(u8),
+}
+impl Display for TileSurroundingMines {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Self::Tile(surrounding) = self {
+            write!(f, " {}", surrounding)
+        } else {
+            write!(f, " \u{2588}")
+        }
+    }
 }
 // deliberately not Copy so it stays owned
 // #[derive(Clone, Debug, Default)]

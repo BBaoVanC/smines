@@ -83,12 +83,17 @@ impl Drop for Term {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    let _term = Term::new();
+    //let _term = Term::new();
 
     let backend = CrosstermBackend::new(io::stdout());
     let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
 
-    let minefield = minesweeper::Minefield::new(args.cols, args.rows);
+    let minefield =
+        minesweeper::Minefield::new(args.cols, args.rows).generate_mines_simple(args.mine_count);
+
+    println!("{}", minefield);
+
+    return Ok(());
 
     loop {
         terminal
