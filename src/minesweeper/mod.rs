@@ -1,15 +1,37 @@
 //! Library that handles Minesweeper game logic
 
 use ndarray::Array2;
-use std::num::TryFromIntError;
+use std::{hash::BuildHasher, num::TryFromIntError};
 
 #[derive(Debug)]
-/// Object that holds a Minefield and everything in it.
+pub struct MinefieldBuilder {
+    width: Option<usize>,
+    height: Option<usize>,
+    mines: Option<usize>,
+    tiles: Option<Array2<TileSurroundingMines>>,
+}
+impl MinefieldBuilder {
+    pub fn new() -> Self {
+        Self {
+            width: None,
+            height: None,
+            mines: None,
+            tiles: None,
+        }
+    }
+}
+
+#[derive(Debug)]
+/// Object that holds a Minefield's layout/properties.
+///
+/// This struct is not meant to hold the actual state of the Minefield, just the
+/// underlying information about it, such as its dimensions, total mines, map of
+/// the surrounding mines of each tile, and which tiles are mines themselves.
 pub struct Minefield {
     width: usize,
     height: usize,
     mines: Option<usize>,
-    pub tiles: Array2<Tile>,
+    pub tiles: Array2<TileSurroundingMines>,
 }
 impl Minefield {
     /// Create a new Minefield instance.
@@ -23,7 +45,7 @@ impl Minefield {
             mines: None,
             // tiles: vec![vec![Tile::new(false); height]; width],
             // tiles: Array2D::filled_with(Tile::new(false), height, width),
-            tiles: Array2::from_shape_simple_fn((width, height), || Tile::new(false)),
+            tiles: Array2::from_shape_simple_fn((width, height), Tile::default),
         }
     }
 
@@ -38,7 +60,7 @@ impl Minefield {
     /// Because it's all based on random chance, it's entirely possible for
     /// every single tile to be a mine, or for no tiles to be a mine. Use with
     /// caution, and prefer other distribution methods instead.
-    /// 
+    ///
     /// TODO: add some example to test the logic of `... < chance`
     pub fn generate_mines_by_percentage(mut self, chance: f64) -> Self {
         let mut mines: usize = 0;
@@ -111,33 +133,33 @@ pub enum TileState {
     Hidden,
 }
 
+#[derive(Debug)]
+pub enum TileSurroundingMines {
+    Mine,
+    Tile(u8),
+}
 // deliberately not Copy so it stays owned
-#[derive(Clone, Debug)]
-pub struct Tile {
-    state: TileState,
-    is_mine: bool,
-}
-impl Tile {
-    pub fn new(is_mine: bool) -> Self {
-        Self {
-            state: TileState::default(),
-            is_mine,
-        }
-    }
+// #[derive(Clone, Debug, Default)]
+// pub struct Tile {
+//     is_mine: bool,
+//     surrounding_mines: Option<u8>,
+// }
+// impl Tile {
+//     pub fn is_mine(&self) -> bool {
+//         self.is_mine
+//     }
 
-    pub fn state(&self) -> TileState {
-        self.state
-    }
+//     pub fn set_mine(&mut self) {
+//         self.is_mine = true;
+//     }
+//     pub fn unset_mine(&mut self) {
+//         self.is_mine = false;
+//     }
 
-    pub fn is_mine(&self) -> bool {
-        self.is_mine
-    }
-
-    pub fn set_mine(&mut self) {
-        self.is_mine = true;
-    }
-
-    pub fn unset_mine(&mut self) {
-        self.is_mine = false;
-    }
-}
+//     pub fn set_surrounding_mines(&mut self, surrounding: u8) {
+//         self.surrounding_mines = Some(surrounding);
+//     }
+//     pub fn unset_surrounding_mines(&mut self) {
+//         self.surrounding_mines = None;
+//     }
+// }
