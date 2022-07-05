@@ -1,5 +1,5 @@
 use anyhow::Context;
-use smines::types::Minefield;
+use smines::{constants, types::Minefield};
 use std::io;
 
 use clap::Parser;
@@ -97,9 +97,9 @@ fn main() -> anyhow::Result<()> {
                 let horizontal = Layout::default()
                     .direction(Direction::Horizontal)
                     .constraints([
-                        Constraint::Min(1),
+                        Constraint::Min(1 * 2),
                         Constraint::Length(minefield.display_cols().unwrap() + 2),
-                        Constraint::Min(1),
+                        Constraint::Min(1 + 2),
                     ])
                     .split(f.size());
 
@@ -134,9 +134,7 @@ fn main() -> anyhow::Result<()> {
 
                 // Short instructions
                 f.render_widget(
-                    widgets::Block::default()
-                        .title("Instructions")
-                        .borders(Borders::ALL),
+                    widgets::Paragraph::new(constants::instructions()),
                     instructions,
                 )
             })
