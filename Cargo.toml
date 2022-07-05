@@ -1,7 +1,11 @@
 [package]
 name = "smines"
 version = "0.1.0"
+authors = ["BBaoVanC <bbaovanc@bbaovanc.com>"]
 edition = "2021"
+description = "Simple minesweeper in the terminal"
+repository = "https://github.com/BBaoVanC/smines"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
