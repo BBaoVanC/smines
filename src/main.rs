@@ -1,21 +1,27 @@
 use anyhow::Context;
-use std::{borrow::Borrow, io};
+use smines::types::Minefield;
+use std::io;
 
 use clap::Parser;
 
-use crossterm::{cursor, execute, terminal};
+use crossterm::{
+    cursor,
+    event::{self, Event, KeyCode},
+    execute, terminal,
+};
 
 use tui::{
-    backend::Backend,
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout, Rect},
-    widgets::{Block, Borders, Widget},
-    Frame, Terminal,
+    layout::{Constraint, Direction, Layout},
+    widgets::{self, Borders},
+    Terminal,
 };
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
 /// Simple minesweeper in the terminal.
+///
+/// This is the Rust rewrite version.
 struct Args {
     #[clap(short, long, value_parser, default_value_t = 16)]
     /// Total columns in the minefield
@@ -77,55 +83,71 @@ impl Drop for Term {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    {
-        let _term = Term::new();
+    let _term = Term::new();
 
-        let backend = CrosstermBackend::new(io::stdout());
-        let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
+    let backend = CrosstermBackend::new(io::stdout());
+    let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
 
+    let minefield = Minefield::new(args.cols, args.rows);
+
+    loop {
         terminal
-            .draw(|f| ui(f, &args))
+            .draw(|f| {
+                // Add 2 to everything so it fits the borders too
+                let horizontal = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints([
+                        Constraint::Min(1),
+                        Constraint::Length(minefield.display_cols().unwrap() + 2),
+                        Constraint::Min(1),
+                    ])
+                    .split(f.size());
+
+                let chunks = Layout::default()
+                    .direction(Direction::Vertical)
+                    .constraints([
+                        Constraint::Min(1),
+                        Constraint::Length(4 + 2),
+                        Constraint::Length(minefield.display_rows().unwrap() + 2),
+                        Constraint::Length(4 + 2),
+                        Constraint::Min(1),
+                    ])
+                    .split(horizontal[1]);
+
+                let (scoreboard, minefield, instructions) = (chunks[1], chunks[2], chunks[3]);
+
+                // Scoreboard
+                f.render_widget(
+                    widgets::Block::default()
+                        .title("Scoreboard")
+                        .borders(Borders::ALL),
+                    scoreboard,
+                );
+
+                // Minefield
+                f.render_widget(
+                    widgets::Block::default()
+                        .title("Minefield")
+                        .borders(Borders::ALL),
+                    minefield,
+                );
+
+                // Short instructions
+                f.render_widget(
+                    widgets::Block::default()
+                        .title("Instructions")
+                        .borders(Borders::ALL),
+                    instructions,
+                )
+            })
             .context("Failed to draw UI")?;
-        std::thread::sleep(std::time::Duration::from_secs(3));
+
+        if let Event::Key(key) = event::read()? {
+            if let KeyCode::Char('q') = key.code {
+                break;
+            }
+        }
     }
 
-    println!("{:?}", &args);
-
     Ok(())
-}
-
-fn ui<B: Backend, C: Borrow<Args>>(f: &mut Frame<B>, config: C) {
-    let config = config.borrow();
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .margin(1)
-        .constraints([
-            Constraint::Length(4),
-            Constraint::Length(config.rows.try_into().unwrap()),
-            Constraint::Length(4),
-        ])
-        .split(Rect {
-            x: 0,
-            y: 0,
-            width: config.cols.try_into().unwrap(),
-            height: config.rows.try_into().unwrap(),
-        });
-
-    // Scoreboard
-    f.render_widget(
-        Block::default().title("Scoreboard").borders(Borders::ALL),
-        chunks[0],
-    );
-
-    // Minefield
-    f.render_widget(
-        Block::default().title("Minefield").borders(Borders::ALL),
-        chunks[1],
-    );
-
-    // Short instructions
-    f.render_widget(
-        Block::default().title("Instructions").borders(Borders::ALL),
-        chunks[2],
-    );
 }
