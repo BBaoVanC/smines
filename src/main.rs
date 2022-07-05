@@ -1,5 +1,5 @@
 use anyhow::Context;
-use smines::{constants, types::Minefield};
+use smines::{constants, minesweeper};
 use std::io;
 
 use clap::Parser;
@@ -28,18 +28,18 @@ struct Args {
     ///
     /// This sets the amount of columns (lines stacked horizontally) in the
     /// minefield.
-    cols: u32,
+    cols: usize,
     #[clap(short, long, value_parser, default_value_t = 16)]
     /// Total rows in the minefield
     ///
     /// This sets the amount of rows (lines stacked vertically) in the
     /// minefield.
-    rows: u32,
+    rows: usize,
     #[clap(short, long, value_parser, default_value_t = 40)]
     /// Total mines in the minefield
     ///
     /// This sets the amount of mines that will be distributed in the minefield.
-    mine_count: u32,
+    mine_count: usize,
 
     #[clap(short, long, value_parser)]
     /// Should you be allowed to undo your last move?
@@ -50,7 +50,7 @@ struct Args {
     allow_undo: bool,
 }
 
-struct Term {}
+struct Term;
 impl Term {
     fn new() -> Self {
         execute!(
@@ -88,7 +88,7 @@ fn main() -> anyhow::Result<()> {
     let backend = CrosstermBackend::new(io::stdout());
     let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
 
-    let minefield = Minefield::new(args.cols, args.rows);
+    let minefield = minesweeper::Minefield::new(args.cols, args.rows);
 
     loop {
         terminal

@@ -12,9 +12,11 @@ license = "MIT"
 [dependencies]
 anyhow = "1.0.58"
 thiserror = "1.0.31"
-better-panic = "0.3.0"
 
 clap = { version = "3.2.8", features = ["derive"] }
 
 tui = "0.18.0"
 crossterm = "0.23.2"
+
+ndarray = "0.15.4"
+rand = "0.8.5"
