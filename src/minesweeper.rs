@@ -169,6 +169,7 @@ impl Display for Tile {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 /// A basic two-dimensional coordinate.
 pub struct Coordinate {
     /// The horizontal position of the coordinate.

@@ -1,8 +1,5 @@
 use anyhow::Context;
-use smines::{
-    constants,
-    minesweeper::{self, state},
-};
+use smines::minesweeper::state::{Game, GameWidget};
 use std::io;
 
 use clap::Parser;
@@ -16,8 +13,9 @@ use crossterm::{
 use tui::{
     backend::CrosstermBackend,
     layout::Rect,
-    widgets::{self, Borders},
-    Terminal,
+    style::{Color, Style},
+    text::Span,
+    widgets::{self, Borders, Paragraph},
 };
 
 #[derive(Parser, Debug)]
@@ -95,9 +93,10 @@ fn main() -> anyhow::Result<()> {
     let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
 
     // let minefield =
-    //     minesweeper::Minefield::new(args.cols, args.rows).generate_mines_simple(args.mine_count);
+    //     minesweeper::Minefield::new(args.cols,
+    // args.rows).generate_mines_simple(args.mine_count);
 
-    let mut game = state::Game::new(args.cols, args.rows, args.mine_count);
+    let mut game = Game::new(args.cols, args.rows, args.mine_count);
 
     loop {
         terminal
@@ -146,6 +145,13 @@ fn main() -> anyhow::Result<()> {
                     y: start_y + 4,
                 };
 
+                let cursor = Rect {
+                    height: 1,
+                    width: 1,
+                    x: start_x.saturating_add(game.cursor.x as u16),
+                    y: start_y.saturating_add(game.cursor.y as u16),
+                };
+
                 // Scoreboard
                 f.render_widget(
                     widgets::Block::default()
@@ -155,6 +161,11 @@ fn main() -> anyhow::Result<()> {
                 );
 
                 // Minefield
+                f.render_widget(GameWidget::new(&game), minefield);
+                f.render_widget(
+                    Paragraph::new("").style(Style::default().bg(Color::White).fg(Color::Black)),
+                    cursor,
+                )
                 // f.render_widget(
                 //     widgets::Block::default()
                 //         .title("Minefield")
@@ -176,6 +187,9 @@ fn main() -> anyhow::Result<()> {
 
                 // Movement
                 KeyCode::Char('h') => game.move_cursor_relative(-1, 0),
+                KeyCode::Char('j') => game.move_cursor_relative(0, 1),
+                KeyCode::Char('k') => game.move_cursor_relative(0, -1),
+                KeyCode::Char('l') => game.move_cursor_relative(1, 0),
                 _ => (),
             }
         }
