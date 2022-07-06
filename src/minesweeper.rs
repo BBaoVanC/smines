@@ -1,9 +1,13 @@
 //! Library that handles Minesweeper game logic
 
+pub mod state;
+
 use ndarray::Array2;
 use rand::Rng;
-use std::{num::TryFromIntError, fmt::{Display, self}};
-
+use std::{
+    fmt::{self, Display},
+    num::TryFromIntError,
+};
 
 #[derive(Debug)]
 /// Object that holds a Minefield's layout/properties.
@@ -11,14 +15,19 @@ use std::{num::TryFromIntError, fmt::{Display, self}};
 /// This struct is not meant to hold the actual state of the Minefield, just the
 /// underlying information about it, such as its dimensions, total mines, map of
 /// the surrounding mines of each tile, and which tiles are mines themselves.
+/// 
+/// You can access a tile by index by using `minefield.tiles.get((col, row))`.
+/// 
+/// TODO: Write a test/demo
 pub struct Minefield {
     width: usize,
     height: usize,
     mines: Option<usize>,
-    pub tiles: Array2<TileSurroundingMines>,
+    /// Two-dimensional array that holds all the [`Tile`]s in the [`Minefield`].
+    pub tiles: Array2<Tile>,
 }
 impl Minefield {
-    /// Create a new Minefield instance.
+    /// Create a new Minefield struct.
     ///
     /// This function does not generate any mines; be sure to use one of the
     /// generation functions to do so.
@@ -27,16 +36,17 @@ impl Minefield {
             width,
             height,
             mines: None,
-            tiles: Array2::from_shape_simple_fn((width, height), || TileSurroundingMines::Tile(0)),
+            tiles: Array2::from_shape_simple_fn((width, height), || Tile::Tile(0)),
         }
     }
 
     /// Distribute a total amount of mines randomy onto a minefield.
-    /// 
+    ///
     /// # TODO
-    /// 
-    /// - Prevent infinite loop when `mines` > the total amount of tiles in the minefield
-    /// - Consider 
+    ///
+    /// - Prevent infinite loop when `mines` > the total amount of tiles in the
+    ///   minefield
+    /// - Consider
     pub fn generate_mines_simple(mut self, mines: usize) -> Self {
         let mut placed_mines = 0;
         // TODO: if self.mines is Some, clear all tiles
@@ -45,56 +55,31 @@ impl Minefield {
             let mine_col = rand::thread_rng().gen_range(0..self.width);
             let mine_row = rand::thread_rng().gen_range(0..self.height);
 
-            // TODO: maybe prevent the center tile from being a mine, that's a future endeavor
+            // TODO: maybe prevent the center tile from being a mine, that's a future
+            // endeavor
 
             let mine_tile = self.tiles.get_mut((mine_col, mine_row)).unwrap();
-            if let TileSurroundingMines::Tile(_) = mine_tile {
+            if let Tile::Tile(_) = mine_tile {
                 placed_mines += 1;
-                *mine_tile = TileSurroundingMines::Mine;
+                *mine_tile = Tile::Mine;
 
                 // Increment surrounding mines for the surrounding tiles
                 for col in (mine_col.saturating_sub(1))..=(mine_col.saturating_add(1)) {
-                    if col > self.width-1 {
+                    if col > self.width - 1 {
                         continue;
                     }
 
                     for row in (mine_row.saturating_sub(1))..=(mine_row.saturating_add(1)) {
-                        if row > self.height-1 {
+                        if row > self.height - 1 {
                             continue;
                         }
 
                         let tile = self.tiles.get_mut((col, row)).unwrap();
-                        if let TileSurroundingMines::Tile(surrounding) = tile {
+                        if let Tile::Tile(surrounding) = tile {
                             *surrounding += 1;
                         }
                     }
                 }
-            }
-        }
-
-        self.mines = Some(mines);
-        self
-    }
-
-    /// Distribute mines in the minefield based on a percentage chance that each
-    /// tile is a mine.
-    ///
-    /// Because it's all based on random chance, it's entirely possible for
-    /// every single tile to be a mine, or for no tiles to be a mine. Use with
-    /// caution, and prefer other distribution methods instead.
-    ///
-    /// TODO: add some example to test the logic of `... < chance`
-    ///
-    /// DO NOT USE -- INCOMPLETE
-    #[deprecated]
-    pub fn generate_mines_by_percentage(mut self, chance: f64) -> Self {
-        let mut mines: usize = 0;
-        // No need to check if self.tiles is Some since this function will clear all
-        // tiles completely anyways
-        for tile in self.tiles.iter_mut() {
-            if rand::random::<f64>() < chance {
-                *tile = TileSurroundingMines::Mine;
-                mines += 1;
             }
         }
 
@@ -138,6 +123,8 @@ impl Minefield {
         (self.height).try_into()
     }
 }
+
+/// Simple way to print out what a minefield looks like, mainly for debugging.
 impl Display for Minefield {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "Minefield:")?;
@@ -156,20 +143,23 @@ impl Display for Minefield {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default)]
-pub enum TileState {
-    Flagged,
-    Visible,
-    #[default]
-    Hidden,
-}
-
 #[derive(Debug)]
-pub enum TileSurroundingMines {
+/// Object that represents a tile in a Minefield.
+///
+/// This enum does not handle any game state and is purely informational.
+pub enum Tile {
+    /// This tile is a mine.
+    ///
+    /// Mines do not need to show how many other mines are surrounding it, so
+    /// there's no need to store it.
     Mine,
+    /// This tile is not a mine.
+    ///
+    /// This variant takes a u8, but it should never have a value > 8
     Tile(u8),
 }
-impl Display for TileSurroundingMines {
+/// Simple way to print out what a tile looks like, mainly for debugging.
+impl Display for Tile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Self::Tile(surrounding) = self {
             write!(f, " {}", surrounding)
@@ -178,28 +168,11 @@ impl Display for TileSurroundingMines {
         }
     }
 }
-// deliberately not Copy so it stays owned
-// #[derive(Clone, Debug, Default)]
-// pub struct Tile {
-//     is_mine: bool,
-//     surrounding_mines: Option<u8>,
-// }
-// impl Tile {
-//     pub fn is_mine(&self) -> bool {
-//         self.is_mine
-//     }
 
-//     pub fn set_mine(&mut self) {
-//         self.is_mine = true;
-//     }
-//     pub fn unset_mine(&mut self) {
-//         self.is_mine = false;
-//     }
-
-//     pub fn set_surrounding_mines(&mut self, surrounding: u8) {
-//         self.surrounding_mines = Some(surrounding);
-//     }
-//     pub fn unset_surrounding_mines(&mut self) {
-//         self.surrounding_mines = None;
-//     }
-// }
+/// A basic two-dimensional coordinate.
+pub struct Coordinate {
+    /// The horizontal position of the coordinate.
+    pub x: usize,
+    /// The vertical position of the coordinate.
+    pub y: usize,
+}
