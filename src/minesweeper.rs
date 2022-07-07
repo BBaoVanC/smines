@@ -1,12 +1,9 @@
 //! Library that handles Minesweeper game logic
 
-pub mod state;
-
 use ndarray::Array2;
 use rand::Rng;
 use std::{
     fmt::{self, Display},
-    num::TryFromIntError,
 };
 
 #[derive(Debug)]
@@ -98,29 +95,17 @@ impl Minefield {
     }
 
     /// Get the amount of terminal columns required to display the minefield
-    ///
-    /// This returns u16 since that's the type that
-    /// tui::layout::Constraint::Length takes.
-    ///
-    /// # Errors
-    ///
-    /// This function will return [`TryFromIntError`] if the required amount of
-    /// terminal columns does not fit into a u16.
-    pub fn display_cols(&self) -> Result<u16, TryFromIntError> {
-        (self.width * 2).try_into()
+    /// 
+    /// This is equal to twice the width, since each tile is 2 terminal columns wide.
+    pub fn display_cols(&self) -> usize {
+        self.width * 2
     }
 
     /// Get the amount of terminal rows required to display the minefield.
-    ///
-    /// This returns u16 since that's the type that
-    /// tui::layout::Constraint::Length takes.
-    ///
-    /// # Errors
-    ///
-    /// This function will return [`TryFromIntError`] if the required amount of
-    /// terminal rows does not fit into a u16.
-    pub fn display_rows(&self) -> Result<u16, TryFromIntError> {
-        (self.height).try_into()
+    /// 
+    /// This is equal to the height, since each tile is 1 terminal row wide.
+    pub fn display_rows(&self) -> usize {
+        self.height
     }
 }
 

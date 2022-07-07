@@ -1,0 +1,62 @@
+//! Logic relating to handling minesweeper gameplay.
+
+use ndarray::Array2;
+use tui::{
+    style::{Color, Style},
+    text::{Span, Spans},
+    widgets::Widget,
+};
+
+use crate::minesweeper::{Coordinate, Minefield, Tile};
+
+#[derive(Clone, Copy, Debug, Default)]
+/// The status of the game.
+pub enum GameStatus {
+    /// The player has won the game.
+    Win,
+    /// The player has lost the game.
+    Loss,
+    #[default]
+    /// The game is still in progress.
+    Playing,
+}
+
+#[derive(Debug)]
+/// An actual minesweeper game, with its own state.
+pub struct Game {
+    status: GameStatus,
+    pub flags: Array2<bool>,
+    /// The underlying minefield schematic.
+    pub minefield: Minefield,
+    /// The cursor position on the minefield.
+    pub cursor: Coordinate,
+}
+impl Game {
+    /// Create a new Minesweeper game.
+    pub fn new(width: usize, height: usize, mine_count: usize) -> Self {
+        Self {
+            status: GameStatus::default(),
+            minefield: Minefield::new(width, height).generate_mines_simple(mine_count),
+            flags: Array2::from_shape_simple_fn((width, height), || false),
+            cursor: Coordinate {
+                x: width / 2,
+                y: height / 2,
+            },
+        }
+    }
+
+    /// Move the cursor to an exact position.
+    ///
+    /// TODO: put an example/test
+    pub fn move_cursor_absolute(&mut self, x: usize, y: usize) {
+        self.cursor.x = x;
+        self.cursor.y = y;
+    }
+    /// Move the cursor relative to itself.
+    ///
+    /// TODO: put an example/test
+    pub fn move_cursor_relative(&mut self, x: isize, y: isize) {
+        self.cursor.x = self.cursor.x.saturating_add(x as usize);
+        self.cursor.y = self.cursor.y.saturating_add(y as usize);
+    }
+}

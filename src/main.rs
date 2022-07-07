@@ -1,5 +1,5 @@
 use anyhow::Context;
-use smines::minesweeper::state::{Game, GameWidget};
+use smines::{display::GameWidget, game::Game, minesweeper};
 use std::io;
 
 use clap::Parser;
