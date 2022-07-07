@@ -16,6 +16,7 @@ use tui::{
     style::{Color, Style},
     text::Span,
     widgets::{self, Borders, Paragraph},
+    Terminal,
 };
 
 #[derive(Parser, Debug)]
