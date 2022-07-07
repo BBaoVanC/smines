@@ -1,5 +1,5 @@
 use anyhow::Context;
-use smines::{display::GameWidget, game::Game, minesweeper};
+use smines::{display::GameWidget, game::Game};
 use std::io;
 
 use clap::Parser;
@@ -14,7 +14,6 @@ use tui::{
     backend::CrosstermBackend,
     layout::Rect,
     style::{Color, Style},
-    text::Span,
     widgets::{self, Borders, Paragraph},
     Terminal,
 };
@@ -102,32 +101,8 @@ fn main() -> anyhow::Result<()> {
     loop {
         terminal
             .draw(|f| {
-                // Add 2 to everything so it fits the borders too
-                // let horizontal = Layout::default()
-                //     .direction(Direction::Horizontal)
-                //     .constraints([
-                //         Constraint::Ratio(1, 3),
-                //         Constraint::Length(minefield.display_cols().unwrap() + 2),
-                //         Constraint::Ratio(1, 3),
-                //     ])
-                //     .split(f.size());
-
-                // let chunks = Layout::default()
-                //     .direction(Direction::Vertical)
-                //     .constraints([
-                //         Constraint::Ratio(1, 5),
-                //         Constraint::Length(4 + 2),
-                //         Constraint::Length(minefield.display_rows().unwrap() + 2),
-                //         Constraint::Length(4 + 2),
-                //         Constraint::Ratio(1, 5),
-                //     ])
-                //     .split(horizontal[1]);
-
-                // let (scoreboard, minefield, instructions) = (chunks[1], chunks[2],
-                // chunks[3]);
-
-                let width = game.minefield.display_cols().unwrap();
-                let minefield_height = game.minefield.display_rows().unwrap();
+                let width = game.minefield.display_cols().try_into().unwrap();
+                let minefield_height = game.minefield.display_rows().try_into().unwrap();
 
                 let start_x = ((f.size().width) - width) / 2;
                 let start_y = (f.size().height - (4 + minefield_height)) / 2;
@@ -148,7 +123,7 @@ fn main() -> anyhow::Result<()> {
 
                 let cursor = Rect {
                     height: 1,
-                    width: 1,
+                    width: 2,
                     x: start_x.saturating_add(game.cursor.x as u16),
                     y: start_y.saturating_add(game.cursor.y as u16),
                 };

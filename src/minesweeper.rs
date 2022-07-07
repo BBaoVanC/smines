@@ -2,9 +2,7 @@
 
 use ndarray::Array2;
 use rand::Rng;
-use std::{
-    fmt::{self, Display},
-};
+use std::fmt::{self, Display};
 
 #[derive(Debug)]
 /// Object that holds a Minefield's layout/properties.
@@ -12,9 +10,9 @@ use std::{
 /// This struct is not meant to hold the actual state of the Minefield, just the
 /// underlying information about it, such as its dimensions, total mines, map of
 /// the surrounding mines of each tile, and which tiles are mines themselves.
-/// 
+///
 /// You can access a tile by index by using `minefield.tiles.get((col, row))`.
-/// 
+///
 /// TODO: Write a test/demo
 pub struct Minefield {
     width: usize,
@@ -95,14 +93,15 @@ impl Minefield {
     }
 
     /// Get the amount of terminal columns required to display the minefield
-    /// 
-    /// This is equal to twice the width, since each tile is 2 terminal columns wide.
+    ///
+    /// This is equal to twice the width, since each tile is 2 terminal columns
+    /// wide.
     pub fn display_cols(&self) -> usize {
         self.width * 2
     }
 
     /// Get the amount of terminal rows required to display the minefield.
-    /// 
+    ///
     /// This is equal to the height, since each tile is 1 terminal row wide.
     pub fn display_rows(&self) -> usize {
         self.height
@@ -152,13 +151,4 @@ impl Display for Tile {
             write!(f, " \u{2588}")
         }
     }
-}
-
-#[derive(Clone, Copy, Debug)]
-/// A basic two-dimensional coordinate.
-pub struct Coordinate {
-    /// The horizontal position of the coordinate.
-    pub x: usize,
-    /// The vertical position of the coordinate.
-    pub y: usize,
 }

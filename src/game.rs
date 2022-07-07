@@ -1,13 +1,8 @@
 //! Logic relating to handling minesweeper gameplay.
 
 use ndarray::Array2;
-use tui::{
-    style::{Color, Style},
-    text::{Span, Spans},
-    widgets::Widget,
-};
 
-use crate::minesweeper::{Coordinate, Minefield, Tile};
+use crate::minesweeper::Minefield;
 
 #[derive(Clone, Copy, Debug, Default)]
 /// The status of the game.
@@ -21,15 +16,33 @@ pub enum GameStatus {
     Playing,
 }
 
+#[derive(Clone, Copy, Debug)]
+/// A cursor on the minefield.
+pub struct Cursor {
+    /// The horizontal position of the coordinate in tiles.
+    pub x: usize,
+    /// The vertical position of the coordinate in tiles.
+    pub y: usize,
+}
+impl Cursor {
+    pub fn display_x(&self) -> usize {
+        self.x * 2
+    }
+    pub fn display_y(&self) -> usize {
+        self.y
+    }
+}
+
 #[derive(Debug)]
 /// An actual minesweeper game, with its own state.
 pub struct Game {
-    status: GameStatus,
+    /// The current stage of the game.
+    pub status: GameStatus,
     pub flags: Array2<bool>,
     /// The underlying minefield schematic.
     pub minefield: Minefield,
     /// The cursor position on the minefield.
-    pub cursor: Coordinate,
+    pub cursor: Cursor,
 }
 impl Game {
     /// Create a new Minesweeper game.
@@ -38,7 +51,7 @@ impl Game {
             status: GameStatus::default(),
             minefield: Minefield::new(width, height).generate_mines_simple(mine_count),
             flags: Array2::from_shape_simple_fn((width, height), || false),
-            cursor: Coordinate {
+            cursor: Cursor {
                 x: width / 2,
                 y: height / 2,
             },
