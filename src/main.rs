@@ -1,5 +1,9 @@
 use anyhow::Context;
-use smines::{display::GameWidget, game::Game, constants::{TILE_TERMINAL_WIDTH, TILE_TERMINAL_HEIGHT}};
+use smines::{
+    constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
+    display::GameWidget,
+    game::Game,
+};
 use std::io;
 
 use clap::Parser;

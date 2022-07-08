@@ -1,7 +1,5 @@
 //! Logic relating to handling minesweeper gameplay.
 
-use std::{error::Error, backtrace::Backtrace};
-
 use ndarray::Array2;
 use thiserror::Error;
 use tui::{
@@ -86,31 +84,35 @@ impl Game {
     }
 
     // pub fn render(&self) -> Result<Vec<Spans>, RenderError> {
-    //     let mut output_tiles = Array2::from_shape_fn((self.width(), self.height()), |(x, y)| {
-    //         let tile = match self.get_tile(x, y) {
+    //     let mut output_tiles = Array2::from_shape_fn((self.width(),
+    // self.height()), |(x, y)| {         let tile = match self.get_tile(x, y) {
     //             Some(t) => t,
     //             // Some(t) => {
-    //             //     return Span::styled("!!", Style::default().bg(Color::Red).fg(Color::White))
-    //             // }
+    //             //     return Span::styled("!!",
+    // Style::default().bg(Color::Red).fg(Color::White))             // }
     //             None => {
-    //                 return Span::styled("!!", Style::default().bg(Color::Red).fg(Color::White))
-    //             }
+    //                 return Span::styled("!!",
+    // Style::default().bg(Color::Red).fg(Color::White))             }
     //         };
 
     //         match self.get_flag(x, y).ok_or(RenderError {})?{
     //             TileFlag::Flagged => {
     //                 match self.status {
-    //                     GameStatus::Playing => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Yellow)),
-    //                     GameStatus::Win => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Green)),
-    //                     GameStatus::Loss => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Red)),
-    //                 }
+    //                     GameStatus::Playing => Span::styled(" F",
+    // Style::default().bg(Color::Black).fg(Color::Yellow)),
+    // GameStatus::Win => Span::styled(" F",
+    // Style::default().bg(Color::Black).fg(Color::Green)),
+    // GameStatus::Loss => Span::styled(" F",
+    // Style::default().bg(Color::Black).fg(Color::Red)),                 }
     //             },
     //             TileFlag::Guessing => {
     //                 match self.status {
-    //                     GameStatus::Playing => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Yellow)),
-    //                     GameStatus::Win => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Green)),
-    //                     GameStatus::Loss => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Red)),
-    //                 }
+    //                     GameStatus::Playing => Span::styled(" ?",
+    // Style::default().bg(Color::Black).fg(Color::Yellow)),
+    // GameStatus::Win => Span::styled(" ?",
+    // Style::default().bg(Color::Black).fg(Color::Green)),
+    // GameStatus::Loss => Span::styled(" ?",
+    // Style::default().bg(Color::Black).fg(Color::Red)),                 }
     //             },
     //             TileFlag::Empty => {
     //                 match self.status
@@ -118,14 +120,15 @@ impl Game {
     //         }
 
     //         // match tile {
-    //         //     // Tile::Mine => Span::styled(" X", Style::default().bg(Color::Black).fg(Color::Red)),
-    //         //     Tile::Mine => match self.status {
-    //         //         GameStatus::Playing => {
-    //         //             match self.get_flag(x, y).ok_or(RenderError {})? {
-    //         //                 TileFlag::Flagged => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Yellow)),
-    //         //                 TileFlag::Guessing => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Yellow)),
-    //         //                 TileFlag::Empty => Span::raw("  "),
-    //         //             }
+    //         //     // Tile::Mine => Span::styled(" X",
+    // Style::default().bg(Color::Black).fg(Color::Red)),         //
+    // Tile::Mine => match self.status {         //         GameStatus::Playing
+    // => {         //             match self.get_flag(x, y).ok_or(RenderError
+    // {})? {         //                 TileFlag::Flagged => Span::styled(" F",
+    // Style::default().bg(Color::Black).fg(Color::Yellow)),         //
+    // TileFlag::Guessing => Span::styled(" ?",
+    // Style::default().bg(Color::Black).fg(Color::Yellow)),         //
+    // TileFlag::Empty => Span::raw("  "),         //             }
     //         //         }
     //         //         GameStatus::Win
     //         //     }
@@ -149,8 +152,8 @@ impl Game {
     //     Ok(output_tiles
     //         .rows()
     //         .into_iter()
-    //         .map(|row| Spans::from(row.iter().map(|span| span.clone()).collect::<Vec<Span>>()))
-    //         .collect())
+    //         .map(|row| Spans::from(row.iter().map(|span|
+    // span.clone()).collect::<Vec<Span>>()))         .collect())
     //     // for (y, row) in output_tiles.rows().into_iter().enumerate() {
     //     //     for (x, span) in row.into_iter().enumerate() {
     //     //         // width is 2 because each tile is 1x2 in the terminal
@@ -170,7 +173,6 @@ impl Game {
     // }
 }
 
-#[derive(Error, Debug)]
-#[error("Error rendering minefield for tui.rs")]
-pub struct RenderError {
-}
+// #[derive(Error, Debug)]
+// #[error("Error rendering minefield for tui.rs")]
+// pub struct RenderError;

@@ -83,7 +83,7 @@ impl Minefield {
     }
 
     /// Get a tile by its index.
-    /// 
+    ///
     /// This function returns [`None`] if the index is out of bounds.
     pub fn get_tile(&self, x: usize, y: usize) -> Option<&Tile> {
         self.tiles.get((x, y))
