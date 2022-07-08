@@ -20,39 +20,39 @@ use tui::{
     Terminal,
 };
 
-#[derive(Parser, Debug)]
-#[clap(author, version)]
 /// Simple minesweeper in the terminal.
 ///
 /// This is the Rust rewrite version.
+#[derive(Parser, Debug)]
+#[clap(author, version)]
 struct Args {
     // #[clap(short, long, value_parser, default_value_t = 16)]
-    #[clap(short, long, value_parser, default_value_t = 4)]
     /// Total columns in the minefield
     ///
     /// This sets the amount of columns (lines stacked horizontally) in the
     /// minefield.
+    #[clap(short, long, value_parser, default_value_t = 4)]
     cols: usize,
     // #[clap(short, long, value_parser, default_value_t = 16)]
-    #[clap(short, long, value_parser, default_value_t = 4)]
     /// Total rows in the minefield
     ///
     /// This sets the amount of rows (lines stacked vertically) in the
     /// minefield.
+    #[clap(short, long, value_parser, default_value_t = 4)]
     rows: usize,
     // #[clap(short, long, value_parser, default_value_t = 40)]
-    #[clap(short, long, value_parser, default_value_t = 4)]
     /// Total mines in the minefield
     ///
     /// This sets the amount of mines that will be distributed in the minefield.
+    #[clap(short, long, value_parser, default_value_t = 4)]
     mine_count: usize,
 
-    #[clap(short, long, value_parser)]
     /// Should you be allowed to undo your last move?
     ///
     /// If true, then you can press `u` to undo your last move. Pressing `u`
     /// again will "undo the undo" -- meaning that you'll be back to your
     /// original move.
+    #[clap(short, long, value_parser)]
     allow_undo: bool,
 }
 
