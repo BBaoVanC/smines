@@ -19,7 +19,7 @@ pub struct Minefield {
     height: usize,
     mines: Option<usize>,
     /// Two-dimensional array that holds all the [`Tile`]s in the [`Minefield`].
-    pub tiles: Array2<Tile>,
+    tiles: Array2<Tile>,
 }
 impl Minefield {
     /// Create a new Minefield struct.
@@ -82,28 +82,19 @@ impl Minefield {
         self
     }
 
+    /// Get a tile by its index.
+    /// 
+    /// This function returns [`None`] if the index is out of bounds.
+    pub fn get_tile(&self, x: usize, y: usize) -> Option<&Tile> {
+        self.tiles.get((x, y))
+    }
+
     /// Get the amount of columns (the width of the minefield in tiles)
     pub fn width(&self) -> usize {
         self.width
     }
-
     /// Get the amount of rows (the height of the minefield in tiles)
     pub fn height(&self) -> usize {
-        self.height
-    }
-
-    /// Get the amount of terminal columns required to display the minefield
-    ///
-    /// This is equal to twice the width, since each tile is 2 terminal columns
-    /// wide.
-    pub fn display_cols(&self) -> usize {
-        self.width * 2
-    }
-
-    /// Get the amount of terminal rows required to display the minefield.
-    ///
-    /// This is equal to the height, since each tile is 1 terminal row wide.
-    pub fn display_rows(&self) -> usize {
         self.height
     }
 }

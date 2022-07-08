@@ -101,8 +101,8 @@ fn main() -> anyhow::Result<()> {
     loop {
         terminal
             .draw(|f| {
-                let width = game.minefield.display_cols().try_into().unwrap();
-                let minefield_height = game.minefield.display_rows().try_into().unwrap();
+                let width = game.display_cols().try_into().unwrap();
+                let minefield_height = game.display_rows().try_into().unwrap();
 
                 let start_x = ((f.size().width) - width) / 2;
                 let start_y = (f.size().height - (4 + minefield_height)) / 2;
@@ -162,10 +162,10 @@ fn main() -> anyhow::Result<()> {
                 KeyCode::Char('q') => break,
 
                 // Movement
-                KeyCode::Char('h') => game.move_cursor_relative(-1, 0),
-                KeyCode::Char('j') => game.move_cursor_relative(0, 1),
-                KeyCode::Char('k') => game.move_cursor_relative(0, -1),
-                KeyCode::Char('l') => game.move_cursor_relative(1, 0),
+                KeyCode::Char('h') => game.cursor.x -= 1,
+                KeyCode::Char('j') => game.cursor.y += 1,
+                KeyCode::Char('k') => game.cursor.y -= 1,
+                KeyCode::Char('l') => game.cursor.x += 1,
                 _ => (),
             }
         }
