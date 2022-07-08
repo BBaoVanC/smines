@@ -1,8 +1,11 @@
+//! OLD
+//!
 //! Library that handles Minesweeper game logic
+
+use std::fmt::{self, Display};
 
 use ndarray::Array2;
 use rand::Rng;
-use std::fmt::{self, Display};
 
 #[derive(Debug)]
 /// Object that holds a Minefield's layout/properties.

@@ -3,4 +3,6 @@
 pub mod constants;
 pub mod display;
 pub mod game;
+pub mod generate;
+pub mod minefield;
 pub mod minesweeper;

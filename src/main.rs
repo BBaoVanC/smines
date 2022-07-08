@@ -1,19 +1,17 @@
-use anyhow::Context;
-use smines::{
-    constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
-    display::GameWidget,
-    game::Game,
-};
 use std::io;
 
+use anyhow::Context;
 use clap::Parser;
-
 use crossterm::{
     cursor,
     event::{self, Event, KeyCode},
     execute, terminal,
 };
-
+use smines::{
+    constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
+    display::GameWidget,
+    game::Game,
+};
 use tui::{
     backend::CrosstermBackend,
     layout::Rect,

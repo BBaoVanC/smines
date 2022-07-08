@@ -1,3 +1,5 @@
+//! OLD
+//!
 //! Widget for tui.rs that displays a minefield game on the screen.
 //!
 //! # Panics

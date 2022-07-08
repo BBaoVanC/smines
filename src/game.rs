@@ -1,3 +1,5 @@
+//! OLD
+//!
 //! Logic relating to handling minesweeper gameplay.
 
 use ndarray::Array2;
