@@ -1,5 +1,5 @@
 use anyhow::Context;
-use smines::{display::GameWidget, game::Game};
+use smines::{display::GameWidget, game::Game, constants::{TILE_TERMINAL_WIDTH, TILE_TERMINAL_HEIGHT}};
 use std::io;
 
 use clap::Parser;
@@ -101,8 +101,8 @@ fn main() -> anyhow::Result<()> {
     loop {
         terminal
             .draw(|f| {
-                let width = game.display_cols().try_into().unwrap();
-                let minefield_height = game.display_rows().try_into().unwrap();
+                let width = (game.width() * TILE_TERMINAL_WIDTH).try_into().unwrap();
+                let minefield_height = (game.height() * TILE_TERMINAL_HEIGHT).try_into().unwrap();
 
                 let start_x = ((f.size().width) - width) / 2;
                 let start_y = (f.size().height - (4 + minefield_height)) / 2;
@@ -121,13 +121,6 @@ fn main() -> anyhow::Result<()> {
                     y: start_y + 4,
                 };
 
-                let cursor = Rect {
-                    height: 1,
-                    width: 2,
-                    x: start_x.saturating_add(game.cursor.x as u16),
-                    y: start_y.saturating_add(game.cursor.y as u16),
-                };
-
                 // Scoreboard
                 f.render_widget(
                     widgets::Block::default()
@@ -137,11 +130,8 @@ fn main() -> anyhow::Result<()> {
                 );
 
                 // Minefield
-                f.render_widget(GameWidget::new(&game), minefield);
-                f.render_widget(
-                    Paragraph::new("").style(Style::default().bg(Color::White).fg(Color::Black)),
-                    cursor,
-                )
+                // f.render_widget(GameWidget::new(&game), minefield);
+                f.render_widget(Paragraph::new(game.render().unwrap()), minefield)
                 // f.render_widget(
                 //     widgets::Block::default()
                 //         .title("Minefield")

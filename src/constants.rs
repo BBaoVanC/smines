@@ -22,3 +22,6 @@ pub fn instructions() -> Vec<Spans<'static>> {
         ]),
     ]
 }
+
+pub const TILE_TERMINAL_WIDTH: usize = 2;
+pub const TILE_TERMINAL_HEIGHT: usize = 1;

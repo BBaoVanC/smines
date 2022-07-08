@@ -1,6 +1,13 @@
 //! Logic relating to handling minesweeper gameplay.
 
+use std::{error::Error, backtrace::Backtrace};
+
 use ndarray::Array2;
+use thiserror::Error;
+use tui::{
+    style::{Color, Style},
+    text::{Span, Spans},
+};
 
 use crate::minesweeper::{Minefield, Tile};
 
@@ -67,20 +74,6 @@ impl Game {
         self.minefield.height()
     }
 
-    /// Get the amount of terminal columns required to display the minefield
-    ///
-    /// This is equal to twice the width, since each tile is 2 terminal columns
-    /// wide.
-    pub fn display_cols(&self) -> usize {
-        self.minefield.width() * 2
-    }
-    /// Get the amount of terminal rows required to display the minefield.
-    ///
-    /// This is equal to the height, since each tile is 1 terminal row wide.
-    pub fn display_rows(&self) -> usize {
-        self.minefield.height()
-    }
-
     pub fn get_flag(&self, x: usize, y: usize) -> Option<&TileFlag> {
         self.flags.get((x, y))
     }
@@ -91,4 +84,93 @@ impl Game {
     pub fn get_tile(&self, x: usize, y: usize) -> Option<&Tile> {
         self.minefield.get_tile(x, y)
     }
+
+    // pub fn render(&self) -> Result<Vec<Spans>, RenderError> {
+    //     let mut output_tiles = Array2::from_shape_fn((self.width(), self.height()), |(x, y)| {
+    //         let tile = match self.get_tile(x, y) {
+    //             Some(t) => t,
+    //             // Some(t) => {
+    //             //     return Span::styled("!!", Style::default().bg(Color::Red).fg(Color::White))
+    //             // }
+    //             None => {
+    //                 return Span::styled("!!", Style::default().bg(Color::Red).fg(Color::White))
+    //             }
+    //         };
+
+    //         match self.get_flag(x, y).ok_or(RenderError {})?{
+    //             TileFlag::Flagged => {
+    //                 match self.status {
+    //                     GameStatus::Playing => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Yellow)),
+    //                     GameStatus::Win => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Green)),
+    //                     GameStatus::Loss => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Red)),
+    //                 }
+    //             },
+    //             TileFlag::Guessing => {
+    //                 match self.status {
+    //                     GameStatus::Playing => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Yellow)),
+    //                     GameStatus::Win => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Green)),
+    //                     GameStatus::Loss => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Red)),
+    //                 }
+    //             },
+    //             TileFlag::Empty => {
+    //                 match self.status
+    //             }
+    //         }
+
+    //         // match tile {
+    //         //     // Tile::Mine => Span::styled(" X", Style::default().bg(Color::Black).fg(Color::Red)),
+    //         //     Tile::Mine => match self.status {
+    //         //         GameStatus::Playing => {
+    //         //             match self.get_flag(x, y).ok_or(RenderError {})? {
+    //         //                 TileFlag::Flagged => Span::styled(" F", Style::default().bg(Color::Black).fg(Color::Yellow)),
+    //         //                 TileFlag::Guessing => Span::styled(" ?", Style::default().bg(Color::Black).fg(Color::Yellow)),
+    //         //                 TileFlag::Empty => Span::raw("  "),
+    //         //             }
+    //         //         }
+    //         //         GameStatus::Win
+    //         //     }
+    //         //     Tile::Tile(surrounding_mines) => Span::styled(
+    //         //         format!(" {surrounding_mines}"),
+    //         //         Style::default().fg(Color::White).bg(
+    //         //             match self.status {
+    //         //                 GameStatus::Win => todo!(),
+    //         //             }
+    //         //         ),
+    //         //     ),
+    //         // }
+    //     });
+
+    //     // Overwrite the cursor tile
+    //     let cursor_tile = output_tiles.get_mut((self.cursor.x, self.cursor.y));
+    //     if let Some(cursor_tile) = cursor_tile {
+    //         cursor_tile.style.bg(Color::White).fg(Color::Black);
+    //     }
+
+    //     Ok(output_tiles
+    //         .rows()
+    //         .into_iter()
+    //         .map(|row| Spans::from(row.iter().map(|span| span.clone()).collect::<Vec<Span>>()))
+    //         .collect())
+    //     // for (y, row) in output_tiles.rows().into_iter().enumerate() {
+    //     //     for (x, span) in row.into_iter().enumerate() {
+    //     //         // width is 2 because each tile is 1x2 in the terminal
+    //     //         buf.set_span(
+    //     //             area.x
+    //     //
+    //     // .saturating_add(x.saturating_mul(TILE_TERMINAL_WIDTH).try_into().
+    //     // unwrap()),             area.y
+    //     //                 .saturating_add(y.try_into().unwrap())
+    //     //
+    //     // .saturating_mul(TILE_TERMINAL_HEIGHT.try_into().unwrap()),
+    //     //             span,
+    //     //             2,
+    //     //         );
+    //     //     }
+    //     // }
+    // }
+}
+
+#[derive(Error, Debug)]
+#[error("Error rendering minefield for tui.rs")]
+pub struct RenderError {
 }
