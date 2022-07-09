@@ -16,7 +16,6 @@ use smines::{
 use tui::{
     backend::CrosstermBackend,
     layout::Rect,
-    style::{Color, Style},
     widgets::{self, Borders, Paragraph},
     Terminal,
 };

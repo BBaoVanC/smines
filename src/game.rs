@@ -1,8 +1,7 @@
 //! Stuff that handles an entire minesweeper game.
 
-use ndarray::Array2;
 use tui::{
-    style::{Color, Style},
+    style::Color,
     text::{Span, Spans},
 };
 
@@ -61,7 +60,7 @@ impl Game {
     }
 
     pub fn display(&self) -> Vec<Spans> {
-        let mut output_array = self.minefield.tiles.map(|t| {
+        let output_array = self.minefield.tiles.map(|t| {
             // TODO: think of more cases that are unreachable and mark them
             let raw = match (self.state, t.flag_state, t.mine_state, t.is_visible) {
                 // Revealed tiles that are safe. They don't change visually based on GameState.
@@ -142,7 +141,7 @@ impl Game {
             .map(|r| {
                 Spans::from(
                     // TODO: find a better way to do this without cloning every span
-                    r.iter().map(|s| s.clone()).collect::<Vec<Span>>(),
+                    r.iter().cloned().collect::<Vec<Span>>(),
                 )
             })
             .collect()
