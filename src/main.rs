@@ -11,6 +11,8 @@ use smines::{
     constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
     display::GameWidget,
     game::Game,
+    generate::TemplateMinefield,
+    minefield::{FieldDimension, Minefield},
 };
 use tui::{
     backend::CrosstermBackend,
@@ -98,7 +100,16 @@ fn main() -> anyhow::Result<()> {
     //     minesweeper::Minefield::new(args.cols,
     // args.rows).generate_mines_simple(args.mine_count);
 
-    let mut game = Game::new(args.cols, args.rows, args.mine_count);
+    let mut game = Game::from_minefield(Minefield::from_template(
+        TemplateMinefield::new_randomly_spread(
+            FieldDimension {
+                x: args.cols,
+                y: args.rows,
+            },
+            args.mine_count,
+        ),
+    ));
+    // let mut game = Game::new(args.cols, args.rows, args.mine_count);
 
     loop {
         terminal

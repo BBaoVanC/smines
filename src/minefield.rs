@@ -20,10 +20,12 @@ pub enum TileFlagState {
     Flagged,
     /// The player is unsure if this tile is a mine.
     Suspicious,
-    /// The player has not flagged the tile, or does not think the tile is a mine.
-    /// 
-    /// There's no reason to have a different flag type for tiles that the player is sure aren't mines
-    /// because they should instead just reveal the mine.
+    /// The player has not flagged the tile, or does not think the tile is a
+    /// mine.
+    ///
+    /// There's no reason to have a different flag type for tiles that the
+    /// player is sure aren't mines because they should instead just reveal
+    /// the mine.
     #[default]
     Empty,
 }
@@ -31,9 +33,11 @@ pub enum TileFlagState {
 /// Whether a tile is a mine, otherwise how many surrounding tiles are mines.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TileMineState {
-    /// The tile is a mine. The amount of surrounding mines does not need to be known.
+    /// The tile is a mine. The amount of surrounding mines does not need to be
+    /// known.
     Mine,
-    /// The tile is not a mine. The included [`u8`] is the amount of surrounding tiles that are mines.
+    /// The tile is not a mine. The included [`u8`] is the amount of surrounding
+    /// tiles that are mines.
     Empty(u8),
 }
 
@@ -42,6 +46,7 @@ pub enum TileMineState {
 pub struct Tile {
     pub flag_state: TileFlagState,
     pub mine_state: TileMineState,
+    pub is_visible: bool,
 }
 impl Tile {
     /// Create a new tile. The tile is not flagged by default.
@@ -49,6 +54,7 @@ impl Tile {
         Self {
             flag_state: TileFlagState::Empty,
             mine_state,
+            is_visible: false,
         }
     }
 }
@@ -61,7 +67,8 @@ pub struct Minefield {
     pub tiles: Array2<Tile>,
 }
 impl Minefield {
-    /// Create a new minefield based on a [`TemplateMinefield`] that has already been created.
+    /// Create a new minefield based on a [`TemplateMinefield`] that has already
+    /// been created.
     pub fn from_template(template: TemplateMinefield) -> Self {
         Self {
             size: template.size,

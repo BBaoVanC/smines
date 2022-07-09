@@ -13,22 +13,26 @@ pub struct TemplateMinefield {
     pub size: FieldDimension,
     /// The total amount of mines placed in the minefield.
     pub total_mines: usize,
-    /// Two-dimensional array of the mine placement, and tile surrounding mine counts.
+    /// Two-dimensional array of the mine placement, and tile surrounding mine
+    /// counts.
     pub layout: Array2<TileMineState>,
 }
 impl TemplateMinefield {
-    /// Create a new minefield by randomly spreading a predefined amount of mines.
+    /// Create a new minefield by randomly spreading a predefined amount of
+    /// mines.
     pub fn new_randomly_spread(size: FieldDimension, mines: usize) -> Self {
         let mut total_mines = 0usize;
-        let mut layout =
-            Array2::from_shape_simple_fn((size.x, size.y), || TileMineState::Empty(0));
+        let mut layout = Array2::from_shape_simple_fn((size.x, size.y), || TileMineState::Empty(0));
 
-        // TODO: prevent infinite loops where there's more mines than total tiles
-        //       idea for this: create an array that contains a list of every single index
-        //       possible, and then pick randomly from that array, and then remove from the array
-        //       every time a mine is placed. then if the array is empty, that means that there were too many mines
-        //       ---
-        //       another idea: add a guard that errors if (mines > size.x * size.y)
+        // TODO:
+        // prevent infinite loops where there's more mines than total tiles
+        // idea for this: create an array that contains a list of every single
+        // index possible, and then pick randomly from that array, and
+        // then remove from the array every time a mine is placed. then if
+        // the array is empty, that means that there were too many mines
+        // ---
+        // another idea:
+        // add a guard that errors if (mines > size.x * size.y)
         while total_mines < mines {
             let mine_col = rand::thread_rng().gen_range(0..size.x);
             let mine_row = rand::thread_rng().gen_range(0..size.y);
@@ -41,7 +45,7 @@ impl TemplateMinefield {
             if let TileMineState::Mine = mine_tile {
                 continue;
             }
-            
+
             total_mines += 1;
             *mine_tile = TileMineState::Mine;
 
