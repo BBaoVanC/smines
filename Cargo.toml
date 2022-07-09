@@ -6,6 +6,7 @@ edition = "2021"
 description = "Simple minesweeper in the terminal."
 repository = "https://github.com/BBaoVanC/smines"
 license = "MIT"
+default-run = "smines"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

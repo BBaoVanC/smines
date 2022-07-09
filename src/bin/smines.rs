@@ -16,7 +16,7 @@ use smines::{
 use tui::{
     backend::CrosstermBackend,
     layout::Rect,
-    widgets::{self, Borders, Paragraph},
+    widgets::{self, Block, Borders, Paragraph},
     Terminal,
 };
 
@@ -26,25 +26,25 @@ use tui::{
 #[derive(Parser, Debug)]
 #[clap(author, version)]
 struct Args {
-    // #[clap(short, long, value_parser, default_value_t = 16)]
     /// Total columns in the minefield
     ///
     /// This sets the amount of columns (lines stacked horizontally) in the
     /// minefield.
     #[clap(short, long, value_parser, default_value_t = 4)]
-    cols: usize,
     // #[clap(short, long, value_parser, default_value_t = 16)]
+    cols: usize,
     /// Total rows in the minefield
     ///
     /// This sets the amount of rows (lines stacked vertically) in the
     /// minefield.
     #[clap(short, long, value_parser, default_value_t = 4)]
+    // #[clap(short, long, value_parser, default_value_t = 16)]
     rows: usize,
-    // #[clap(short, long, value_parser, default_value_t = 40)]
     /// Total mines in the minefield
     ///
     /// This sets the amount of mines that will be distributed in the minefield.
     #[clap(short, long, value_parser, default_value_t = 4)]
+    // #[clap(short, long, value_parser, default_value_t = 40)]
     mine_count: usize,
 
     /// Should you be allowed to undo your last move?
@@ -107,29 +107,30 @@ fn main() -> anyhow::Result<()> {
             args.mine_count,
         ),
     ));
-    // let mut game = Game::new(args.cols, args.rows, args.mine_count);
 
     loop {
         terminal
             .draw(|f| {
-                let width = (game.size().x * TILE_TERMINAL_WIDTH).try_into().unwrap();
-                let minefield_height = (game.size().y * TILE_TERMINAL_HEIGHT).try_into().unwrap();
+                let width: u16 = (game.size().x * TILE_TERMINAL_WIDTH).try_into().unwrap();
+                let scoreboard_height: u16 = 4;
+                let minefield_height: u16 =
+                    (game.size().y * TILE_TERMINAL_HEIGHT).try_into().unwrap();
 
                 let start_x = ((f.size().width) - width) / 2;
                 let start_y = (f.size().height - (4 + minefield_height)) / 2;
 
                 let scoreboard = Rect {
-                    height: 4,
-                    width,
+                    height: scoreboard_height + 2,
+                    width: width + 2,
                     x: start_x,
                     y: start_y,
                 };
 
                 let minefield = Rect {
-                    height: minefield_height,
-                    width,
+                    height: minefield_height + 2,
+                    width: width + 2,
                     x: start_x,
-                    y: start_y + 4,
+                    y: start_y + 4 + 2,
                 };
 
                 // Scoreboard
@@ -142,7 +143,11 @@ fn main() -> anyhow::Result<()> {
 
                 // Minefield
                 // f.render_widget(GameWidget::new(&game), minefield);
-                f.render_widget(Paragraph::new(game.display()), minefield)
+                f.render_widget(
+                    Paragraph::new(game.display())
+                        .block(Block::default().title("Minefield").borders(Borders::ALL)),
+                    minefield,
+                )
                 // f.render_widget(
                 //     widgets::Block::default()
                 //         .title("Minefield")
