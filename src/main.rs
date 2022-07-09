@@ -9,7 +9,6 @@ use crossterm::{
 };
 use smines::{
     constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
-    display::GameWidget,
     game::Game,
     generate::TemplateMinefield,
     minefield::{FieldDimension, Minefield},
@@ -114,8 +113,8 @@ fn main() -> anyhow::Result<()> {
     loop {
         terminal
             .draw(|f| {
-                let width = (game.width() * TILE_TERMINAL_WIDTH).try_into().unwrap();
-                let minefield_height = (game.height() * TILE_TERMINAL_HEIGHT).try_into().unwrap();
+                let width = (game.size().x * TILE_TERMINAL_WIDTH).try_into().unwrap();
+                let minefield_height = (game.size().y * TILE_TERMINAL_HEIGHT).try_into().unwrap();
 
                 let start_x = ((f.size().width) - width) / 2;
                 let start_y = (f.size().height - (4 + minefield_height)) / 2;
@@ -144,7 +143,7 @@ fn main() -> anyhow::Result<()> {
 
                 // Minefield
                 // f.render_widget(GameWidget::new(&game), minefield);
-                f.render_widget(Paragraph::new(game.render().unwrap()), minefield)
+                f.render_widget(Paragraph::new(game.display()), minefield)
                 // f.render_widget(
                 //     widgets::Block::default()
                 //         .title("Minefield")
