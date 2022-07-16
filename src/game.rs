@@ -59,6 +59,7 @@ impl Game {
         self.minefield.size
     }
 
+    #[deprecated]
     pub fn display(&self) -> Vec<Spans> {
         let output_array = self.minefield.tiles.map(|t| {
             // TODO: think of more cases that are unreachable and mark them
