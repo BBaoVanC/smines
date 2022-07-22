@@ -1,10 +1,5 @@
 //! Stuff that handles an entire minesweeper game.
 
-use tui::{
-    style::Color,
-    text::{Span, Spans},
-};
-
 use crate::{
     colors::{get_color, get_color_from_surrounding, get_str_from_surrounding, ColorType},
     minefield::{FieldDimension, Minefield, TileFlagState, TileMineState},
@@ -59,6 +54,7 @@ impl Game {
         self.minefield.size
     }
 
+    /*
     #[deprecated]
     pub fn display(&self) -> Vec<Spans> {
         let output_array = self.minefield.tiles.map(|t| {
@@ -147,4 +143,5 @@ impl Game {
             })
             .collect()
     }
+    */
 }
