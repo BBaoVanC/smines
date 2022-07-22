@@ -1,7 +1,7 @@
 //! Stuff that handles an entire minesweeper game.
 
 use crate::{
-    colors::{get_color, get_color_from_surrounding, get_str_from_surrounding, ColorType},
+    colors::{get_color, ColorType},
     minefield::{FieldDimension, Minefield, TileFlagState, TileMineState},
 };
 
