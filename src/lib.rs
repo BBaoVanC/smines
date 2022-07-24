@@ -7,4 +7,5 @@ pub mod generate;
 pub mod minefield;
 // pub mod minesweeper;
 pub mod game;
+pub mod term;
 // pub mod render;

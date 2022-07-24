@@ -38,8 +38,10 @@ fn main() {
     // let _term = Term::new();
 
     let game = Game::from_minefield(Minefield::from_template(
-        TemplateMinefield::new_randomly_spread(FieldDimension { x: 4, y: 4 }, 2),
+        TemplateMinefield::new_randomly_spread(FieldDimension { x: 16, y: 16 }, 40),
     ));
 
-    println!("{:#?}", game.display());
+    println!("{:#?}", game.minefield)
+
+    // println!("{:#?}", game.display());
 }

@@ -12,12 +12,7 @@ use smines::{
     game::Game,
     generate::TemplateMinefield,
     minefield::{FieldDimension, Minefield},
-};
-use tui::{
-    backend::CrosstermBackend,
-    layout::Rect,
-    widgets::{self, Block, Borders, Paragraph},
-    Terminal,
+    term::Terminal,
 };
 
 /// Simple minesweeper in the terminal.
@@ -30,21 +25,21 @@ struct Args {
     ///
     /// This sets the amount of columns (lines stacked horizontally) in the
     /// minefield.
-    #[clap(short, long, value_parser, default_value_t = 4)]
-    // #[clap(short, long, value_parser, default_value_t = 16)]
+    // #[clap(short, long, value_parser, default_value_t = 4)]
+    #[clap(short, long, value_parser, default_value_t = 16)]
     cols: usize,
     /// Total rows in the minefield
     ///
     /// This sets the amount of rows (lines stacked vertically) in the
     /// minefield.
-    #[clap(short, long, value_parser, default_value_t = 4)]
-    // #[clap(short, long, value_parser, default_value_t = 16)]
+    // #[clap(short, long, value_parser, default_value_t = 4)]
+    #[clap(short, long, value_parser, default_value_t = 16)]
     rows: usize,
     /// Total mines in the minefield
     ///
     /// This sets the amount of mines that will be distributed in the minefield.
-    #[clap(short, long, value_parser, default_value_t = 4)]
-    // #[clap(short, long, value_parser, default_value_t = 40)]
+    // #[clap(short, long, value_parser, default_value_t = 4)]
+    #[clap(short, long, value_parser, default_value_t = 40)]
     mine_count: usize,
 
     /// Should you be allowed to undo your last move?
@@ -56,47 +51,18 @@ struct Args {
     allow_undo: bool,
 }
 
-struct Term;
-impl Term {
-    fn new() -> Self {
-        execute!(
-            io::stdout(),
-            terminal::EnterAlternateScreen,
-            terminal::Clear(terminal::ClearType::All),
-            cursor::Hide,
-        )
-        .unwrap();
-        terminal::enable_raw_mode().unwrap();
-        Self {}
-    }
-}
-impl Drop for Term {
-    fn drop(&mut self) {
-        execute!(
-            io::stdout(),
-            cursor::MoveTo(0, 0),
-            terminal::Clear(terminal::ClearType::All),
-            terminal::LeaveAlternateScreen,
-            cursor::Show,
-        )
-        .unwrap();
-        terminal::disable_raw_mode().unwrap();
-    }
-}
-
 // Separate run() function to ensure that raw mode gets disabled even if there's
 // an error
 fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
+    // let args = Args::parse();
+    let args = Args {
+        allow_undo: true,
+        cols: 16,
+        rows: 16,
+        mine_count: 40,
+    };
 
-    let _term = Term::new();
-
-    let backend = CrosstermBackend::new(io::stdout());
-    let mut terminal = Terminal::new(backend).context("Failed to create terminal")?;
-
-    // let minefield =
-    //     minesweeper::Minefield::new(args.cols,
-    // args.rows).generate_mines_simple(args.mine_count);
+    let mut term = Terminal::init(io::stdout()).context("Failed to initialize terminal.")?;
 
     let mut game = Game::from_minefield(Minefield::from_template(
         TemplateMinefield::new_randomly_spread(
@@ -109,59 +75,7 @@ fn main() -> anyhow::Result<()> {
     ));
 
     loop {
-        terminal
-            .draw(|f| {
-                let width: u16 = (game.size().x * TILE_TERMINAL_WIDTH).try_into().unwrap();
-                let scoreboard_height: u16 = 4;
-                let minefield_height: u16 =
-                    (game.size().y * TILE_TERMINAL_HEIGHT).try_into().unwrap();
-
-                let start_x = ((f.size().width) - width) / 2;
-                let start_y = (f.size().height - (4 + minefield_height)) / 2;
-
-                let scoreboard = Rect {
-                    height: scoreboard_height + 2,
-                    width: width + 2,
-                    x: start_x,
-                    y: start_y,
-                };
-
-                let minefield = Rect {
-                    height: minefield_height + 2,
-                    width: width + 2,
-                    x: start_x,
-                    y: start_y + 4 + 2,
-                };
-
-                // Scoreboard
-                f.render_widget(
-                    widgets::Block::default()
-                        .title("Scoreboard")
-                        .borders(Borders::ALL),
-                    scoreboard,
-                );
-
-                // Minefield
-                // f.render_widget(GameWidget::new(&game), minefield);
-                f.render_widget(
-                    Paragraph::new(game.display())
-                        .block(Block::default().title("Minefield").borders(Borders::ALL)),
-                    minefield,
-                )
-                // f.render_widget(
-                //     widgets::Block::default()
-                //         .title("Minefield")
-                //         .borders(Borders::ALL),
-                //     minefield,
-                // );
-
-                // // Short instructions
-                // f.render_widget(
-                //     widgets::Paragraph::new(constants::instructions()),
-                //     instructions,
-                // );
-            })
-            .context("Failed to draw UI")?;
+        term.draw(&game).context("Failed to draw to terminal.")?;
 
         if let Event::Key(key) = event::read()? {
             match key.code {

@@ -2,7 +2,7 @@
 //! and each tile's surrounding mines.
 
 use ndarray::Array2;
-use rand::Rng;
+use rand::{Rng, prelude::SliceRandom};
 
 use crate::minefield::{FieldDimension, TileMineState};
 
@@ -24,32 +24,20 @@ impl TemplateMinefield {
         let mut total_mines = 0usize;
         let mut layout = Array2::from_shape_simple_fn((size.x, size.y), || TileMineState::Empty(0));
 
-        // TODO:
-        // prevent infinite loops where there's more mines than total tiles
-        // idea for this: create an array that contains a list of every single
-        // index possible, and then pick randomly from that array, and
-        // then remove from the array every time a mine is placed. then if
-        // the array is empty, that means that there were too many mines
-        // ---
-        // another idea:
-        // add a guard that errors if (mines > size.x * size.y)
-        while total_mines < mines {
-            let mine_col = rand::thread_rng().gen_range(0..size.x);
-            let mine_row = rand::thread_rng().gen_range(0..size.y);
+        let mut rng = rand::thread_rng();
 
-            // TODO: maybe prevent the center tile from being a mine, that's a future
-            // endeavor
+        let mut possible_cols: Vec<usize> = (0..size.x).collect();
+        let mut possible_rows: Vec<usize> = (0..size.y).collect();
+        possible_cols.shuffle(&mut rng);
+        possible_rows.shuffle(&mut rng);
 
-            let mine_tile = layout.get_mut((mine_col, mine_row)).unwrap();
-            // Skip tiles that are already mines
-            if let TileMineState::Mine = mine_tile {
-                continue;
-            }
-
+        for i in 0..mines {
+            let mine_col = possible_cols[i];
+            let mine_row = possible_rows[i];
+            layout[[mine_col, mine_row]] = TileMineState::Mine;
             total_mines += 1;
-            *mine_tile = TileMineState::Mine;
 
-            // Increment surrounding mines for the surrounding tiles
+            // Increment surrounding mine count for each surrounding tile
             for col in (mine_col.saturating_sub(1))..=(mine_col.saturating_add(1)) {
                 if col > size.x - 1 {
                     continue;
@@ -60,13 +48,14 @@ impl TemplateMinefield {
                         continue;
                     }
 
-                    let tile = layout.get_mut((col, row)).unwrap();
-                    if let TileMineState::Empty(surrounding) = tile {
+                    if let TileMineState::Empty(surrounding) = layout.get_mut((col, row)).unwrap() {
                         *surrounding += 1;
                     }
                 }
             }
         }
+
+        debug_assert_eq!(total_mines, mines);
 
         Self {
             size,

@@ -38,7 +38,8 @@ impl Cursor {
 pub struct Game {
     state: GameState,
     pub cursor: Cursor,
-    minefield: Minefield,
+    // TODO: make this private
+    pub minefield: Minefield,
 }
 impl Game {
     /// Create a game instance from an existing minefield instance.
