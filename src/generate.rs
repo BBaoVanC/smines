@@ -2,7 +2,7 @@
 //! and each tile's surrounding mines.
 
 use ndarray::Array2;
-use rand::{Rng, prelude::SliceRandom};
+use rand::{prelude::SliceRandom, Rng};
 
 use crate::minefield::{FieldDimension, TileMineState};
 
@@ -31,26 +31,34 @@ impl TemplateMinefield {
         possible_cols.shuffle(&mut rng);
         possible_rows.shuffle(&mut rng);
 
-        for i in 0..mines {
-            let mine_col = possible_cols[i];
-            let mine_row = possible_rows[i];
-            layout[[mine_col, mine_row]] = TileMineState::Mine;
-            total_mines += 1;
+        // TODO: make this actually work
+        for mine_col in &possible_cols {
+            for mine_row in &possible_rows {
+                let mine_tile = layout.get_mut((*mine_col, *mine_row)).unwrap();
+                *mine_tile = TileMineState::Mine;
+                total_mines += 1;
 
-            // Increment surrounding mine count for each surrounding tile
-            for col in (mine_col.saturating_sub(1))..=(mine_col.saturating_add(1)) {
-                if col > size.x - 1 {
-                    continue;
-                }
-
-                for row in (mine_row.saturating_sub(1))..=(mine_row.saturating_add(1)) {
-                    if row > size.y - 1 {
+                // Increment surrounding mine count for each surrounding tile
+                for col in (mine_col.saturating_sub(1))..=(mine_col.saturating_add(1)) {
+                    if col > size.x - 1 {
                         continue;
                     }
 
-                    if let TileMineState::Empty(surrounding) = layout.get_mut((col, row)).unwrap() {
-                        *surrounding += 1;
+                    for row in (mine_row.saturating_sub(1))..=(mine_row.saturating_add(1)) {
+                        if row > size.y - 1 {
+                            continue;
+                        }
+
+                        if let TileMineState::Empty(surrounding) =
+                            layout.get_mut((col, row)).unwrap()
+                        {
+                            *surrounding += 1;
+                        }
                     }
+                }
+
+                if total_mines >= mines {
+                    break;
                 }
             }
         }
