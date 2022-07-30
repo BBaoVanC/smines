@@ -36,7 +36,6 @@ impl Cursor {
 pub struct Game {
     pub state: GameState,
     pub cursor: Cursor,
-    // TODO: make this private
     pub minefield: Minefield,
 }
 impl Game {

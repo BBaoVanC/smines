@@ -82,16 +82,16 @@ impl Tile {
             self.mine_state,
             self.is_visible,
         ) {
-            // DEBUGGING
-            (GameState::Playing, TileFlagState::Empty, TileMineState::Mine, false) => {
-                (" X".into(), ColorType::TileFlag)
-            }
-            (GameState::Playing, TileFlagState::Empty, TileMineState::Empty(0), false) => {
-                ("  ".into(), ColorType::TileNormal(0))
-            }
-            (GameState::Playing, TileFlagState::Empty, TileMineState::Empty(s), false) => {
-                (format!(" {}", s).into(), ColorType::TileNormal(s))
-            }
+            // // DEBUGGING
+            // (GameState::Playing, TileFlagState::Empty, TileMineState::Mine, false) => {
+            //     (" X".into(), ColorType::TileFlag)
+            // }
+            // (GameState::Playing, TileFlagState::Empty, TileMineState::Empty(0), false) => {
+            //     ("  ".into(), ColorType::TileNormal(0))
+            // }
+            // (GameState::Playing, TileFlagState::Empty, TileMineState::Empty(s), false) => {
+            //     (format!(" {}", s).into(), ColorType::TileNormal(s))
+            // }
 
             // Hidden tiles (the mine state should be ignored)
             (GameState::Playing, TileFlagState::Empty, _, false) => {
