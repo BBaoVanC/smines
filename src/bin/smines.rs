@@ -8,7 +8,7 @@ use smines::{
         game::Game,
         minefield::{FieldDimension, Minefield},
     },
-    terminal::term::Terminal,
+    terminal::Terminal,
 };
 
 /// Simple minesweeper in the terminal.

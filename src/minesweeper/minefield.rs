@@ -120,24 +120,5 @@ impl Minefield {
                 tiles: template_tiles.map(|t| Tile::new_unflagged(*t)),
             })
         }
-
-        // let mut possible_cols = (0..size.x).collect::<Vec<usize>>();
-        // let mut possible_rows = (0..size.y).collect::<Vec<usize>>();
-        // possible_cols.shuffle(&mut rng);
-        // possible_rows.shuffle(&mut rng);
-
-        // let possible_mines =
-        // possible_cols.iter().zip(possible_rows).take(mines);
-        // if possible_mines.len() < mines {}
     }
-
-    // /// Create a new minefield based on a [`TemplateMinefield`] that has already
-    // /// been created.
-    // pub fn from_template(template: TemplateMinefield) -> Self {
-    //     Self {
-    //         size: template.size,
-    //         total_mines: template.total_mines,
-    //         tiles: template.layout.map(|t| Tile::new_unflagged(*t)),
-    //     }
-    // }
 }
