@@ -21,20 +21,17 @@ struct Args {
     ///
     /// This sets the amount of columns (lines stacked horizontally) in the
     /// minefield.
-    // #[clap(short, long, value_parser, default_value_t = 4)]
     #[clap(short, long, value_parser, default_value_t = 16)]
     cols: usize,
     /// Total rows in the minefield
     ///
     /// This sets the amount of rows (lines stacked vertically) in the
     /// minefield.
-    // #[clap(short, long, value_parser, default_value_t = 4)]
     #[clap(short, long, value_parser, default_value_t = 16)]
     rows: usize,
     /// Total mines in the minefield
     ///
     /// This sets the amount of mines that will be distributed in the minefield.
-    // #[clap(short, long, value_parser, default_value_t = 4)]
     #[clap(short, long, value_parser, default_value_t = 40)]
     mine_count: usize,
 
@@ -50,13 +47,7 @@ struct Args {
 // Separate run() function to ensure that raw mode gets disabled even if there's
 // an error
 fn main() -> anyhow::Result<()> {
-    // let args = Args::parse();
-    let args = Args {
-        allow_undo: true,
-        cols: 16,
-        rows: 16,
-        mine_count: 40,
-    };
+    let args = Args::parse();
 
     let mut term = Terminal::init(io::stdout()).context("Failed to initialize terminal.")?;
 
