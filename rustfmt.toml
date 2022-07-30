@@ -9,4 +9,5 @@ group_imports = "StdExternalCrate"
 enum_discrim_align_threshold = 16
 
 ignore = [
+    "src/terminal/colors.rs",
 ]

@@ -16,24 +16,24 @@ pub enum ColorType {
 
 pub fn get_color(color_type: ColorType) -> ContentStyle {
     match color_type {
-        ColorType::TileHidden => ContentStyle::new().with(Color::Grey).on(Color::Reset),
-        ColorType::TileFlag => ContentStyle::new().with(Color::Yellow).on(Color::Black),
-        ColorType::TileFlagCorrect => ContentStyle::new().with(Color::Green).on(Color::Black),
-        ColorType::TileFlagWrong => ContentStyle::new().with(Color::Yellow).on(Color::Black),
+        ColorType::TileHidden => ContentStyle::new().with(Color::DarkGrey).on(Color::Reset),
+        ColorType::TileFlag => ContentStyle::new().with(Color::DarkYellow).on(Color::Black),
+        ColorType::TileFlagCorrect => ContentStyle::new().with(Color::DarkGreen).on(Color::Black),
+        ColorType::TileFlagWrong => ContentStyle::new().with(Color::DarkYellow).on(Color::Black),
 
-        ColorType::TileMineDead => ContentStyle::new().with(Color::Red).on(Color::Black),
-        ColorType::TileMineSafe => ContentStyle::new().with(Color::Green).on(Color::Black),
+        ColorType::TileMineDead => ContentStyle::new().with(Color::DarkRed).on(Color::Black),
+        ColorType::TileMineSafe => ContentStyle::new().with(Color::DarkGreen).on(Color::Black),
 
         ColorType::TileNormal(s) => match s {
             0 => ContentStyle::new().with(Color::White).on(Color::Black),
-            1 => ContentStyle::new().with(Color::White).on(Color::Blue),
-            2 => ContentStyle::new().with(Color::Black).on(Color::Green),
-            3 => ContentStyle::new().with(Color::White).on(Color::Red),
-            4 => ContentStyle::new().with(Color::Black).on(Color::Cyan),
-            5 => ContentStyle::new().with(Color::Black).on(Color::Yellow),
-            6 => ContentStyle::new().with(Color::Black).on(Color::Magenta),
+            1 => ContentStyle::new().with(Color::White).on(Color::DarkBlue),
+            2 => ContentStyle::new().with(Color::Black).on(Color::DarkGreen),
+            3 => ContentStyle::new().with(Color::White).on(Color::DarkRed),
+            4 => ContentStyle::new().with(Color::Black).on(Color::DarkCyan),
+            5 => ContentStyle::new().with(Color::Black).on(Color::DarkYellow),
+            6 => ContentStyle::new().with(Color::Black).on(Color::DarkMagenta),
             7 => ContentStyle::new().with(Color::White).on(Color::Black),
-            8 => ContentStyle::new().with(Color::White).on(Color::Grey),
+            8 => ContentStyle::new().with(Color::White).on(Color::Black),
             _ => unimplemented!(),
         },
     }

@@ -32,8 +32,9 @@ impl Cursor {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Game {
-    state: GameState,
+    pub state: GameState,
     pub cursor: Cursor,
     // TODO: make this private
     pub minefield: Minefield,

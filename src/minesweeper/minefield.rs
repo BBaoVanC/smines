@@ -67,6 +67,7 @@ pub enum MinefieldError {
 
 /// A minefield that's ready to be used in an actual game.
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Minefield {
     pub size: FieldDimension,
     pub total_mines: usize,
@@ -91,9 +92,12 @@ impl Minefield {
         if mine_positions.len() < total_mines {
             Err(MinefieldError::NotEnoughSpace)
         } else {
+            // Place the mines in the field
             for (x, y) in mine_positions.clone() {
                 template_tiles[[*x, *y]] = TileMineState::Mine;
             }
+
+            // Generate the surrounding mines values
             for (mine_col, mine_row) in mine_positions {
                 for col in mine_col.saturating_sub(1)..=(mine_col.saturating_add(1)) {
                     if col > size.x - 1 {
