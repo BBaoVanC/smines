@@ -1,9 +1,6 @@
 //! Stuff that handles an entire minesweeper game.
 
-use crate::{
-    colors::{get_color, ColorType},
-    minefield::{FieldDimension, Minefield, TileFlagState, TileMineState},
-};
+use crate::minesweeper::minefield::{FieldDimension, Minefield};
 
 /// The current status of the game.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

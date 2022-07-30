@@ -2,17 +2,13 @@ use std::io;
 
 use anyhow::Context;
 use clap::Parser;
-use crossterm::{
-    cursor,
-    event::{self, Event, KeyCode},
-    execute, terminal,
-};
+use crossterm::event::{self, Event, KeyCode};
 use smines::{
-    constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
-    game::Game,
-    generate::TemplateMinefield,
-    minefield::{FieldDimension, Minefield},
-    term::Terminal,
+    minesweeper::{
+        game::Game,
+        minefield::{FieldDimension, Minefield},
+    },
+    terminal::term::Terminal,
 };
 
 /// Simple minesweeper in the terminal.
@@ -64,15 +60,13 @@ fn main() -> anyhow::Result<()> {
 
     let mut term = Terminal::init(io::stdout()).context("Failed to initialize terminal.")?;
 
-    let mut game = Game::from_minefield(Minefield::from_template(
-        TemplateMinefield::new_randomly_spread(
-            FieldDimension {
-                x: args.cols,
-                y: args.rows,
-            },
-            args.mine_count,
-        ),
-    ));
+    let mut game = Game::from_minefield(Minefield::new(
+        FieldDimension {
+            x: args.cols,
+            y: args.rows,
+        },
+        args.mine_count,
+    )?);
 
     loop {
         term.draw(&game).context("Failed to draw to terminal.")?;

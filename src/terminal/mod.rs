@@ -1,12 +1,20 @@
-//! Abstraction module that helps display the game to a terminal using
-//! [`crossterm`].
+//! Module with everything relating to drawing the minesweeper game into the
+//! terminal using [`crossterm`].
 
-use std::{io::{self, Stdout, Write}, fmt::write};
+pub mod colors;
+pub mod constants;
 
-use crossterm::{cursor, terminal::{self, ClearType}, QueueableCommand, style::Print};
+use std::io::{self, Stdout, Write};
+
+use crossterm::{
+    cursor,
+    style::Print,
+    terminal::{self, ClearType},
+    QueueableCommand,
+};
 use thiserror::Error;
 
-use crate::{game::Game, constants::TILE_TERMINAL_WIDTH};
+use crate::{minesweeper::game::Game, terminal::constants::TILE_TERMINAL_WIDTH};
 
 // Prevent this struct from being created without using init()
 #[non_exhaustive]
@@ -37,11 +45,16 @@ impl Terminal {
         let min_rows = game.size().y + 4 + 2;
 
         if (usize::from(size.0) < min_cols) || (usize::from(size.1) < min_rows) {
-            self.stdout.queue(Print(format!("Please make your terminal at least {min_cols} cols by {min_rows} rows.")))?;
-            self.stdout.queue(Print(format!("Current size: {} cols by {} rows", size.0, size.1)))?;
+            self.stdout.queue(Print(format!(
+                "Please make your terminal at least {min_cols} cols by {min_rows} rows."
+            )))?;
+            self.stdout.queue(Print(format!(
+                "Current size: {} cols by {} rows",
+                size.0, size.1
+            )))?;
 
             self.stdout.flush()?;
-            return Ok(())
+            return Ok(());
         }
 
         self.stdout.queue(Print("This is cool"))?;
