@@ -6,7 +6,7 @@ use std::{
 
 use crossterm::{
     cursor,
-    style::{Print, PrintStyledContent, StyledContent},
+    style::{Color, Print, PrintStyledContent, StyledContent, Stylize},
     terminal::{self, ClearType},
     QueueableCommand,
 };
@@ -14,7 +14,7 @@ use thiserror::Error;
 
 use super::{
     colors::{get_color, ColorType},
-    constants::TILE_TERMINAL_WIDTH,
+    constants::{TILE_TERMINAL_HEIGHT, TILE_TERMINAL_WIDTH},
     Terminal,
 };
 use crate::minesweeper::{
@@ -68,6 +68,18 @@ impl Terminal {
                     .queue(PrintStyledContent(tile.display(game.state)))?;
             }
         }
+
+        let cursor_tile_pos: (u16, u16) = (game.cursor.x.try_into()?, game.cursor.y.try_into()?);
+        let cursor_x = start_x as u16 + (cursor_tile_pos.0 * TILE_TERMINAL_WIDTH as u16);
+        let cursor_y = start_y as u16 + (cursor_tile_pos.1 * TILE_TERMINAL_HEIGHT as u16);
+        self.stdout.queue(cursor::MoveTo(cursor_x, cursor_y))?;
+        self.stdout.queue(PrintStyledContent(
+            game.minefield.tiles[[game.cursor.x, game.cursor.y]]
+                .display(game.state)
+                .with(Color::Black)
+                .on(Color::White),
+        ))?;
+
         self.stdout.flush()?;
 
         Ok(())
