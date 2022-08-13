@@ -31,7 +31,9 @@ pub fn get_color(color_type: ColorType) -> ContentStyle {
             3 => ContentStyle::new().with(Color::White).on(Color::DarkRed),
             4 => ContentStyle::new().with(Color::Black).on(Color::DarkCyan),
             5 => ContentStyle::new().with(Color::Black).on(Color::DarkYellow),
-            6 => ContentStyle::new().with(Color::Black).on(Color::DarkMagenta),
+            6 => ContentStyle::new()
+                .with(Color::Black)
+                .on(Color::DarkMagenta),
             7 => ContentStyle::new().with(Color::White).on(Color::Black),
             8 => ContentStyle::new().with(Color::White).on(Color::Black),
             _ => unimplemented!(),
