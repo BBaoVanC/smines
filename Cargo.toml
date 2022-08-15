@@ -20,3 +20,6 @@ crossterm = "0.25.0"
 
 ndarray = "0.15.4"
 rand = "0.8.5"
+
+[profile.release]
+strip = "symbols"
