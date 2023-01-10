@@ -16,4 +16,7 @@ srcs = [
   'smines.c',
 ]
 
-executable('smines', srcs, dependencies: [ncurses_dep])
+conf_data = configuration_data()
+configure_file(input: 'config.def.h', output: 'config.h', configuration: conf_data)
+
+executable('smines', srcs, dependencies: [ncurses_dep], install: true)
