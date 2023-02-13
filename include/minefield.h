@@ -6,7 +6,6 @@
 #ifndef SMINES_MINEFIELD_H
 #define SMINES_MINEFIELD_H
 
-#include "config.h"
 #include "types.h"
 
 #include <ncurses.h>

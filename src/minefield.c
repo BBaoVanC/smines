@@ -6,7 +6,6 @@
 #include "minefield.h"
 
 #include "colornames.h"
-#include "config.h"
 #include "draw.h"
 #include "types.h"
 

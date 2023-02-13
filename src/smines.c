@@ -4,7 +4,6 @@
  */
 
 #include "colornames.h"
-#include "config.h"
 #include "draw.h"
 #include "help.h"
 #include "helper.h"
@@ -17,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <getopt.h>
 
 #if ALLOW_UNDO
     #include "undo.h"
@@ -40,7 +40,72 @@ Minefield undo_minefield;   /* the minefield before the last move */
 Game_State undo_game_state; /* the game state before the last move */
 #endif
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    // should these all be static
+    const char cmd_usage[] =
+        "Usage: smines [options]\n"
+    ;
+    const char cmd_help[] =
+        "Options:\n"
+        "  -h, --help\n"
+    ;
+
+    int help_flag = 0;
+    int undo_flag = 0;
+    const struct option long_options[] = {
+        { "help",       no_argument,        &help_flag, 1   },
+        { "rows",       required_argument,  0,          'r' },
+        { "cols",       required_argument,  0,          'c' },
+        { "difficulty", required_argument,  0,          'd' },
+        { "allow-undo", no_argument,        &undo_flag, 1   },
+        { 0, 0, 0, 0 }
+    };
+
+    bool exit_for_invalid_args = false;
+    int opt_idx = 0;
+    int c;
+    while ((c = getopt_long(argc, argv, "hr:c:d:u", long_options, &opt_idx)) != -1) {
+        switch (c) {
+            case 0:
+                // do nothing else if flag was set
+                if (long_options[opt_idx].flag != 0) {
+                    break;
+                }
+                abort();
+            case '?':
+                exit_for_invalid_args = true;
+                break;
+            case 'h':
+                help_flag = 1;
+                break;
+            case 'r':
+                rows = optarg;
+                break;
+            case 'c':
+                cols = optarg;
+                break;
+            case 'd':
+                printf("unimplemented difficulty setting\n");
+                abort();
+            case 'u':
+                undo_flag = 1;
+                break;
+            default:
+                abort();
+        }
+    }
+    if (exit_for_invalid_args) {
+        printf(cmd_usage);
+        printf("Use the '--help' option to display help page\n");
+        return 1;
+    }
+    if (help_flag) {
+        printf(cmd_usage);
+        printf(cmd_help);
+        return 0;
+    }
+    // TODO: print out non option args
+
     srand((unsigned)time(NULL)); /* seed the random number generator */
 
     /* ncurses setup */

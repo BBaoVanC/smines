@@ -3,7 +3,6 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include "config.h"
 #include "global.h"
 
 #include <string.h>

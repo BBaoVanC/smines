@@ -5,8 +5,6 @@
 
 #include "help.h"
 
-#include "config.h"
-
 #include <ncurses.h>
 
 const char helptxt[] =

@@ -6,8 +6,6 @@
 #ifndef SMINES_TYPES_H
 #define SMINES_TYPES_H
 
-#include "config.h"
-
 #include <stdbool.h>
 
 typedef struct {
