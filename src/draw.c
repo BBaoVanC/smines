@@ -93,12 +93,12 @@ void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
     for (int y = 0; y < minefield->rows; y++) {
         for (int x = 0; x < minefield->cols; x++) {
             wmove(win, y + 1, x * 2 + 1);
-            draw_tile_color(win, &minefield->tiles[y][x], game_state);
+            draw_tile_color(win, minefield_get_tile(minefield, y, x), game_state);
         }
     }
 
     wmove(win, cur_r + 1, cur_c * 2 + 1);
-    draw_tile(win, &minefield->tiles[cur_r][cur_c], COLOR_PAIR(TILE_CURSOR), game_state);
+    draw_tile(win, minefield_get_tile(minefield, cur_r, cur_c), COLOR_PAIR(TILE_CURSOR), game_state);
 }
 
 /*

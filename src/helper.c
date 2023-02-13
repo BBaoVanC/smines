@@ -76,7 +76,7 @@ void reveal_check_state(int row, int col) {
         int r, c;
         for (r = 0; r < minefield->rows; r++) {
             for (c = 0; c < minefield->cols; c++) {
-                minefield->tiles[r][c].visible = true;
+                minefield_get_tile(minefield, r, c)->visible = true;
             }
         }
     }

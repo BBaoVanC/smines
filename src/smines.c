@@ -197,6 +197,7 @@ game:
 
 #if TILE_COLOR_DEBUG
     for (int i = 0; i < 9; i++) {
+        // TODO: minefield_get_tile
         minefield->tiles[i][0].visible = true;
         minefield->tiles[i][0].surrounding = i;
     }
@@ -208,7 +209,7 @@ game:
     Coordinate *cur_pos = &minefield->cur;
     int ch; /* key that was pressed */
     while (true) {
-        cur_tile = &minefield->tiles[cur_pos->row][cur_pos->col];
+        cur_tile = minefield_get_tile(minefield, cur_pos->row, cur_pos->col);
         ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
             nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
@@ -303,6 +304,7 @@ game:
 
             case ' ': /* reveal tile */
                 if (first_reveal) {
+                    // TODO: add these back lmao
                     populate_mines(minefield);
                     generate_surrounding(minefield);
                     reveal_tile(minefield, cur_pos->row, cur_pos->col);
@@ -328,7 +330,7 @@ game:
                         for (int r = cur_pos->row - 1; r < cur_pos->row + 2; r++) {
                             for (int c = cur_pos->col - 1; c < cur_pos->col + 2; c++) {
                                 if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
-                                    if (!minefield->tiles[r][c].flagged) {
+                                    if (!minefield_get_tile(minefield, r, c)->flagged) {
                                         reveal_check_state(r, c);
                                     }
                                 }
