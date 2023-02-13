@@ -18,12 +18,14 @@
 #include <time.h>
 #include <getopt.h>
 
+// TODO: should be set at runtime instead of compile time
 #if ALLOW_UNDO
     #include "undo.h"
 #endif
 
 #include "global.h"
 
+// TODO: no global state
 int SCOREBOARD_ROWS = 4;
 Minefield *minefield = NULL;
 WINDOW *fieldwin = NULL;
@@ -56,10 +58,14 @@ int main(int argc, char *argv[]) {
         { "help",       no_argument,        &help_flag, 1   },
         { "rows",       required_argument,  0,          'r' },
         { "cols",       required_argument,  0,          'c' },
+        { "mines",      required_argument,  0,          'm' },
         { "difficulty", required_argument,  0,          'd' },
         { "allow-undo", no_argument,        &undo_flag, 1   },
         { 0, 0, 0, 0 }
     };
+    // TODO: make these unsigned and also use stdint
+    // TODO: check if not provided and error if not
+    int rows, cols, mines;
 
     bool exit_for_invalid_args = false;
     int opt_idx = 0;
@@ -79,10 +85,25 @@ int main(int argc, char *argv[]) {
                 help_flag = 1;
                 break;
             case 'r':
-                rows = optarg;
+                rows = atoi(optarg);
+                if (rows < 0) {
+                    printf("'rows' cannot be negative!\n");
+                    return 1;
+                }
                 break;
             case 'c':
-                cols = optarg;
+                cols = atoi(optarg);
+                if (cols < 0) {
+                    printf("'cols' cannot be negative!\n");
+                    return 1;
+                }
+                break;
+            case 'm':
+                mines = atoi(optarg);
+                if (mines < 0) {
+                    printf("'mines' cannot be negative!\n");
+                    return 1;
+                }
                 break;
             case 'd':
                 printf("unimplemented difficulty setting\n");
@@ -153,10 +174,10 @@ int main(int argc, char *argv[]) {
 
     /* add 2 to each dimension on every window to fit the
      * borders (since they are inside borders) */
-    fieldwin = newwin(MROWS + 2, MCOLS * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    fieldwin = newwin(rows + 2, cols * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
     wrefresh(fieldwin);
 
-    scorewin = newwin(SCOREBOARD_ROWS, MCOLS * 2, origin_y, origin_x);
+    scorewin = newwin(SCOREBOARD_ROWS, cols * 2, origin_y, origin_x);
     wrefresh(scorewin);
 
 game:
@@ -166,7 +187,8 @@ game:
                              * also might as well increment game_number while we're here */
         free(minefield);
 
-    minefield = init_minefield(MROWS, MCOLS, MINES);
+    // TODO: should accept a pointer to Minefield to init, then stack allocate instead
+    minefield = init_minefield(rows, cols, mines);
     bool first_reveal = true;
 
 #if ALLOW_UNDO

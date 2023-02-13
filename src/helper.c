@@ -9,8 +9,8 @@
 #include "window.h"
 
 void draw_screen(void) {
-    int min_rows = SCOREBOARD_ROWS + MROWS + 2; /* add 2 to fit the minefield borders */
-    int min_cols = MCOLS * 2 + 2;               /* multiply cols by 2 because each tile is 2 cols wide */
+    int min_rows = SCOREBOARD_ROWS + minefield->rows + 2; /* add 2 to fit the minefield borders */
+    int min_cols = minefield->cols * 2 + 2;               /* multiply cols by 2 because each tile is 2 cols wide */
 
     if ((LINES < min_rows) || (COLS < min_cols)) {
         screen_too_small = TRUE;
@@ -39,8 +39,8 @@ void draw_screen(void) {
 void set_origin(void) {
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
-    int height = MROWS + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
-    int width = MCOLS * 2 + 2;                /* add 2 because we're adding 1 to each side to fit borders */
+    int height = minefield->rows + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
+    int width = minefield->cols * 2 + 2;                /* add 2 because we're adding 1 to each side to fit borders */
 
     origin_x = (cols - width) / 2;
     origin_y = (rows - height) / 2;
@@ -59,11 +59,11 @@ void resize_screen(void) {
     endwin(); /* this makes ncurses recalculate things, such as the global variables LINES and COLS */
     set_origin();
 
-    fieldwin = newwin(MROWS + 2, MCOLS * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    fieldwin = newwin(minefield->rows + 2, minefield->cols * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
     wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
     wrefresh(fieldwin);
 
-    scorewin = newwin(SCOREBOARD_ROWS, MCOLS * 2, origin_y, origin_x);
+    scorewin = newwin(SCOREBOARD_ROWS, minefield->cols * 2, origin_y, origin_x);
     wrefresh(scorewin);
 }
 

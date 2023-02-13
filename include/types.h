@@ -26,7 +26,7 @@ typedef struct {
     int mines;
     int placed_flags;
     Coordinate cur;
-    Tile tiles[MROWS][MCOLS];
+    Tile **tiles;
 } Minefield;
 
 typedef enum {
