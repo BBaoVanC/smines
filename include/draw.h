@@ -3,6 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#ifndef SMINES_DRAW_H
+#define SMINES_DRAW_H
+
 #include "minefield.h"
 
 #include <ncurses.h>
@@ -13,3 +16,5 @@ void draw_tile(WINDOW *, Tile *, int, Game_State);
 
 void draw_minefield(WINDOW *, Minefield *, Game_State);
 void draw_scoreboard(WINDOW *, Minefield *, int, Game_State);
+
+#endif

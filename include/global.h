@@ -3,6 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#ifndef SMINES_GLOBAL_H
+#define SMINES_GLOBAL_H
+
 #include "minefield.h"
 #include "types.h"
 
@@ -22,4 +25,6 @@ extern bool help_visible; /* if true, draw help page **instead of** everything e
 #if ALLOW_UNDO
 extern Minefield undo_minefield;   /* the minefield before the last move */
 extern Game_State undo_game_state; /* the game state before the last move */
+#endif
+
 #endif

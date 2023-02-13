@@ -3,8 +3,8 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#ifndef __SMINES_TYPES_H
-#define __SMINES_TYPES_H
+#ifndef SMINES_TYPES_H
+#define SMINES_TYPES_H
 
 #include "config.h"
 

@@ -3,6 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#ifndef SMINES_DIFFICULTIES_H
+#define SMINES_DIFFICULTIES_H
+
 /* default difficulty levels, so you don't
  * have to manually look them up and
  * enter them */
@@ -28,4 +31,6 @@
     #define MROWS 10
     #define MCOLS 20
     #define MINES 10
+#endif
+
 #endif

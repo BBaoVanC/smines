@@ -3,6 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#ifndef SMINES_COLORNAMES_H
+#define SMINES_COLORNAMES_H
+
 #define TILE_ZERO  10
 #define TILE_ONE   1
 #define TILE_TWO   2
@@ -24,3 +27,5 @@
 
 #define MSG_DEATH 16
 #define MSG_WIN   17
+
+#endif

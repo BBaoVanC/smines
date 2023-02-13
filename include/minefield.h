@@ -3,6 +3,9 @@
  * https://github.com/BBaoVanC/smines
  */
 
+#ifndef SMINES_MINEFIELD_H
+#define SMINES_MINEFIELD_H
+
 #include "config.h"
 #include "types.h"
 
@@ -28,3 +31,5 @@ int get_flag_surround(Minefield *, int, int);
 
 /* Check if the player won yet */
 bool check_victory(Minefield *);
+
+#endif
