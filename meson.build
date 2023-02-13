@@ -6,17 +6,6 @@ project(
 
 ncurses_dep = dependency('ncurses')
 
-srcs = [
-  'draw.c',
-  'help.c',
-  'helper.c',
-  'minefield.c',
-  'undo.c',
-  'window.c',
-  'smines.c',
-]
+include = include_directories('include')
 
-conf_data = configuration_data()
-configure_file(input: 'config.def.h', output: 'config.h', configuration: conf_data)
-
-executable('smines', srcs, dependencies: [ncurses_dep], install: true)
+subdir('src')
