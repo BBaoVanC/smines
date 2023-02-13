@@ -3,8 +3,6 @@
  * https://github.com/BBaoVanC/smines
  */
 
-#include "global.h"
-
 #include <string.h>
 
 #if ALLOW_UNDO

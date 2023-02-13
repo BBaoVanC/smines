@@ -11,10 +11,10 @@
 #include <ncurses.h>
 
 /* draw_tile with color */
-void draw_tile_color(WINDOW *, Tile *, Game_State);
-void draw_tile(WINDOW *, Tile *, int, Game_State);
+void draw_tile_color(WINDOW *, struct Tile *, Game_State);
+void draw_tile(WINDOW *, struct Tile *, int, Game_State);
 
-void draw_minefield(WINDOW *, Minefield *, Game_State);
-void draw_scoreboard(WINDOW *, Minefield *, int, Game_State);
+void draw_minefield(WINDOW *, struct Minefield *, Game_State);
+void draw_scoreboard(WINDOW *, struct Minefield *, int, Game_State);
 
 #endif

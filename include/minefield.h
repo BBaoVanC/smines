@@ -24,14 +24,16 @@ struct Minefield {
     size_t cols;
     size_t mines;
     size_t placed_flags;
-    struct cur {
+    struct {
         size_t col;
         size_t row;
-    };
+    } cur;
     struct Tile *tiles;
 };
 
+// does not populate mines, remember to run minefield_populate!
 void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines);
+void minefield_populate(struct Minefield *minefield);
 struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t col);
 /* Figure out what color to use based on surrounding tiles */
 int get_surround_color(int surrounding);
@@ -42,7 +44,7 @@ void reveal_mines(struct Minefield *);
 /* Count surrounding mines of a single tile */
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col);
 /* Count the surrounding flags, this is get_surround but with flags instead */
-size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col);
+size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row, size_t col);
 
 /* Check if the player won yet */
 bool minefield_check_victory(struct Minefield *);

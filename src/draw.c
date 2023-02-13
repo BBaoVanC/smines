@@ -15,7 +15,7 @@
  *  Tile *tile: the tile to draw
  *  Game_State game_state: the current game state
  */
-void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
+void draw_tile_color(WINDOW *win, struct Tile *tile, Game_State game_state) {
     int color;
 
     if (tile->flagged) {
@@ -49,7 +49,7 @@ void draw_tile_color(WINDOW *win, Tile *tile, Game_State game_state) {
  *  int color: ncurses color pair to use
  *  Game_State game_state: the current game state
  */
-void draw_tile(WINDOW *win, Tile *tile, int color, Game_State game_state) {
+void draw_tile(WINDOW *win, struct Tile *tile, int color, Game_State game_state) {
     wattron(win, color);
 
     if (tile->flagged) {
@@ -85,7 +85,7 @@ void draw_tile(WINDOW *win, Tile *tile, int color, Game_State game_state) {
  *  Minefield *minefield: the minefield to draw
  *  Game_State game_state: the current gqme state
  */
-void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
+void draw_minefield(WINDOW *win, struct Minefield *minefield, Game_State game_state) {
     /* remember: multiply x by 2 because each tile is 2 cols wide */
     int cur_r = minefield->cur.row;
     int cur_c = minefield->cur.col;
@@ -109,7 +109,7 @@ void draw_minefield(WINDOW *win, Minefield *minefield, Game_State game_state) {
  *  int game_number: the current game number
  *  Game_State state: the current game state
  */
-void draw_scoreboard(WINDOW *win, Minefield *minefield, int game_number, Game_State state) {
+void draw_scoreboard(WINDOW *win, struct Minefield *minefield, int game_number, Game_State state) {
     wclear(win); /* if we don't clear, then if the new text is shorter than the old
                     text, characters are left on screen */
     int mines = minefield->mines;

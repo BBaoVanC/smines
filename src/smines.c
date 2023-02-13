@@ -6,7 +6,6 @@
 #include "colornames.h"
 #include "draw.h"
 #include "help.h"
-#include "helper.h"
 #include "minefield.h"
 #include "morecolor.h"
 #include "types.h"
@@ -23,13 +22,8 @@
     #include "undo.h"
 #endif
 
-#include "global.h"
-
 // TODO: no global state
 int SCOREBOARD_ROWS = 4;
-Minefield *minefield = NULL;
-WINDOW *fieldwin = NULL;
-WINDOW *scorewin = NULL;
 int origin_x, origin_y;
 int game_number = 0; /* start at 0 because it's incremented before each game */
 bool screen_too_small = FALSE;
@@ -38,9 +32,83 @@ Game_State game_state;
 bool help_visible = false; /* if true, draw help page **instead of** everything else */
 
 #if ALLOW_UNDO
-Minefield undo_minefield;   /* the minefield before the last move */
+struct Minefield undo_minefield;   /* the minefield before the last move */
 Game_State undo_game_state; /* the game state before the last move */
 #endif
+
+static void draw_screen(struct Minefield *minefield) {
+    int min_rows = SCOREBOARD_ROWS + minefield->rows + 2; /* add 2 to fit the minefield borders */
+    int min_cols = minefield->cols * 2 + 2;               /* multiply cols by 2 because each tile is 2 cols wide */
+
+    if ((LINES < min_rows) || (COLS < min_cols)) {
+        screen_too_small = TRUE;
+        clear(); /* we don't want any leftover pieces of the minefield */
+        mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", min_cols, min_rows);
+        printw("Current size: %i cols by %i rows", COLS, LINES);
+        refresh();
+    } else if (help_visible) {
+        draw_help(stdscr);
+        refresh();
+    } else {
+        if (screen_too_small) {
+            clear();
+            screen_too_small = FALSE;
+        }
+
+        draw_minefield(fieldwin, minefield, game_state);
+        wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+        wrefresh(fieldwin);
+
+        draw_scoreboard(scorewin, minefield, game_number, game_state);
+        wrefresh(scorewin);
+    }
+}
+
+static void set_origin(struct Minefield *minefield) {
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    int height = minefield->rows + SCOREBOARD_ROWS * 2; /* center based on the minefield, ignoring the scoreboard */
+    int width = minefield->cols * 2 + 2;                /* add 2 because we're adding 1 to each side to fit borders */
+
+    origin_x = (cols - width) / 2;
+    origin_y = (rows - height) / 2;
+
+    /* make sure we don't try and start drawing past the top and left sides */
+    if (origin_x < 0)
+        origin_x = 0;
+    if (origin_y < 0)
+        origin_y = 0;
+}
+
+static void resize_screen(struct Minefield *minefield) {
+    destroy_win(fieldwin);
+    destroy_win(scorewin);
+
+    endwin(); /* this makes ncurses recalculate things, such as the global variables LINES and COLS */
+    set_origin();
+
+    fieldwin = newwin(minefield->rows + 2, minefield->cols * 2 + 2, origin_y + SCOREBOARD_ROWS, origin_x);
+    wborder(fieldwin, 0, 0, 0, 0, 0, 0, 0, 0);
+    wrefresh(fieldwin);
+
+    scorewin = newwin(SCOREBOARD_ROWS, minefield->cols * 2, origin_y, origin_x);
+    wrefresh(scorewin);
+}
+
+static void reveal_check_state(struct Minefield *minefield, size_t row, size_t col) {
+    if (!reveal_tile(minefield, row, col)) {
+        game_state = dead;
+        reveal_mines(minefield);
+    } else if (check_victory(minefield)) {
+        game_state = victory;
+        int r, c;
+        for (r = 0; r < minefield->rows; r++) {
+            for (c = 0; c < minefield->cols; c++) {
+                minefield_get_tile(minefield, r, c)->visible = true;
+            }
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
     // should these all be static
@@ -182,34 +250,23 @@ int main(int argc, char *argv[]) {
 
 game:
     game_state = alive;
-
-    if (++game_number != 1) /* we don't need to free the first game because we haven't started yet
-                             * also might as well increment game_number while we're here */
-        free(minefield);
+    game_number++; // starts at 0 but immediately increment to 1 for first game
 
     // TODO: should accept a pointer to Minefield to init, then stack allocate instead
-    minefield = init_minefield(rows, cols, mines);
+    struct Minefield minefield;
+    minefield_init(&minefield, rows, cols, mines);
     bool first_reveal = true;
 
 #if ALLOW_UNDO
     copy_undo();
 #endif
 
-#if TILE_COLOR_DEBUG
-    for (int i = 0; i < 9; i++) {
-        // TODO: minefield_get_tile
-        minefield->tiles[i][0].visible = true;
-        minefield->tiles[i][0].surrounding = i;
-    }
-#endif
-
     draw_screen();
 
-    Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
-    Coordinate *cur_pos = &minefield->cur;
+    struct Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
     int ch; /* key that was pressed */
     while (true) {
-        cur_tile = minefield_get_tile(minefield, cur_pos->row, cur_pos->col);
+        cur_tile = minefield_get_tile(&minefield, minefield.cur.row, minefield.cur.col);
         ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
             nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
@@ -262,37 +319,37 @@ game:
             /* movement keys */
             case 'h':
             case KEY_LEFT:
-                if (cur_pos->col > 0)
-                    cur_pos->col--;
+                if (minefield.cur.col > 0)
+                    minefield.cur.col--;
                 break;
             case 'j':
             case KEY_DOWN:
-                if (cur_pos->row < minefield->rows - 1)
-                    cur_pos->row++;
+                if (minefield.cur.row < minefield.rows - 1)
+                    minefield.cur.row++;
                 break;
             case 'k':
             case KEY_UP:
-                if (cur_pos->row > 0)
-                    cur_pos->row--;
+                if (minefield.cur.row > 0)
+                    minefield.cur.row--;
                 break;
             case 'l':
             case KEY_RIGHT:
-                if (cur_pos->col < minefield->cols - 1)
-                    cur_pos->col++;
+                if (minefield.cur.col < minefield.cols - 1)
+                    minefield.cur.col++;
                 break;
 
             case '0':
             case '^':
-                cur_pos->col = 0;
+                minefield.cur.col = 0;
                 break;
             case '$':
-                cur_pos->col = minefield->cols - 1;
+                minefield.cur.col = minefield.cols - 1;
                 break;
             case 'g':
-                cur_pos->row = 0;
+                minefield.cur.row = 0;
                 break;
             case 'G':
-                cur_pos->row = minefield->rows - 1;
+                minefield.cur.row = minefield.rows - 1;
                 break;
 
 #if ALLOW_UNDO
@@ -305,9 +362,8 @@ game:
             case ' ': /* reveal tile */
                 if (first_reveal) {
                     // TODO: add these back lmao
-                    populate_mines(minefield);
-                    generate_surrounding(minefield);
-                    reveal_tile(minefield, cur_pos->row, cur_pos->col);
+                    minefield_populate(&minefield);
+                    minefield_reveal_tile(&minefield, minefield.cur.row, minefield.cur.col);
                     first_reveal = false;
 #if ALLOW_UNDO
                     copy_undo();
@@ -317,7 +373,7 @@ game:
                 if (game_state != alive)
                     break;
                 if (cur_tile->visible) {
-                    if (get_flag_surround(minefield, cur_pos->row, cur_pos->col) == cur_tile->surrounding) {
+                    if (minefield_count_surrounding_flags(&minefield, minefield.cur.row, minefield.cur.col) == cur_tile->surrounding) {
 #if ALLOW_UNDO
                         copy_undo();
 #endif
@@ -327,10 +383,10 @@ game:
                          * If any of the flags are incorrect, then you die.
                          * Other versions seem to do it this way too, and it's easy to
                          * program it this way. */
-                        for (int r = cur_pos->row - 1; r < cur_pos->row + 2; r++) {
-                            for (int c = cur_pos->col - 1; c < cur_pos->col + 2; c++) {
-                                if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) {
-                                    if (!minefield_get_tile(minefield, r, c)->flagged) {
+                        for (int r = minefield.cur.row - 1; r < minefield.cur.row + 2; r++) {
+                            for (int c = minefield.cur.col - 1; c < minefield.cur.col + 2; c++) {
+                                if ((r >= 0 && c >= 0) && (r < minefield.rows && c < minefield.cols)) {
+                                    if (!minefield_get_tile(&minefield, r, c)->flagged) {
                                         reveal_check_state(r, c);
                                     }
                                 }
@@ -341,7 +397,7 @@ game:
 #if ALLOW_UNDO
                     copy_undo();
 #endif
-                    reveal_check_state(cur_pos->row, cur_pos->col);
+                    reveal_check_state(minefield.cur.row, minefield.cur.col);
                 }
                 break;
 
@@ -351,9 +407,9 @@ game:
                 if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
                     if (cur_tile->flagged)
-                        minefield->placed_flags++;
+                        minefield.placed_flags++;
                     else
-                        minefield->placed_flags--;
+                        minefield.placed_flags--;
                 }
                 break;
         }

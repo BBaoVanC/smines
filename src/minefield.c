@@ -11,10 +11,23 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines) {
+    minefield->rows = rows;
+    minefield->cols = cols;
+    minefield->mines = mines;
+    minefield->placed_flags = 0;
 
-static void minefield_populate(struct Minefield *minefield) {
+    minefield->cur.col = cols / 2;
+    minefield->cur.row = rows / 2;
+
+    // TODO: should we take this as an arg instead of allocating?
+    minefield->tiles = calloc(rows * cols, sizeof(struct Tile));
+}
+
+void minefield_populate(struct Minefield *minefield) {
+    // randomly spread mines
     size_t i, r, c;
-    Tile *t = NULL;
+    struct Tile *t = NULL;
     for (i = 0; i < minefield->mines;) {          // don't increment i here because it's incremented later if it's an acceptable place
         r = (rand() % (minefield->rows - 1 + 1)); // TODO: why did i do - 1 + 1
         c = (rand() % (minefield->cols - 1 + 1));
@@ -33,8 +46,8 @@ static void minefield_populate(struct Minefield *minefield) {
             }
         }
     }
-}
-static void minefield_generate_surrounding(Minefield *minefield) {
+
+    // generate surrounding mines count for each tile
     for (size_t y = 0; y < minefield->rows; y++) {
         for (size_t x = 0; x < minefield->cols; x++) {
             if (minefield_get_tile(minefield, y, x)->mine) {
@@ -51,28 +64,10 @@ static void minefield_generate_surrounding(Minefield *minefield) {
     }
 }
 
-void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines) {
-    minefield->rows = rows;
-    minefield->cols = cols;
-    minefield->mines = mines;
-    minefield->placed_flags = 0;
-
-    minefield->cur.col = cols / 2;
-    minefield->cur.row = rows / 2;
-
-    // TODO: should we take this as an arg instead of allocating?
-    minefield->tiles = calloc(rows * cols, sizeof(Tile));
-
-    minefield_populate(minefield);
-    minefield_generate_surrounding(minefield);
-
-    return minefield;
-}
-
 struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t col) {
     // tile array is treated as a sequential list of rows, each row containing `minefield.cols` elements
     size_t row_start = row * minefield->cols; // index of start of row
-    return minefield[row_start + col];
+    return &minefield->tiles[row_start + col];
 }
 
 // TODO: move this function
@@ -92,7 +87,7 @@ int get_surround_color(int surrounding) {
 
 // output: bool - false if the clicked tile was a mine, true otherwise
 bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) {
-    Tile *tile = minefield_get_tile(minefield, row, col);
+    struct Tile *tile = minefield_get_tile(minefield, row, col);
     if (tile->mine) {
         return false;
     } else {
@@ -105,7 +100,7 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
             for (c = col - 1; c < col + 2; c++) {
                 if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { /* stay in bounds */
                     if (!minefield_get_tile(minefield, r, c)->visible) {
-                        reveal_tile(minefield, r, c);
+                        minefield_reveal_tile(minefield, r, c);
                     }
                 }
             }
@@ -139,10 +134,10 @@ void reveal_mines(struct Minefield *minefield) {
  * output:
  *  int - the amount of surrounding mines
  */
-size_t minefield_count_surrounding_mines(Minefield *minefield, size_t row, size_t col) {
+size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col) {
     size_t r, c;
     size_t surrounding = 0;
-    Tile *current_tile = NULL;
+    struct Tile *current_tile = NULL;
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
@@ -166,10 +161,10 @@ size_t minefield_count_surrounding_mines(Minefield *minefield, size_t row, size_
  * output:
  *  int - the amount of surrounding flags
  */
-size_t minefield_count_surrounding_flags(Minefield *minefield, size_t row, size_t col) {
+size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row, size_t col) {
     size_t r, c;
     size_t surrounding = 0;
-    Tile *current_tile = NULL;
+    struct Tile *current_tile = NULL;
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {

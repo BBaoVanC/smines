@@ -2,7 +2,6 @@ srcs = [
   'smines.c',
   'draw.c',
   'help.c',
-  'helper.c',
   'minefield.c',
   'undo.c',
   'window.c',
