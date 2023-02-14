@@ -251,7 +251,7 @@ game:
                 case 'H': /* close help */
                 case '?':
                 case 'q':
-                    clear();
+                    erase();
                     display.state = GAME;
                     display_draw(&display, &game);
                     break;
@@ -279,7 +279,7 @@ game:
 
             case 'H': /* toggle help, only checked here if not visible already */
             case '?':
-                clear();
+                erase();
                 display.state = HELP;
                 break;
 

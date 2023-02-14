@@ -51,7 +51,7 @@ static void display_update_origin(struct Display *display, int minefield_rows, i
  * Source: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html
  */
 static void destroy_win(WINDOW *local_win) {
-    wclear(local_win);
+    werase(local_win);
     /* box(local_win, ' ', ' '); : This won't produce the desired
      * result of erasing the window. It will leave it's four corners
      * and so an ugly remnant of window.
@@ -233,7 +233,7 @@ static void display_draw_minefield(struct Display *display, struct Game *game) {
 
 static void display_draw_scoreboard(struct Display *display, struct Game *game) {
     WINDOW *win = display->scoreboard;
-    wclear(win); // if we don't clear, and the new text is shorter than the old text, characters are left on screen
+    werase(win); // if we don't clear, and the new text is shorter than the old text, characters are left on screen
     size_t mines = game->minefield->mines;
     size_t placed = game->minefield->placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
@@ -267,7 +267,7 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
 }
 
 void display_draw(struct Display *display, struct Game *game) {
-    clear();
+    erase();
     switch (display->state) {
         case TOO_SMALL:
             mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
