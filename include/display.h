@@ -9,12 +9,13 @@
 enum DisplayState {
     GAME, // showing the minesweeper game
     HELP, // help menu
-    TOO_SMALL, // error that the screen is too small
 };
 struct Display {
+    bool too_small;
     enum DisplayState state; // current screen we are displaying
     WINDOW *scoreboard;
     WINDOW *minefield;
+    WINDOW *too_small_popup;
 
     struct {
         int x, y;
@@ -33,5 +34,6 @@ void display_destroy(struct Display *display);
 void display_draw(struct Display *display, struct Game *game);
 // draw the entire minefield
 // TODO: damage/regional update
+void display_refresh(struct Display *display);
 
 #endif

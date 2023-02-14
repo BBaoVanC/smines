@@ -75,14 +75,17 @@ static void display_make_windows(struct Display *display, int minefield_rows, in
 
     // add 2 for borders
     display->minefield = newwin(minefield_rows + 2, minefield_cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
+
+    display->too_small_popup = newwin(2, COLS, 0, 0);
 }
 static void display_set_min_size(struct Display *display, int minefield_rows, int minefield_cols) {
     // check if terminal is too small
     display->min_rows = SCOREBOARD_ROWS + minefield_rows + 2; // add 2 for borders
     display->min_cols = minefield_cols * 2 + 2;
     if (LINES < display->min_rows || COLS < display->min_cols) {
-        // TODO: this needs to be undone somehow
-        display->state = TOO_SMALL;
+        display->too_small = true;
+    } else {
+        display->too_small = false;
     }
 }
 // recalculate everything if the terminal is resized
@@ -91,6 +94,7 @@ static void display_set_min_size(struct Display *display, int minefield_rows, in
 void display_resize(struct Display *display, int minefield_rows, int minefield_cols) {
     destroy_win(display->scoreboard);
     destroy_win(display->minefield);
+    destroy_win(display->too_small_popup);
 
     endwin(); // make ncurses recalculate stuff like global vars LINES and COLS
     display_update_origin(display, minefield_rows, minefield_cols);
@@ -269,11 +273,16 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
 
 void display_draw(struct Display *display, struct Game *game) {
     erase();
+    if (display->too_small) {
+        wmove(display->too_small_popup, 0, 0);
+        // TODO: make a window to display this so it overlays
+        wprintw(display->too_small_popup, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
+        wprintw(display->too_small_popup, "Current size: %i cols by %i rows", COLS, LINES);
+        //wrefresh(display->too_small_popup);
+        return;
+    }
+
     switch (display->state) {
-        case TOO_SMALL:
-            mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
-            printw("Current size: %i cols by %i rows", COLS, LINES);
-            break;
         case HELP:
             mvprintw(0, 0, helptxt);
             break;
@@ -284,4 +293,11 @@ void display_draw(struct Display *display, struct Game *game) {
         default:
             abort();
     }
+}
+
+void display_refresh(struct Display *display) {
+    refresh();
+    wrefresh(display->scoreboard);
+    wrefresh(display->minefield);
+    wrefresh(display->too_small_popup);
 }
