@@ -1,5 +1,5 @@
 srcs = [
-  'smines.c',
+  'main.c',
   'display.c',
   'game.c',
   'minefield.c',
