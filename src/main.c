@@ -221,9 +221,9 @@ game:
     int ch; /* key that was pressed */
     while (true) {
         display_draw(&display, &game);
+        refresh();
         wrefresh(display.scoreboard);
         wrefresh(display.minefield);
-        refresh();
         cur_tile = minefield_get_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
         ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
