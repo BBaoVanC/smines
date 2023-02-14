@@ -272,22 +272,21 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
 }
 
 void display_draw(struct Display *display, struct Game *game) {
+    clear();
     switch (display->state) {
         case TOO_SMALL:
-            clear(); // get rid of potential leftover pieces of minefield
             mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
             printw("Current_size: %i cols by %i rows", COLS, LINES);
-            refresh();
             break;
         case HELP:
             mvprintw(0, 0, helptxt);
             break;
         case GAME:
-            clear(); // TODO: get rid of need for this by damaging
             display_draw_minefield(display, game);
             display_draw_scoreboard(display, game);
             break;
         default:
             abort();
     }
+    refresh();
 }

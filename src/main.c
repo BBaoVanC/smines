@@ -211,6 +211,7 @@ int main(int argc, char *argv[]) {
     };
 
 game:
+    game.state = ALIVE;
     game.game_number++;
 
     minefield_init(game.minefield, rows, cols, mines);
@@ -258,6 +259,10 @@ game:
         switch (ch) {
             case 'L': /* redraw screen, just in case */
                 display_resize(&display, game.minefield);
+                display_draw(&display, &game);
+                wrefresh(display.minefield);
+                wrefresh(display.scoreboard);
+                refresh();
                 break;
 
             case 'q': /* quit */
