@@ -214,15 +214,15 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, enum G
 }
 
 static void display_draw_minefield(struct Display *display, struct Game *game) {
-    for (int y = 0; y < game->minefield->rows; y++) {
-        for (int x = 0; x < game->minefield->cols; x++) {
+    for (int y = 0; y < game->minefield.rows; y++) {
+        for (int x = 0; x < game->minefield.cols; x++) {
             display_draw_tile(display, minefield_get_tile(game->minefield, y, x), game->state, y, x);
         }
     }
 
     // draw the cursor
-    int cur_y = game->minefield->cur.row;
-    int cur_x = game->minefield->cur.col;
+    int cur_y = game->minefield.cur.row;
+    int cur_x = game->minefield.cur.col;
     wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
     display_draw_tile_text(display, minefield_get_tile(game->minefield, cur_y, cur_x), game->state, cur_y, cur_x);
@@ -234,10 +234,10 @@ static void display_draw_minefield(struct Display *display, struct Game *game) {
 static void display_draw_scoreboard(struct Display *display, struct Game *game) {
     WINDOW *win = display->scoreboard;
     werase(win); // if we don't clear, and the new text is shorter than the old text, characters are left on screen
-    size_t mines = game->minefield->mines;
-    size_t placed = game->minefield->placed_flags;
+    size_t mines = game->minefield.mines;
+    size_t placed = game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", game->game_number, game->minefield->cols, game->minefield->rows);
+    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", game->game_number, game->minefield.cols, game->minefield.rows);
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 

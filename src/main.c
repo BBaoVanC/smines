@@ -15,19 +15,19 @@ static void reveal_check_state(struct Game *game, size_t row, size_t col) {
     if (!minefield_reveal_tile(game->minefield, row, col)) {
         game->state = DEAD;
         // reveal all the mines
-        for (size_t r = 0; r < game->minefield->rows; r++) {
-            for (size_t c = 0; c < game->minefield->cols; c++) {
-                if (minefield_get_tile(game->minefield, r, c)->mine) {
-                    minefield_get_tile(game->minefield, r, c)->visible = true;
+        for (size_t r = 0; r < game->minefield.rows; r++) {
+            for (size_t c = 0; c < game->minefield.cols; c++) {
+                if (minefield_get_tile(&game->minefield, r, c)->mine) {
+                    minefield_get_tile(&game->minefield, r, c)->visible = true;
                 }
             }
         }
-    } else if (minefield_check_victory(game->minefield)) {
+    } else if (minefield_check_victory(&game->minefield)) {
         game->state = VICTORY;
         int r, c;
-        for (r = 0; r < game->minefield->rows; r++) {
-            for (c = 0; c < game->minefield->cols; c++) {
-                minefield_get_tile(game->minefield, r, c)->visible = true;
+        for (r = 0; r < game->minefield.rows; r++) {
+            for (c = 0; c < game->minefield.cols; c++) {
+                minefield_get_tile(&game->minefield, r, c)->visible = true;
             }
         }
     }
@@ -199,20 +199,16 @@ int main(int argc, char *argv[]) {
     struct Display display;
     display_init(&display, rows, cols);
 
-    struct Minefield minefield = {0};
-    struct Game game = {
-        .minefield = &minefield,
-        .game_number = 0, // will be incremented at game:
-    };
+    struct Game game = {0};
 
 game:
-    if (game.game_number >= 1) {
+    if (game.game_number >= 1) { // started at zero, so this condition skips the first game
         minefield_cleanup(&minefield);
     }
     game.state = ALIVE;
     game.game_number++;
 
-    minefield_init(game.minefield, rows, cols, mines);
+    minefield_init(&game.minefield, rows, cols, mines);
     bool first_reveal = true;
 
     struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
@@ -222,10 +218,10 @@ game:
         refresh();
         wrefresh(display.scoreboard);
         wrefresh(display.minefield);
-        cur_tile = minefield_get_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
+        cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.row, game.minefield.cur.col);
         ch = getch(); // blocks until a key is pressed
         if (ch == KEY_RESIZE) {
-            display_resize(&display, game.minefield->rows, game.minefield->cols);
+            display_resize(&display, game.minefield.rows, game.minefield.cols);
             continue;
         }
 
@@ -244,7 +240,7 @@ game:
         }
         switch (ch) {
             case 'L': // redraw screen
-                display_resize(&display, game.minefield->rows, game.minefield->cols);
+                display_resize(&display, game.minefield.rows, game.minefield.cols);
                 display_draw(&display, &game);
                 refresh();
                 wrefresh(display.minefield);
@@ -268,37 +264,37 @@ game:
             // movement keys
             case 'h':
             case KEY_LEFT:
-                if (game.minefield->cur.col > 0)
-                    game.minefield->cur.col--;
+                if (game.minefield.cur.col > 0)
+                    game.minefield.cur.col--;
                 break;
             case 'j':
             case KEY_DOWN:
-                if (game.minefield->cur.row < game.minefield->rows - 1)
-                    game.minefield->cur.row++;
+                if (game.minefield.cur.row < game.minefield.rows - 1)
+                    game.minefield.cur.row++;
                 break;
             case 'k':
             case KEY_UP:
-                if (game.minefield->cur.row > 0)
-                    game.minefield->cur.row--;
+                if (game.minefield.cur.row > 0)
+                    game.minefield.cur.row--;
                 break;
             case 'l':
             case KEY_RIGHT:
-                if (game.minefield->cur.col < game.minefield->cols - 1)
-                    game.minefield->cur.col++;
+                if (game.minefield.cur.col < game.minefield.cols - 1)
+                    game.minefield.cur.col++;
                 break;
 
             case '0':
             case '^':
-                game.minefield->cur.col = 0;
+                game.minefield.cur.col = 0;
                 break;
             case '$':
-                game.minefield->cur.col = game.minefield->cols - 1;
+                game.minefield.cur.col = game.minefield.cols - 1;
                 break;
             case 'g':
-                game.minefield->cur.row = 0;
+                game.minefield.cur.row = 0;
                 break;
             case 'G':
-                game.minefield->cur.row = game.minefield->rows - 1;
+                game.minefield.cur.row = game.minefield.rows - 1;
                 break;
 
             case 'u': // undo
@@ -311,8 +307,8 @@ game:
             case ' ': // reveal tile
                 if (first_reveal) {
                     // TODO: add these back lmao
-                    minefield_populate(game.minefield);
-                    minefield_reveal_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
+                    minefield_populate(&game.minefield);
+                    minefield_reveal_tile(&game.minefield, game.minefield.cur.row, game.minefield.cur.col);
                     first_reveal = false;
                     game_undo_store(&game);
                     break;
@@ -320,16 +316,16 @@ game:
                 if (game.state != ALIVE)
                     break;
                 if (cur_tile->visible) {
-                    if (minefield_count_surrounding_flags(game.minefield, game.minefield->cur.row, game.minefield->cur.col) == cur_tile->surrounding) {
+                    if (minefield_count_surrounding_flags(&game.minefield, game.minefield.cur.row, game.minefield.cur.col) == cur_tile->surrounding) {
                         game_undo_store(&game);
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
                          * If any of the flags are incorrect, then you die. */
-                        for (int r = game.minefield->cur.row - 1; r < game.minefield->cur.row + 2; r++) {
-                            for (int c = game.minefield->cur.col - 1; c < game.minefield->cur.col + 2; c++) {
-                                if ((r >= 0 && c >= 0) && (r < game.minefield->rows && c < game.minefield->cols)) {
-                                    if (!minefield_get_tile(game.minefield, r, c)->flagged) {
+                        for (int r = game.minefield.cur.row - 1; r < game.minefield.cur.row + 2; r++) {
+                            for (int c = game.minefield.cur.col - 1; c < game.minefield.cur.col + 2; c++) {
+                                if ((r >= 0 && c >= 0) && (r < game.minefield.rows && c < game.minefield.cols)) {
+                                    if (!minefield_get_tile(&game.minefield, r, c)->flagged) {
                                         reveal_check_state(&game, r, c);
                                     }
                                 }
@@ -338,7 +334,7 @@ game:
                     }
                 } else if (!cur_tile->flagged) {
                     game_undo_store(&game);
-                    reveal_check_state(&game, game.minefield->cur.row, game.minefield->cur.col);
+                    reveal_check_state(&game, game.minefield.cur.row, game.minefield.cur.col);
                 }
                 break;
 
@@ -348,9 +344,9 @@ game:
                 if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
                     if (cur_tile->flagged)
-                        game.minefield->placed_flags++;
+                        game.minefield.placed_flags++;
                     else
-                        game.minefield->placed_flags--;
+                        game.minefield.placed_flags--;
                 }
                 break;
         }

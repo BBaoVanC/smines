@@ -12,15 +12,14 @@ enum GameState {
     VICTORY, // game has been won
     DEAD, // game was lost
 };
-struct Undo {
-    enum GameState state;
-    struct Minefield minefield;
-};
 struct Game {
     enum GameState state;
-    struct Minefield *minefield;
+    struct Minefield minefield;
     uint32_t game_number;
-    struct Undo undo;
+    struct {
+        enum GameState state;
+        struct Minefield minefield;
+    } undo;
 };
 
 void game_undo_store(struct Game *game);
