@@ -1,8 +1,3 @@
-/* smines
- * by bbaovanc
- * https://github.com/BBaoVanC/smines
- */
-
 #ifndef SMINES_MINEFIELD_H
 #define SMINES_MINEFIELD_H
 
@@ -38,12 +33,12 @@ void minefield_cleanup(struct Minefield *minefield);
 struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t col);
 // output: bool - false if the clicked tile was a mine, true otherwise
 bool minefield_reveal_tile(struct Minefield *, size_t row, size_t col);
-/* Count surrounding mines of a single tile */
+// get how many mines are surrounding a tile
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col);
-/* Count the surrounding flags, this is get_surround but with flags instead */
+// get how many flags are surrounding a tile
 size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row, size_t col);
 
-/* Check if the player won yet */
+// check if the game has been won yet
 bool minefield_check_victory(struct Minefield *);
 
 #endif

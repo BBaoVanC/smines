@@ -155,7 +155,7 @@ void display_destroy(struct Display *display) {
 static int get_surround_color(int surrounding) {
     if (surrounding == 0) {
         return COLOR_PAIR(10);
-    } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
+    } else if ((surrounding <= 8) && (surrounding >= 1)) { // 1 <= surrounding <= 8
         return COLOR_PAIR(surrounding);
     } else {
         return COLOR_PAIR(100);
@@ -241,7 +241,7 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 
-    switch (game->state) { /* draw the top line */
+    switch (game->state) { // draw the top line
         case ALIVE:
             wattron(win, A_BOLD);
             mvwprintw(win, 0, 0, "Press ? for help");

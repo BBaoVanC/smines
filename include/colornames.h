@@ -1,8 +1,3 @@
-/* smines
- * by bbaovanc
- * https://github.com/BBaoVanC/smines
- */
-
 #ifndef SMINES_COLORNAMES_H
 #define SMINES_COLORNAMES_H
 

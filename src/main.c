@@ -1,8 +1,3 @@
-/* smines
- * by bbaovanc
- * https://github.com/BBaoVanC/smines
- */
-
 #include "display.h"
 #include "game.h"
 #include "minefield.h"
@@ -199,7 +194,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    srand((unsigned)time(NULL)); /* seed the random number generator */
+    srand((unsigned)time(NULL)); // seed the random number generator
 
     struct Display display;
     display_init(&display, rows, cols);
@@ -220,35 +215,24 @@ game:
     minefield_init(game.minefield, rows, cols, mines);
     bool first_reveal = true;
 
-    struct Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
-    int ch; /* key that was pressed */
+    struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
+    int ch; // key that was pressed
     while (true) {
         display_draw(&display, &game);
         refresh();
         wrefresh(display.scoreboard);
         wrefresh(display.minefield);
         cur_tile = minefield_get_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
-        ch = getch(); /* blocks until a key is pressed */
+        ch = getch(); // blocks until a key is pressed
         if (ch == KEY_RESIZE) {
             display_resize(&display, game.minefield->rows, game.minefield->cols);
             continue;
         }
-        //if (ch == KEY_RESIZE) {
-        //    nodelay(stdscr, 1); /* delay can cause the field to go invisible when resizing quickly */
-        //    if (help_visible) {
-        //        clear();
-        //        draw_help(stdscr);
-        //    } else {
-        //        resize_screen();
-        //        display_draw(&display, &game);
-        //    }
-        //    continue; /* immediately start reading another key press */
-        //}
 
-        nodelay(stdscr, 0); /* we want to wait until a key is pressed */
+        nodelay(stdscr, 0); // we want to wait until a key is pressed
         if (display.state == HELP) {
             switch (ch) {
-                case 'H': /* close help */
+                case 'H': // close help
                 case '?':
                 case 'q':
                     erase();
@@ -256,12 +240,10 @@ game:
                     display_draw(&display, &game);
                     break;
             }
-            continue; /* then I don't need to use else below and
-                         add an entire level of indentation to
-                         everything */
+            continue;
         }
         switch (ch) {
-            case 'L': /* redraw screen, just in case */
+            case 'L': // redraw screen
                 display_resize(&display, game.minefield->rows, game.minefield->cols);
                 display_draw(&display, &game);
                 refresh();
@@ -269,21 +251,21 @@ game:
                 wrefresh(display.scoreboard);
                 break;
 
-            case 'q': /* quit */
+            case 'q': // quit
                 goto quit;
                 break;
 
-            case 'r': /* restart */
+            case 'r': // restart
                 goto game;
                 break;
 
-            case 'H': /* toggle help, only checked here if not visible already */
+            case 'H': // toggle help, only checked here if not visible already
             case '?':
                 erase();
                 display.state = HELP;
                 break;
 
-            /* movement keys */
+            // movement keys
             case 'h':
             case KEY_LEFT:
                 if (game.minefield->cur.col > 0)
@@ -319,14 +301,14 @@ game:
                 game.minefield->cur.row = game.minefield->rows - 1;
                 break;
 
-            case 'u': /* undo */
+            case 'u': // undo
                 if (undo_flag) {
                     game_undo(&game);
                     display_draw(&display, &game);
                 }
                 break;
 
-            case ' ': /* reveal tile */
+            case ' ': // reveal tile
                 if (first_reveal) {
                     // TODO: add these back lmao
                     minefield_populate(game.minefield);
@@ -343,9 +325,7 @@ game:
                         /* If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
-                         * If any of the flags are incorrect, then you die.
-                         * Other versions seem to do it this way too, and it's easy to
-                         * program it this way. */
+                         * If any of the flags are incorrect, then you die. */
                         for (int r = game.minefield->cur.row - 1; r < game.minefield->cur.row + 2; r++) {
                             for (int c = game.minefield->cur.col - 1; c < game.minefield->cur.col + 2; c++) {
                                 if ((r >= 0 && c >= 0) && (r < game.minefield->rows && c < game.minefield->cols)) {
@@ -362,7 +342,7 @@ game:
                 }
                 break;
 
-            case 'f': /* toggle flag */
+            case 'f': // toggle flag
                 if (game.state != ALIVE)
                     break;
                 if (!cur_tile->visible) {

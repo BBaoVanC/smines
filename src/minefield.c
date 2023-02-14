@@ -1,8 +1,3 @@
-/* smines
- * by bbaovanc
- * https://github.com/BBaoVanC/smines
- */
-
 #include "minefield.h"
 
 #include <ncurses.h>
@@ -37,7 +32,7 @@ void minefield_populate(struct Minefield *minefield) {
               (c >= minefield->cur.col - 1) &&
               (r <= minefield->cur.row + 1) &&
               (c <= minefield->cur.col + 1))) {
-            if (!t->mine) { /* prevent overlapping of mines */
+            if (!t->mine) { // prevent overlapping of mines
                 t->mine = true;
                 i++; // since it's not incremented by the for loop
             }
@@ -85,7 +80,7 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
 
         for (r = row - 1; r < row + 2; r++) {
             for (c = col - 1; c < col + 2; c++) {
-                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { /* stay in bounds */
+                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { // stay in bounds
                     if (!minefield_get_tile(minefield, r, c)->visible) {
                         minefield_reveal_tile(minefield, r, c);
                     }
@@ -96,16 +91,6 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
     }
 }
 
-/* get_surround - count the surrounding tiles of a tile (3x3 check area)
- * Note: if the tile itself is a mine, then it's included in the count, but
- *       there shouldn't be any reason to need to see this value on a mine.
- * inputs:
- *  Minefield *minefield: needed so we can find the surrounding tiles
- *  int row: the row of the tile to check
- *  int col: the column of the tile to check
- * output:
- *  int - the amount of surrounding mines
- */
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col) {
     size_t r, c;
     size_t surrounding = 0;
@@ -113,7 +98,7 @@ size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* make sure we are in bounds */
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { // make sure we are in bounds
                 current_tile = minefield_get_tile(minefield, r, c);
                 if (current_tile->mine) {
                     surrounding++;
@@ -125,14 +110,6 @@ size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row
     return surrounding;
 }
 
-/* get_flag_surround - basically just get_surround but with flags instead of mines
- * inputs:
- *  Minefield *minefield: needed to read the surrounding tiles
- *  int row: the row of the tile to check
- *  int col: the column of the tile to check
- * output:
- *  int - the amount of surrounding flags
- */
 size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row, size_t col) {
     size_t r, c;
     size_t surrounding = 0;
@@ -140,7 +117,7 @@ size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row
 
     for (r = row - 1; r < row + 2; r++) {
         for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { /* make sure we are in bounds */
+            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { // make sure we are in bounds
                 current_tile = minefield_get_tile(minefield, r, c);
                 if (current_tile->flagged) {
                     surrounding++;
@@ -152,12 +129,6 @@ size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row
     return surrounding;
 }
 
-/* check_victory - check if the player has won
- * inputs:
- *  Minefield *minefield
- * output:
- *  bool - true if the player has won, false otherwise
- */
 bool minefield_check_victory(struct Minefield *minefield) {
     /* TODO: count up the hidden tiles as they are revealed so they
      * don't have to be recounted every time this function runs */
