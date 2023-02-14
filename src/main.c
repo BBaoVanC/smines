@@ -211,6 +211,9 @@ int main(int argc, char *argv[]) {
     };
 
 game:
+    if (game.game_number >= 1) {
+        minefield_cleanup(&minefield);
+    }
     game.state = ALIVE;
     game.game_number++;
 
@@ -374,5 +377,6 @@ game:
     }
 
 quit:
+    minefield_cleanup(&minefield);
     display_destroy(&display);
 }
