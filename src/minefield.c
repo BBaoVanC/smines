@@ -5,9 +5,6 @@
 
 #include "minefield.h"
 
-#include "colornames.h"
-#include "draw.h"
-
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,8 +52,9 @@ void minefield_populate(struct Minefield *minefield) {
                 for (size_t r = y - 1; r <= y + 1; r++) {
                     for (size_t c = x - 1; c <= x + 1; c++) {
                         // do a bounds check, otherwise runaway recursion
-                        if ((c >= 0) && (r >= 0) && (c < minefield->cols) && (r < minefield->rows))
+                        if ((c >= 0) && (r >= 0) && (c < minefield->cols) && (r < minefield->rows)) {
                             minefield_get_tile(minefield, r, c)->surrounding++;
+                        }
                     }
                 }
             }
@@ -64,25 +62,14 @@ void minefield_populate(struct Minefield *minefield) {
     }
 }
 
+void minefield_cleanup(struct Minefield *minefield) {
+    free(minefield->tiles);
+}
+
 struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t col) {
     // tile array is treated as a sequential list of rows, each row containing `minefield.cols` elements
     size_t row_start = row * minefield->cols; // index of start of row
     return &minefield->tiles[row_start + col];
-}
-
-// TODO: move this function
-/* get_surround_color - get the color pair to use based on amount of surrounding tiles
- * inputs:
- *  int surrounding: the amount of surrounding tiles
- */
-int get_surround_color(int surrounding) {
-    if (surrounding == 0) {
-        return COLOR_PAIR(10);
-    } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
-        return COLOR_PAIR(surrounding);
-    } else {
-        return COLOR_PAIR(100);
-    }
 }
 
 // output: bool - false if the clicked tile was a mine, true otherwise
@@ -106,21 +93,6 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
             }
         }
         return true;
-    }
-}
-
-// TODO: maybe remove this
-/* reveal_mines - reveal every single mine
- * inputs:
- *  Minefield *minefield: the minefield to reveal mines in
- */
-void reveal_mines(struct Minefield *minefield) {
-    for (size_t r = 0; r < minefield->rows; r++) {
-        for (size_t c = 0; c < minefield->cols; c++) {
-            if (minefield_get_tile(minefield, r, c)->mine) {
-                minefield_get_tile(minefield, r, c)->visible = true;
-            }
-        }
     }
 }
 

@@ -1,10 +1,8 @@
 srcs = [
   'smines.c',
-  'draw.c',
-  'help.c',
+  'display.c',
+  'game.c',
   'minefield.c',
-  'undo.c',
-  'window.c',
 ]
 
 executable(
