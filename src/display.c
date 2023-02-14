@@ -47,8 +47,6 @@ static void display_update_origin(struct Display *display, int minefield_rows, i
         display->origin.y = 0;
     }
 }
-
-
 /* destroy_win - delete a window without leaving artifacts on screen
  * Source: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/windows.html
  */
@@ -70,16 +68,13 @@ static void destroy_win(WINDOW *local_win) {
      * 8. bl: character to be used for the bottom left corner of the window
      * 9. br: character to be used for the bottom right corner of the window
      */
-    wrefresh(local_win);
     delwin(local_win);
 }
 static void display_make_windows(struct Display *display, int minefield_rows, int minefield_cols) {
     display->scoreboard = newwin(SCOREBOARD_ROWS, minefield_cols * 2, display->origin.y, display->origin.x);
-    wrefresh(display->scoreboard);
 
     // add 2 for borders
     display->minefield = newwin(minefield_rows + 2, minefield_cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
-    wrefresh(display->scoreboard);
 }
 static void display_set_min_size(struct Display *display, int minefield_rows, int minefield_cols) {
     // check if terminal is too small
@@ -115,7 +110,6 @@ bool display_init(struct Display *display, int minefield_rows, int minefield_col
     keypad(stdscr, TRUE); // arrow keys
     noecho(); // don't show letter on key press
     curs_set(0); // make cursor invisible
-    refresh(); // for some reason the window doesnt show until i rfresh, TODO: see if this can be removed
     start_color();
     use_default_colors(); // allows extra colors such as terminal background color
 
@@ -235,7 +229,6 @@ static void display_draw_minefield(struct Display *display, struct Game *game) {
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
     
     wborder(display->minefield, 0, 0, 0, 0, 0, 0, 0, 0);
-    wrefresh(display->minefield);
 }
 
 static void display_draw_scoreboard(struct Display *display, struct Game *game) {
@@ -271,8 +264,6 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
         default:
             abort();
     }
-
-    wrefresh(win);
 }
 
 void display_draw(struct Display *display, struct Game *game) {
@@ -292,5 +283,4 @@ void display_draw(struct Display *display, struct Game *game) {
         default:
             abort();
     }
-    refresh();
 }

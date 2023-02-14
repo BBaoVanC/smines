@@ -221,6 +221,9 @@ game:
     int ch; /* key that was pressed */
     while (true) {
         display_draw(&display, &game);
+        wrefresh(display.scoreboard);
+        wrefresh(display.minefield);
+        refresh();
         cur_tile = minefield_get_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
         ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
@@ -246,7 +249,6 @@ game:
                 case '?':
                 case 'q':
                     clear();
-                    refresh();
                     display.state = GAME;
                     display_draw(&display, &game);
                     break;
@@ -259,9 +261,9 @@ game:
             case 'L': /* redraw screen, just in case */
                 display_resize(&display, game.minefield->rows, game.minefield->cols);
                 display_draw(&display, &game);
+                refresh();
                 wrefresh(display.minefield);
                 wrefresh(display.scoreboard);
-                refresh();
                 break;
 
             case 'q': /* quit */
@@ -275,7 +277,6 @@ game:
             case 'H': /* toggle help, only checked here if not visible already */
             case '?':
                 clear();
-                refresh();
                 display.state = HELP;
                 break;
 

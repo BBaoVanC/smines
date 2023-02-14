@@ -29,12 +29,9 @@ void display_resize(struct Display *display, int minefield_rows, int minefield_c
 // returns bool, true if successful. if false, terminate the entire program
 bool display_init(struct Display *display, int minefield_rows, int minefield_cols);
 void display_destroy(struct Display *display);
+// remember to refresh manually
 void display_draw(struct Display *display, struct Game *game);
-// draw tile at specific row & col in the minefield
-//void display_draw_tile(struct Display *display, struct Tile *tile, int row, int col);
 // draw the entire minefield
 // TODO: damage/regional update
-//void display_draw_minefield(struct Display *display, struct Minefield *minefield);
-//void display_draw_scoreboard(struct Display *display, struct Game *game);
 
 #endif
