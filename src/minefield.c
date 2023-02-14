@@ -1,6 +1,5 @@
 #include "minefield.h"
 
-#include <assert.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,27 +13,25 @@ void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_
     minefield->cur.col = cols / 2;
     minefield->cur.row = rows / 2;
 
-    // TODO: should we take this as an arg instead of allocating?
-    minefield->tiles = calloc(rows * cols, sizeof(struct Tile));
-
-    for (size_t i = 0; i < rows * cols; i++) {
-        minefield->tiles[i].visible = true;
+    if (minefield->tiles != NULL) {
+        free(minefield->tiles);
     }
+    minefield->tiles = calloc(rows * cols, sizeof(struct Tile));
 }
 
 // set a tile as a mine and increment surrounding
 static void minefield_set_mine(struct Minefield *minefield, size_t row, size_t col) {
     struct Tile *tile = minefield_get_tile(minefield, row, col);
-    assert(tile->mine == false);
     tile->mine = true;
 
-    // int because otherwise subtraction might overflow
-    for (int r = row - 1; r <= row + 1; r++) {
-        for (int c = col - 1; c <= col + 1; c++) {
-            // bounds check to prevent infinite recursion
-            if (c >= 0 && r >= 0 && c < minefield->cols && r < minefield->rows) {
-                minefield_get_tile(minefield, r, c)->surrounding++;
-            }
+    int r_start = row > 0 ? row - 1 : 0;
+    int c_start = col > 0 ? col - 1 : 0;
+    // TODO: this is kinda ugly
+    int r_end = row < minefield->rows - 1 ? row + 1 : row;
+    int c_end = col < minefield->cols - 1 ? col + 1 : col;
+    for (size_t r = r_start; r <= r_end; r++) {
+        for (size_t c = c_start; c <= c_end; c++) {
+            minefield_get_tile(minefield, r, c)->surrounding++;
         }
     }
 }
@@ -77,23 +74,23 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
     struct Tile *tile = minefield_get_tile(minefield, row, col);
     if (tile->mine) {
         return false;
-    } else {
-        tile->visible = true;
-        size_t r, c;
-        if (tile->surrounding != 0)
-            return true;
+    }
 
-        for (r = row - 1; r < row + 2; r++) {
-            for (c = col - 1; c < col + 2; c++) {
-                if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { // stay in bounds
-                    if (!minefield_get_tile(minefield, r, c)->visible) {
-                        minefield_reveal_tile(minefield, r, c);
-                    }
+    tile->visible = true;
+    int r, c;
+    if (tile->surrounding != 0)
+        return true;
+
+    for (r = row - 1; r < row + 2; r++) {
+        for (c = col - 1; c < col + 2; c++) {
+            if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { // stay in bounds
+                if (!minefield_get_tile(minefield, r, c)->visible) {
+                    minefield_reveal_tile(minefield, r, c);
                 }
             }
         }
-        return true;
     }
+    return true;
 }
 
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col) {

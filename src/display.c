@@ -81,6 +81,7 @@ static void display_set_min_size(struct Display *display, int minefield_rows, in
     display->min_rows = SCOREBOARD_ROWS + minefield_rows + 2; // add 2 for borders
     display->min_cols = minefield_cols * 2 + 2;
     if (LINES < display->min_rows || COLS < display->min_cols) {
+        // TODO: this needs to be undone somehow
         display->state = TOO_SMALL;
     }
 }
@@ -271,7 +272,7 @@ void display_draw(struct Display *display, struct Game *game) {
     switch (display->state) {
         case TOO_SMALL:
             mvprintw(0, 0, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
-            printw("Current_size: %i cols by %i rows", COLS, LINES);
+            printw("Current size: %i cols by %i rows", COLS, LINES);
             break;
         case HELP:
             mvprintw(0, 0, helptxt);

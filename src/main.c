@@ -34,11 +34,11 @@ static void reveal_check_state(struct Game *game, size_t row, size_t col) {
 }
 
 int main(int argc, char *argv[]) {
-    // should these all be static
-    const char cmd_usage[] =
+    // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
+    static const char cmd_usage[] =
         "Usage: smines [options]\n"
     ;
-    const char cmd_help[] =
+    static const char cmd_help[] =
         "Options:\n"
         "  -h, --help\n"
         "  -r, --rows=ROWS                  Set the amount of rows in the minefield\n"
@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
         "  -u, --allow-undo                 Allow undoing the last move\n"
     ;
 
-    int help_flag = 0;
-    int undo_flag = 0;
-    const struct option long_options[] = {
+    static int help_flag = 0;
+    static int undo_flag = 0;
+    static const struct option long_options[] = {
         { "help",       no_argument,        &help_flag, 1   },
         { "rows",       required_argument,  0,          'r' },
         { "cols",       required_argument,  0,          'c' },
@@ -202,9 +202,6 @@ int main(int argc, char *argv[]) {
     struct Game game = {0};
 
 game:
-    if (game.game_number >= 1) { // started at zero, so this condition skips the first game
-        minefield_cleanup(&game.minefield);
-    }
     game.state = ALIVE;
     game.game_number++;
 
