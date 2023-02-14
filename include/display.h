@@ -25,7 +25,7 @@ struct Display {
 
 // should only be called once; there should only be one Display!
 // needs to be cleaned up with display_destroy
-void display_resize(struct Display *display, struct Minefield *minefield);
+void display_resize(struct Display *display, int minefield_rows, int minefield_cols);
 // returns bool, true if successful. if false, terminate the entire program
 bool display_init(struct Display *display, int minefield_rows, int minefield_cols);
 void display_destroy(struct Display *display);

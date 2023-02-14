@@ -81,24 +81,27 @@ static void display_make_windows(struct Display *display, int minefield_rows, in
     display->minefield = newwin(minefield_rows + 2, minefield_cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
     wrefresh(display->scoreboard);
 }
+static void display_set_min_size(struct Display *display, int minefield_rows, int minefield_cols) {
+    // check if terminal is too small
+    display->min_rows = SCOREBOARD_ROWS + minefield_rows + 2; // add 2 for borders
+    display->min_cols = minefield_cols * 2 + 2;
+    if (LINES < display->min_rows || COLS < display->min_cols) {
+        display->state = TOO_SMALL;
+    }
+}
 // recalculate everything if the terminal is resized
 // TODO: maybe store Minefield somewhere in Display so it's not an arg
 // TODO: should this be `display_reset` instead?
-void display_resize(struct Display *display, struct Minefield *minefield) {
+void display_resize(struct Display *display, int minefield_rows, int minefield_cols) {
     destroy_win(display->scoreboard);
     destroy_win(display->minefield);
 
     endwin(); // make ncurses recalculate stuff like global vars LINES and COLS
-    display_update_origin(display, minefield->rows, minefield->cols);
+    display_update_origin(display, minefield_rows, minefield_cols);
 
-    display_make_windows(display, minefield->rows, minefield->cols);
+    display_make_windows(display, minefield_rows, minefield_cols);
 
-    // check if terminal is too small
-    display->min_rows = SCOREBOARD_ROWS + minefield->rows + 2; // add 2 for borders
-    display->min_cols = minefield->cols * 2 + 2;
-    if (LINES < display->min_rows || COLS < display->min_cols) {
-        display->state = TOO_SMALL;
-    }
+    display_set_min_size(display, minefield_rows, minefield_cols);
 }
 
 bool display_init(struct Display *display, int minefield_rows, int minefield_cols) {
@@ -143,6 +146,7 @@ bool display_init(struct Display *display, int minefield_rows, int minefield_col
 
     *display = (struct Display){0};
 
+    display_set_min_size(display, minefield_rows, minefield_cols);
     display_update_origin(display, minefield_rows, minefield_cols);
     display_make_windows(display, minefield_rows, minefield_cols);
 

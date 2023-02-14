@@ -217,15 +217,14 @@ game:
     minefield_init(game.minefield, rows, cols, mines);
     bool first_reveal = true;
 
-    display_draw(&display, &game);
-
     struct Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
     int ch; /* key that was pressed */
     while (true) {
+        display_draw(&display, &game);
         cur_tile = minefield_get_tile(game.minefield, game.minefield->cur.row, game.minefield->cur.col);
         ch = getch(); /* blocks until a key is pressed */
         if (ch == KEY_RESIZE) {
-            display_resize(&display, game.minefield);
+            display_resize(&display, game.minefield->rows, game.minefield->cols);
             continue;
         }
         //if (ch == KEY_RESIZE) {
@@ -258,7 +257,7 @@ game:
         }
         switch (ch) {
             case 'L': /* redraw screen, just in case */
-                display_resize(&display, game.minefield);
+                display_resize(&display, game.minefield->rows, game.minefield->cols);
                 display_draw(&display, &game);
                 wrefresh(display.minefield);
                 wrefresh(display.scoreboard);
@@ -371,8 +370,6 @@ game:
                 }
                 break;
         }
-
-        display_draw(&display, &game);
     }
 
 quit:
