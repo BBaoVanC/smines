@@ -1,8 +1,10 @@
 #include "minefield.h"
 
+#include <assert.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines) {
     minefield->rows = rows;
     minefield->cols = cols;
@@ -14,46 +16,49 @@ void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_
 
     // TODO: should we take this as an arg instead of allocating?
     minefield->tiles = calloc(rows * cols, sizeof(struct Tile));
+
+    for (size_t i = 0; i < rows * cols; i++) {
+        minefield->tiles[i].visible = true;
+    }
 }
 
-void minefield_populate(struct Minefield *minefield) {
-    // randomly spread mines
-    size_t i, r, c;
-    struct Tile *t = NULL;
-    for (i = 0; i < minefield->mines;) {          // don't increment i here because it's incremented later if it's an acceptable place
-        r = (rand() % (minefield->rows - 1 + 1)); // TODO: why did i do - 1 + 1
-        c = (rand() % (minefield->cols - 1 + 1));
-        t = minefield_get_tile(minefield, r, c);
+// set a tile as a mine and increment surrounding
+static void minefield_set_mine(struct Minefield *minefield, size_t row, size_t col) {
+    struct Tile *tile = minefield_get_tile(minefield, row, col);
+    assert(tile->mine == false);
+    tile->mine = true;
 
-        /* When I first checked this I thoguht it was too complicated
-         * but reading it, now I realize that it is just checking the 3x3,
-         * but it looks bad because there's two dimensions */
-        if (!((r >= minefield->cur.row - 1) &&
-              (c >= minefield->cur.col - 1) &&
-              (r <= minefield->cur.row + 1) &&
-              (c <= minefield->cur.col + 1))) {
-            if (!t->mine) { // prevent overlapping of mines
-                t->mine = true;
-                i++; // since it's not incremented by the for loop
+    // int because otherwise subtraction might overflow
+    for (int r = row - 1; r <= row + 1; r++) {
+        for (int c = col - 1; c <= col + 1; c++) {
+            // bounds check to prevent infinite recursion
+            if (c >= 0 && r >= 0 && c < minefield->cols && r < minefield->rows) {
+                minefield_get_tile(minefield, r, c)->surrounding++;
             }
         }
     }
+}
+void minefield_populate(struct Minefield *minefield) {
+    // randomly spread mines
+    int r, c; // otherwise our 3x3 check might overflow and break
+    size_t i = 0;
+    while (i < minefield->mines) {
+        r = (rand() % (minefield->rows)); // non inclusive; i didn't forget about starting at 0
+        c = (rand() % (minefield->cols));
 
-    // generate surrounding mines count for each tile
-    for (size_t y = 0; y < minefield->rows; y++) {
-        for (size_t x = 0; x < minefield->cols; x++) {
-            if (minefield_get_tile(minefield, y, x)->mine) {
-                // if the tile is a mine, increment `surrounding` on the nearby tiles by one
-                for (size_t r = y - 1; r <= y + 1; r++) {
-                    for (size_t c = x - 1; c <= x + 1; c++) {
-                        // do a bounds check, otherwise runaway recursion
-                        if ((c >= 0) && (r >= 0) && (c < minefield->cols) && (r < minefield->rows)) {
-                            minefield_get_tile(minefield, r, c)->surrounding++;
-                        }
-                    }
-                }
-            }
+        // don't generate mines in a 3x3 centered on the cursor
+        if ((r >= minefield->cur.row - 1) &&
+            (c >= minefield->cur.col - 1) &&
+            (r <= minefield->cur.row + 1) &&
+            (c <= minefield->cur.col + 1)) {
+            continue;
         }
+        if (minefield_get_tile(minefield, r, c)->mine) {
+            continue;
+        }
+
+        minefield_set_mine(minefield, r, c);
+        i++;
     }
 }
 

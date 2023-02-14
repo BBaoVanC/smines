@@ -9,7 +9,7 @@ struct Tile {
     bool mine;
     bool visible;
     bool flagged;
-    uint8_t surrounding;
+    uint8_t surrounding; // if mine, this value is undefined!
 };
 
 // TODO: size_t or int/uint?

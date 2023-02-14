@@ -216,7 +216,7 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, enum G
 static void display_draw_minefield(struct Display *display, struct Game *game) {
     for (int y = 0; y < game->minefield.rows; y++) {
         for (int x = 0; x < game->minefield.cols; x++) {
-            display_draw_tile(display, minefield_get_tile(game->minefield, y, x), game->state, y, x);
+            display_draw_tile(display, minefield_get_tile(&game->minefield, y, x), game->state, y, x);
         }
     }
 
@@ -225,7 +225,7 @@ static void display_draw_minefield(struct Display *display, struct Game *game) {
     int cur_x = game->minefield.cur.col;
     wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
-    display_draw_tile_text(display, minefield_get_tile(game->minefield, cur_y, cur_x), game->state, cur_y, cur_x);
+    display_draw_tile_text(display, minefield_get_tile(&game->minefield, cur_y, cur_x), game->state, cur_y, cur_x);
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
     
     wborder(display->minefield, 0, 0, 0, 0, 0, 0, 0, 0);

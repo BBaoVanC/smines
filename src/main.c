@@ -12,7 +12,7 @@
 #include <time.h>
 
 static void reveal_check_state(struct Game *game, size_t row, size_t col) {
-    if (!minefield_reveal_tile(game->minefield, row, col)) {
+    if (!minefield_reveal_tile(&game->minefield, row, col)) {
         game->state = DEAD;
         // reveal all the mines
         for (size_t r = 0; r < game->minefield.rows; r++) {
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
 
 game:
     if (game.game_number >= 1) { // started at zero, so this condition skips the first game
-        minefield_cleanup(&minefield);
+        minefield_cleanup(&game.minefield);
     }
     game.state = ALIVE;
     game.game_number++;
@@ -353,6 +353,6 @@ game:
     }
 
 quit:
-    minefield_cleanup(&minefield);
+    minefield_cleanup(&game.minefield);
     display_destroy(&display);
 }
