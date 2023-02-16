@@ -77,16 +77,19 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
     }
 
     tile->visible = true;
-    int r, c;
-    if (tile->surrounding != 0)
+    int r_start = row > 0 ? row - 1 : 0;
+    int c_start = col > 0 ? col - 1 : 0;
+    // TODO: this is kinda ugly
+    int r_end = row < minefield->rows - 1 ? row + 1 : row;
+    int c_end = col < minefield->cols - 1 ? col + 1 : col;
+    if (tile->surrounding != 0) {
         return true;
+    }
 
-    for (r = row - 1; r < row + 2; r++) {
-        for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0) && (c >= 0) && (r < minefield->rows) && (c < minefield->cols)) { // stay in bounds
-                if (!minefield_get_tile(minefield, r, c)->visible) {
-                    minefield_reveal_tile(minefield, r, c);
-                }
+    for (size_t r = r_start; r <= r_end; r++) {
+        for (size_t c = c_start; c <= c_end; c++) {
+            if (!minefield_get_tile(minefield, r, c)->visible) {
+                minefield_reveal_tile(minefield, r, c);
             }
         }
     }

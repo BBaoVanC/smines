@@ -198,6 +198,7 @@ int main(int argc, char *argv[]) {
 
     struct Display display;
     display_init(&display, rows, cols);
+    nodelay(stdscr, 0); // block while waiting for key press
 
     struct Game game = {0};
 
@@ -220,15 +221,12 @@ game:
             continue;
         }
 
-        nodelay(stdscr, 0); // we want to wait until a key is pressed
         if (display.state == HELP) {
             switch (ch) {
                 case 'H': // close help
                 case '?':
                 case 'q':
-                    erase();
                     display.state = GAME;
-                    display_draw(&display, &game);
                     break;
             }
             continue;
@@ -250,7 +248,6 @@ game:
 
             case 'H': // toggle help, only checked here if not visible already
             case '?':
-                erase();
                 display.state = HELP;
                 break;
 
@@ -293,7 +290,6 @@ game:
             case 'u': // undo
                 if (undo_flag) {
                     game_undo(&game);
-                    display_draw(&display, &game);
                 }
                 break;
 
@@ -306,8 +302,10 @@ game:
                     game_undo_store(&game);
                     break;
                 }
-                if (game.state != ALIVE)
+                if (game.state != ALIVE) {
                     break;
+                }
+                // TODO: maybe somethign wrong here, doesnt work on top or left edges
                 if (cur_tile->visible) {
                     if (minefield_count_surrounding_flags(&game.minefield, game.minefield.cur.row, game.minefield.cur.col) == cur_tile->surrounding) {
                         game_undo_store(&game);
@@ -332,14 +330,16 @@ game:
                 break;
 
             case 'f': // toggle flag
-                if (game.state != ALIVE)
+                if (game.state != ALIVE) {
                     break;
+                }
                 if (!cur_tile->visible) {
                     cur_tile->flagged = !cur_tile->flagged;
-                    if (cur_tile->flagged)
+                    if (cur_tile->flagged) {
                         game.minefield.placed_flags++;
-                    else
+                    } else {
                         game.minefield.placed_flags--;
+                    }
                 }
                 break;
         }

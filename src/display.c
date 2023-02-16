@@ -97,11 +97,9 @@ void display_resize(struct Display *display, int minefield_rows, int minefield_c
     destroy_win(display->too_small_popup);
 
     endwin(); // make ncurses recalculate stuff like global vars LINES and COLS
-    display_update_origin(display, minefield_rows, minefield_cols);
-
-    display_make_windows(display, minefield_rows, minefield_cols);
-
     display_set_min_size(display, minefield_rows, minefield_cols);
+    display_update_origin(display, minefield_rows, minefield_cols);
+    display_make_windows(display, minefield_rows, minefield_cols);
 }
 
 bool display_init(struct Display *display, int minefield_rows, int minefield_cols) {
@@ -246,6 +244,7 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 
+    // TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting
     switch (game->state) { // draw the top line
         case ALIVE:
             wattron(win, A_BOLD);

@@ -18,6 +18,7 @@ struct Game {
     uint32_t game_number;
     struct {
         enum GameState state;
+        // TODO: deep copy tiles array
         struct Minefield minefield;
     } undo;
 };
