@@ -12,6 +12,7 @@ enum DisplayState {
 };
 struct Display {
     bool too_small;
+    bool erase_needed; // if entire screen needs to be erased (during transition)
     enum DisplayState state; // current screen we are displaying
     WINDOW *scoreboard;
     WINDOW *minefield;
@@ -35,5 +36,9 @@ void display_draw(struct Display *display, struct Game *game);
 // draw the entire minefield
 // TODO: damage/regional update
 void display_refresh(struct Display *display);
+// switch to help screen
+void display_transition_help(struct Display *display);
+// switch to main game screen
+void display_transition_game(struct Display *display);
 
 #endif

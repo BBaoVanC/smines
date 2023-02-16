@@ -271,7 +271,10 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
 }
 
 void display_draw(struct Display *display, struct Game *game) {
-    erase();
+    if (display->erase_needed) {
+        erase();
+        display->erase_needed = false;
+    }
     if (display->too_small) {
         wmove(display->too_small_popup, 0, 0);
         // TODO: make a window to display this so it overlays
@@ -299,4 +302,14 @@ void display_refresh(struct Display *display) {
     wrefresh(display->scoreboard);
     wrefresh(display->minefield);
     wrefresh(display->too_small_popup);
+}
+
+void display_transition_help(struct Display *display) {
+    display->state = HELP;
+    display->erase_needed = true;
+}
+
+void display_transition_game(struct Display *display) {
+    display->state = GAME;
+    display->erase_needed = true;
 }

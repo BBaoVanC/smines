@@ -226,7 +226,7 @@ game:
                 case 'H': // close help
                 case '?':
                 case 'q':
-                    display.state = GAME;
+                    display_transition_game(&display);
                     break;
             }
             continue;
@@ -248,7 +248,7 @@ game:
 
             case 'H': // toggle help, only checked here if not visible already
             case '?':
-                display.state = HELP;
+                display_transition_help(&display);
                 break;
 
             // movement keys
