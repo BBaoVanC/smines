@@ -175,27 +175,29 @@ int main(int argc, char *argv[]) {
     srand((unsigned)time(NULL)); // seed the random number generator
 
     struct Display display;
-    display_init(&display, rows, cols);
+    display_init(&display);
     nodelay(stdscr, 0); // block while waiting for key press
 
+game:; // otherwise syntax error for this declaration
     struct Game game = {0};
 
-game:
     game.state = ALIVE;
     game.game_number++;
 
     minefield_init(&game.minefield, rows, cols, mines);
     bool first_reveal = true;
 
+    display_set_game(&display, &game);
+
     struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
     int ch; // key that was pressed
     while (true) {
-        display_draw(&display, &game);
+        display_draw(&display);
         display_refresh(&display);
         cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.row, game.minefield.cur.col);
         ch = getch(); // blocks until a key is pressed
         if (ch == KEY_RESIZE) {
-            display_resize(&display, game.minefield.rows, game.minefield.cols);
+            display_resize(&display);
             continue;
         }
 
@@ -211,8 +213,8 @@ game:
         }
         switch (ch) {
             case 'L': // redraw screen
-                display_resize(&display, game.minefield.rows, game.minefield.cols);
-                display_draw(&display, &game);
+                display_resize(&display);
+                display_draw(&display);
                 display_refresh(&display);
                 break;
 

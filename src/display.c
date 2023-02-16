@@ -28,12 +28,12 @@ static const char helptxt[] =
 
 // set the correct starting position to center the game in the terminal
 // reads from ncurses to figure that out
-static void display_update_origin(struct Display *display, int minefield_rows, int minefield_cols) {
+static void display_update_origin(struct Display *display) {
     int scr_rows, scr_cols;
     getmaxyx(stdscr, scr_rows, scr_cols);
     // add 1 col/row per side for each border, so 2 rows and 2 cols for all 4 borders
-    int height = minefield_rows + SCOREBOARD_ROWS * 2;
-    int width = minefield_cols * 2 + 2;
+    int height = display->game->minefield.rows + SCOREBOARD_ROWS * 2;
+    int width = display->game->minefield.cols * 2 + 2;
 
     display->origin.x = (scr_cols - width) / 2;
     display->origin.y = (scr_rows - height) / 2;
@@ -70,18 +70,18 @@ static void destroy_win(WINDOW *local_win) {
      */
     delwin(local_win);
 }
-static void display_make_windows(struct Display *display, int minefield_rows, int minefield_cols) {
-    display->scoreboard = newwin(SCOREBOARD_ROWS, minefield_cols * 2, display->origin.y, display->origin.x);
+static void display_make_windows(struct Display *display) {
+    display->scoreboard = newwin(SCOREBOARD_ROWS, display->game->minefield.cols * 2, display->origin.y, display->origin.x);
 
     // add 2 for borders
-    display->minefield = newwin(minefield_rows + 2, minefield_cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
+    display->minefield = newwin(display->game->minefield.rows + 2, display->game->minefield.cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
 
     display->too_small_popup = newwin(2, COLS, 0, 0);
 }
-static void display_set_min_size(struct Display *display, int minefield_rows, int minefield_cols) {
+static void display_set_min_size(struct Display *display) {
     // check if terminal is too small
-    display->min_rows = SCOREBOARD_ROWS + minefield_rows + 2; // add 2 for borders
-    display->min_cols = minefield_cols * 2 + 2;
+    display->min_rows = SCOREBOARD_ROWS + display->game->minefield.rows + 2; // add 2 for borders
+    display->min_cols = display->game->minefield.cols * 2 + 2;
     if (LINES < display->min_rows || COLS < display->min_cols) {
         display->too_small = true;
     } else {
@@ -91,18 +91,18 @@ static void display_set_min_size(struct Display *display, int minefield_rows, in
 // recalculate everything if the terminal is resized
 // TODO: maybe store Minefield somewhere in Display so it's not an arg
 // TODO: should this be `display_reset` instead?
-void display_resize(struct Display *display, int minefield_rows, int minefield_cols) {
+void display_resize(struct Display *display) {
     destroy_win(display->scoreboard);
     destroy_win(display->minefield);
     destroy_win(display->too_small_popup);
 
     endwin(); // make ncurses recalculate stuff like global vars LINES and COLS
-    display_set_min_size(display, minefield_rows, minefield_cols);
-    display_update_origin(display, minefield_rows, minefield_cols);
-    display_make_windows(display, minefield_rows, minefield_cols);
+    display_set_min_size(display);
+    display_update_origin(display);
+    display_make_windows(display);
 }
 
-bool display_init(struct Display *display, int minefield_rows, int minefield_cols) {
+bool display_init(struct Display *display) {
     // ncurses setup
     initscr();
     if (!has_colors()) {
@@ -142,12 +142,14 @@ bool display_init(struct Display *display, int minefield_rows, int minefield_col
     init_pair(MSG_WIN, COLOR_GREEN, -1);
 
     *display = (struct Display){0};
-
-    display_set_min_size(display, minefield_rows, minefield_cols);
-    display_update_origin(display, minefield_rows, minefield_cols);
-    display_make_windows(display, minefield_rows, minefield_cols);
-
     return true;
+}
+
+void display_set_game(struct Display *display, struct Game *game) {
+    display->game = game;
+    display_set_min_size(display);
+    display_update_origin(display);
+    display_make_windows(display);
 }
 
 void display_destroy(struct Display *display) {
@@ -164,12 +166,12 @@ static int get_surround_color(int surrounding) {
         return COLOR_PAIR(100);
     }
 }
-static void display_draw_tile_text(struct Display *display, struct Tile *tile, enum GameState game_state, int row, int col) {
+static void display_draw_tile_text(struct Display *display, struct Tile *tile, int row, int col) {
     WINDOW *win = display->minefield;
     wmove(win, row + 1, col * 2 + 1); // add 1 because of border? TODO: verify this
     if (tile->flagged) {
         wattron(win, A_BOLD);
-        if (game_state == DEAD && !tile->mine) {
+        if (display->game->state == DEAD && !tile->mine) {
             wprintw(win, "!F");
         } else {
             wprintw(win, " F");
@@ -191,20 +193,20 @@ static void display_draw_tile_text(struct Display *display, struct Tile *tile, e
         wprintw(win, " ?");
     }
 }
-static void display_draw_tile(struct Display *display, struct Tile *tile, enum GameState game_state, int row, int col) {
+static void display_draw_tile(struct Display *display, struct Tile *tile, int row, int col) {
     int color;
     // get the color pair to draw with
     if (tile->flagged) {
-        if (game_state == VICTORY) {
+        if (display->game->state == VICTORY) {
             color = COLOR_PAIR(TILE_MINE_SAFE);
-        } else if ((game_state == DEAD) && (!tile->mine)) {
+        } else if ((display->game->state == DEAD) && (!tile->mine)) {
             color = COLOR_PAIR(TILE_FLAG_WRONG);
         } else {
             color = COLOR_PAIR(TILE_FLAG);
         }
     } else if (tile->visible) {
         if (tile->mine) {
-            color = COLOR_PAIR(game_state == VICTORY ? TILE_MINE_SAFE : TILE_MINE);
+            color = COLOR_PAIR(display->game->state == VICTORY ? TILE_MINE_SAFE : TILE_MINE);
         } else {
             color = get_surround_color(tile->surrounding);
         }
@@ -212,40 +214,40 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, enum G
         color = COLOR_PAIR(TILE_HIDDEN);
     }
     wattron(display->minefield, color);
-    display_draw_tile_text(display, tile, game_state, row, col);
+    display_draw_tile_text(display, tile, row, col);
     wattroff(display->minefield, color);
 }
 
-static void display_draw_minefield(struct Display *display, struct Game *game) {
-    for (int y = 0; y < game->minefield.rows; y++) {
-        for (int x = 0; x < game->minefield.cols; x++) {
-            display_draw_tile(display, minefield_get_tile(&game->minefield, y, x), game->state, y, x);
+static void display_draw_minefield(struct Display *display) {
+    for (int y = 0; y < display->game->minefield.rows; y++) {
+        for (int x = 0; x < display->game->minefield.cols; x++) {
+            display_draw_tile(display, minefield_get_tile(&display->game->minefield, y, x), y, x);
         }
     }
 
     // draw the cursor
-    int cur_y = game->minefield.cur.row;
-    int cur_x = game->minefield.cur.col;
+    int cur_y = display->game->minefield.cur.row;
+    int cur_x = display->game->minefield.cur.col;
     wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
-    display_draw_tile_text(display, minefield_get_tile(&game->minefield, cur_y, cur_x), game->state, cur_y, cur_x);
+    display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_y, cur_x), cur_y, cur_x);
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
     
     wborder(display->minefield, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
-static void display_draw_scoreboard(struct Display *display, struct Game *game) {
+static void display_draw_scoreboard(struct Display *display) {
     WINDOW *win = display->scoreboard;
     werase(win); // if we don't clear, and the new text is shorter than the old text, characters are left on screen
-    size_t mines = game->minefield.mines;
-    size_t placed = game->minefield.placed_flags;
+    size_t mines = display->game->minefield.mines;
+    size_t placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", game->game_number, game->minefield.cols, game->minefield.rows);
+    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game->game_number, display->game->minefield.cols, display->game->minefield.rows);
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 
     // TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting
-    switch (game->state) { // draw the top line
+    switch (display->game->state) { // draw the top line
         case ALIVE:
             wattron(win, A_BOLD);
             mvwprintw(win, 0, 0, "Press ? for help");
@@ -270,7 +272,7 @@ static void display_draw_scoreboard(struct Display *display, struct Game *game) 
     }
 }
 
-void display_draw(struct Display *display, struct Game *game) {
+void display_draw(struct Display *display) {
     if (display->erase_needed) {
         erase();
         display->erase_needed = false;
@@ -289,8 +291,8 @@ void display_draw(struct Display *display, struct Game *game) {
             mvprintw(0, 0, helptxt);
             break;
         case GAME:
-            display_draw_minefield(display, game);
-            display_draw_scoreboard(display, game);
+            display_draw_minefield(display);
+            display_draw_scoreboard(display);
             break;
         default:
             abort();

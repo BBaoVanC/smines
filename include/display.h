@@ -13,6 +13,7 @@ enum DisplayState {
 struct Display {
     bool too_small;
     bool erase_needed; // if entire screen needs to be erased (during transition)
+    struct Game *game;
     enum DisplayState state; // current screen we are displaying
     WINDOW *scoreboard;
     WINDOW *minefield;
@@ -27,12 +28,14 @@ struct Display {
 
 // should only be called once; there should only be one Display!
 // needs to be cleaned up with display_destroy
-void display_resize(struct Display *display, int minefield_rows, int minefield_cols);
+void display_resize(struct Display *display);
 // returns bool, true if successful. if false, terminate the entire program
-bool display_init(struct Display *display, int minefield_rows, int minefield_cols);
+// not ready for use until you call display_set_game
+bool display_init(struct Display *display);
+void display_set_game(struct Display *display, struct Game *game);
 void display_destroy(struct Display *display);
 // remember to refresh manually
-void display_draw(struct Display *display, struct Game *game);
+void display_draw(struct Display *display);
 // draw the entire minefield
 // TODO: damage/regional update
 void display_refresh(struct Display *display);
