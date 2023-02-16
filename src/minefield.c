@@ -1,5 +1,6 @@
 #include "minefield.h"
 
+#include <assert.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +73,7 @@ struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t 
 // output: bool - false if the clicked tile was a mine, true otherwise
 bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) {
     struct Tile *tile = minefield_get_tile(minefield, row, col);
+    assert(!tile->flagged);
     if (tile->mine) {
         return false;
     }

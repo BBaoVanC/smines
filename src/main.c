@@ -11,28 +11,6 @@
 #include <strings.h> // strcasecmp
 #include <time.h>
 
-static void reveal_check_state(struct Game *game, size_t row, size_t col) {
-    if (!minefield_reveal_tile(&game->minefield, row, col)) {
-        game->state = DEAD;
-        // reveal all the mines
-        for (size_t r = 0; r < game->minefield.rows; r++) {
-            for (size_t c = 0; c < game->minefield.cols; c++) {
-                if (minefield_get_tile(&game->minefield, r, c)->mine) {
-                    minefield_get_tile(&game->minefield, r, c)->visible = true;
-                }
-            }
-        }
-    } else if (minefield_check_victory(&game->minefield)) {
-        game->state = VICTORY;
-        int r, c;
-        for (r = 0; r < game->minefield.rows; r++) {
-            for (c = 0; c < game->minefield.cols; c++) {
-                minefield_get_tile(&game->minefield, r, c)->visible = true;
-            }
-        }
-    }
-}
-
 int main(int argc, char *argv[]) {
     // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
     static const char cmd_usage[] =
@@ -305,29 +283,33 @@ game:
                 if (game.state != ALIVE) {
                     break;
                 }
+                if (!cur_tile->visible) {
+                    game_click_tile(&game, game.minefield.cur.row, game.minefield.cur.col);
+                    break;
+                }
+                // TODO: if clicking an already visible mine, and flags match surrounding, then reveal any hidden surrounding tiles
                 // TODO: maybe somethign wrong here, doesnt work on top or left edges
+                break;
+                /*
                 if (cur_tile->visible) {
                     if (minefield_count_surrounding_flags(&game.minefield, game.minefield.cur.row, game.minefield.cur.col) == cur_tile->surrounding) {
                         game_undo_store(&game);
-                        /* If you have x flags surrounding an already revealed tile, and
+                         * If you have x flags surrounding an already revealed tile, and
                          * that tile has x surrounding mines, then the other surrounding
                          * tiles cannot be mines (assuming your flags are correct).
-                         * If any of the flags are incorrect, then you die. */
+                         * If any of the flags are incorrect, then you die. *
                         for (int r = game.minefield.cur.row - 1; r < game.minefield.cur.row + 2; r++) {
                             for (int c = game.minefield.cur.col - 1; c < game.minefield.cur.col + 2; c++) {
                                 if ((r >= 0 && c >= 0) && (r < game.minefield.rows && c < game.minefield.cols)) {
                                     if (!minefield_get_tile(&game.minefield, r, c)->flagged) {
-                                        reveal_check_state(&game, r, c);
+                                        game_click_tile(&game, r, c);
                                     }
                                 }
                             }
                         }
                     }
-                } else if (!cur_tile->flagged) {
-                    game_undo_store(&game);
-                    reveal_check_state(&game, game.minefield.cur.row, game.minefield.cur.col);
                 }
-                break;
+                */
 
             case 'f': // toggle flag
                 if (game.state != ALIVE) {

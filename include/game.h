@@ -23,6 +23,7 @@ struct Game {
     } undo;
 };
 
+void game_click_tile(struct Game *game, size_t row, size_t col);
 void game_undo_store(struct Game *game);
 void game_undo(struct Game *game);
 
