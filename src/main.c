@@ -127,6 +127,12 @@ int main(int argc, char *argv[]) {
                 abort();
         }
     }
+    if (help_flag) {
+        printf(cmd_usage);
+        printf(cmd_help);
+        return 0;
+    }
+
     if (rows == -1) {
         printf("'rows' was not set, use --rows or --difficulty\n");
         exit_for_invalid_args = true;
@@ -144,11 +150,6 @@ int main(int argc, char *argv[]) {
         printf(cmd_usage);
         printf("Use the '--help' option to display help page\n");
         return 1;
-    }
-    if (help_flag) {
-        printf(cmd_usage);
-        printf(cmd_help);
-        return 0;
     }
 
     if (optind < argc) {
