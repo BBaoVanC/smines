@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     int opt_idx = 0;
     char *strtol_endptr;
     int c;
-    while ((c = getopt_long(argc, argv, "hr:c:d:u", long_options, &opt_idx)) != -1) {
+    while ((c = getopt_long(argc, argv, "hr:c:m:d:u", long_options, &opt_idx)) != -1) {
         switch (c) {
             case 0:
                 // do nothing else if flag was set
