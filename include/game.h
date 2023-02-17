@@ -3,8 +3,7 @@
 
 #include "minefield.h"
 
-#include <ncurses.h>
-
+#include <stddef.h>
 #include <stdint.h>
 
 enum GameState {

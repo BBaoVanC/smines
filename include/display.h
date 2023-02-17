@@ -1,5 +1,5 @@
-#ifndef SMINES_DRAW_H
-#define SMINES_DRAW_H
+#ifndef SMINES_DISPLAY_H
+#define SMINES_DISPLAY_H
 
 #include "game.h"
 #include "minefield.h"

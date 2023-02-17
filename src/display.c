@@ -6,6 +6,7 @@
 
 #include <ncurses.h>
 
+#include <stddef.h>
 #include <stdlib.h>
 
 static const int SCOREBOARD_ROWS = 4;

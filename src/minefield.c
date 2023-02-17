@@ -1,8 +1,7 @@
 #include "minefield.h"
 
 #include <assert.h>
-#include <ncurses.h>
-#include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines) {

@@ -3,7 +3,6 @@
 #include "minefield.h"
 
 #include <getopt.h>
-#include <ncurses.h>
 
 #include <errno.h>
 #include <stdio.h>

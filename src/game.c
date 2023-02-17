@@ -2,6 +2,8 @@
 
 #include "minefield.h"
 
+#include <stddef.h>
+
 void game_click_tile(struct Game *game, size_t row, size_t col) {
     game_undo_store(game);
     bool still_alive = minefield_reveal_tile(&game->minefield, row, col); // false if dead from clicking a mine
