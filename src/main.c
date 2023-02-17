@@ -291,33 +291,11 @@ game:; // otherwise syntax error for this declaration
                 if (game.state != ALIVE) {
                     break;
                 }
-                if (!cur_tile->visible) {
+                if (!cur_tile->flagged && !cur_tile->visible) {
                     game_click_tile(&game, game.minefield.cur.row, game.minefield.cur.col);
                     break;
                 }
-                // TODO: if clicking an already visible mine, and flags match surrounding, then reveal any hidden surrounding tiles
-                // TODO: maybe somethign wrong here, doesnt work on top or left edges
                 break;
-                /*
-                if (cur_tile->visible) {
-                    if (minefield_count_surrounding_flags(&game.minefield, game.minefield.cur.row, game.minefield.cur.col) == cur_tile->surrounding) {
-                        game_undo_store(&game);
-                         * If you have x flags surrounding an already revealed tile, and
-                         * that tile has x surrounding mines, then the other surrounding
-                         * tiles cannot be mines (assuming your flags are correct).
-                         * If any of the flags are incorrect, then you die. *
-                        for (int r = game.minefield.cur.row - 1; r < game.minefield.cur.row + 2; r++) {
-                            for (int c = game.minefield.cur.col - 1; c < game.minefield.cur.col + 2; c++) {
-                                if ((r >= 0 && c >= 0) && (r < game.minefield.rows && c < game.minefield.cols)) {
-                                    if (!minefield_get_tile(&game.minefield, r, c)->flagged) {
-                                        game_click_tile(&game, r, c);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                */
 
             case 'f': // toggle flag
                 if (game.state != ALIVE) {

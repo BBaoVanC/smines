@@ -25,11 +25,11 @@ static void minefield_set_mine(struct Minefield *minefield, size_t row, size_t c
     struct Tile *tile = minefield_get_tile(minefield, row, col);
     tile->mine = true;
 
-    int r_start = row > 0 ? row - 1 : 0;
-    int c_start = col > 0 ? col - 1 : 0;
+    size_t r_start = row > 0 ? row - 1 : 0;
+    size_t c_start = col > 0 ? col - 1 : 0;
     // TODO: this is kinda ugly
-    int r_end = row < minefield->rows - 1 ? row + 1 : row;
-    int c_end = col < minefield->cols - 1 ? col + 1 : col;
+    size_t r_end = row < minefield->rows - 1 ? row + 1 : row;
+    size_t c_end = col < minefield->cols - 1 ? col + 1 : col;
     for (size_t r = r_start; r <= r_end; r++) {
         for (size_t c = c_start; c <= c_end; c++) {
             minefield_get_tile(minefield, r, c)->surrounding++;
@@ -45,6 +45,7 @@ void minefield_populate(struct Minefield *minefield) {
         c = (rand() % (minefield->cols));
 
         // don't generate mines in a 3x3 centered on the cursor
+        // TODO: maybe calculate using distance formula
         if ((r >= minefield->cur.row - 1) &&
             (c >= minefield->cur.col - 1) &&
             (r <= minefield->cur.row + 1) &&
@@ -73,21 +74,21 @@ struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t 
 // output: bool - false if the clicked tile was a mine, true otherwise
 bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) {
     struct Tile *tile = minefield_get_tile(minefield, row, col);
+    assert(!tile->visible);
     assert(!tile->flagged);
     if (tile->mine) {
         return false;
     }
-
     tile->visible = true;
-    int r_start = row > 0 ? row - 1 : 0;
-    int c_start = col > 0 ? col - 1 : 0;
-    // TODO: this is kinda ugly
-    int r_end = row < minefield->rows - 1 ? row + 1 : row;
-    int c_end = col < minefield->cols - 1 ? col + 1 : col;
     if (tile->surrounding != 0) {
         return true;
     }
 
+    size_t r_start = row > 0 ? row - 1 : 0;
+    size_t c_start = col > 0 ? col - 1 : 0;
+    // TODO: this is kinda ugly
+    size_t r_end = row < minefield->rows - 1 ? row + 1 : row;
+    size_t c_end = col < minefield->cols - 1 ? col + 1 : col;
     for (size_t r = r_start; r <= r_end; r++) {
         for (size_t c = c_start; c <= c_end; c++) {
             if (!minefield_get_tile(minefield, r, c)->visible) {
