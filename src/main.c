@@ -24,6 +24,11 @@ int main(int argc, char *argv[]) {
         "  -m, --mines=MINES                Set the amount of mines in the minefield\n"
         "  -d, --difficulty=DIFFICULTY      Set the rows, columns, and mines based on difficulty level\n"
         "  -u, --allow-undo                 Allow undoing the last move\n"
+        "Difficulties:\n"
+        "  super-easy, super_easy   20x10, 10 mines\n"
+        "  easy                     9x9,   10 mines\n"
+        "  intermediate, medium     16x16, 40 mines\n"
+        "  hard                     30x16, 99 mines\n"
     ;
 
     static int help_flag = 0;
