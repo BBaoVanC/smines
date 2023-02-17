@@ -92,6 +92,8 @@ static void display_set_min_size(struct Display *display) {
 // TODO: maybe store Minefield somewhere in Display so it's not an arg
 // TODO: should this be `display_reset` instead?
 void display_resize(struct Display *display) {
+    display->erase_needed = true;
+
     destroy_win(display->scoreboard);
     destroy_win(display->minefield);
     destroy_win(display->too_small_popup);
