@@ -33,8 +33,8 @@ static void display_update_origin(struct Display *display) {
     int scr_rows, scr_cols;
     getmaxyx(stdscr, scr_rows, scr_cols);
     // add 1 col/row per side for each border, so 2 rows and 2 cols for all 4 borders
-    int height = display->game->minefield.rows + SCOREBOARD_ROWS * 2;
-    int width = display->game->minefield.cols * 2 + 2;
+    int width = display->game->minefield.width * 2 + 2;
+    int height = display->game->minefield.height + SCOREBOARD_ROWS * 2;
 
     display->origin.x = (scr_cols - width) / 2;
     display->origin.y = (scr_rows - height) / 2;
@@ -72,17 +72,17 @@ static void destroy_win(WINDOW *local_win) {
     delwin(local_win);
 }
 static void display_make_windows(struct Display *display) {
-    display->scoreboard = newwin(SCOREBOARD_ROWS, display->game->minefield.cols * 2, display->origin.y, display->origin.x);
+    display->scoreboard = newwin(SCOREBOARD_ROWS, display->game->minefield.width * 2, display->origin.y, display->origin.x);
 
     // add 2 for borders
-    display->minefield = newwin(display->game->minefield.rows + 2, display->game->minefield.cols * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
+    display->minefield = newwin(display->game->minefield.height + 2, display->game->minefield.width * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
 
     display->too_small_popup = newwin(2, COLS, 0, 0);
 }
 static void display_set_min_size(struct Display *display) {
     // check if terminal is too small
-    display->min_rows = SCOREBOARD_ROWS + display->game->minefield.rows + 2; // add 2 for borders
-    display->min_cols = display->game->minefield.cols * 2 + 2;
+    display->min_rows = SCOREBOARD_ROWS + display->game->minefield.height + 2; // add 2 for borders
+    display->min_cols = display->game->minefield.width * 2 + 2;
     if (LINES < display->min_rows || COLS < display->min_cols) {
         display->too_small = true;
     } else {
@@ -222,18 +222,18 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, int ro
 }
 
 static void display_draw_minefield(struct Display *display) {
-    for (int y = 0; y < display->game->minefield.rows; y++) {
-        for (int x = 0; x < display->game->minefield.cols; x++) {
-            display_draw_tile(display, minefield_get_tile(&display->game->minefield, y, x), y, x);
+    for (int y = 0; y < display->game->minefield.height; y++) {
+        for (int x = 0; x < display->game->minefield.width; x++) {
+            display_draw_tile(display, minefield_get_tile(&display->game->minefield, x, y), y, x);
         }
     }
 
     // draw the cursor
-    int cur_y = display->game->minefield.cur.row;
-    int cur_x = display->game->minefield.cur.col;
+    int cur_x = display->game->minefield.cur.x;
+    int cur_y = display->game->minefield.cur.y;
     wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
-    display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_y, cur_x), cur_y, cur_x);
+    display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_x, cur_y), cur_y, cur_x);
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
     
     wborder(display->minefield, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -245,7 +245,7 @@ static void display_draw_scoreboard(struct Display *display) {
     size_t mines = display->game->minefield.mines;
     size_t placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game->game_number, display->game->minefield.cols, display->game->minefield.rows);
+    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game->game_number, display->game->minefield.width, display->game->minefield.height);
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 

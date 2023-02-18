@@ -6,23 +6,23 @@
 
 void game_click_tile(struct Game *game, size_t row, size_t col) {
     game_undo_store(game);
-    bool still_alive = minefield_reveal_tile(&game->minefield, row, col); // false if dead from clicking a mine
+    bool still_alive = minefield_reveal_tile(&game->minefield, col, row); // false if dead from clicking a mine
     if (!still_alive) {
         game->state = DEAD;
         // reveal all the mines
-        for (size_t r = 0; r < game->minefield.rows; r++) {
-            for (size_t c = 0; c < game->minefield.cols; c++) {
-                if (minefield_get_tile(&game->minefield, r, c)->mine) {
-                    minefield_get_tile(&game->minefield, r, c)->visible = true;
+        for (size_t r = 0; r < game->minefield.height; r++) {
+            for (size_t c = 0; c < game->minefield.width; c++) {
+                if (minefield_get_tile(&game->minefield, c, r)->mine) {
+                    minefield_get_tile(&game->minefield, c, r)->visible = true;
                 }
             }
         }
     } else if (minefield_check_victory(&game->minefield)) {
         game->state = VICTORY;
         int r, c;
-        for (r = 0; r < game->minefield.rows; r++) {
-            for (c = 0; c < game->minefield.cols; c++) {
-                minefield_get_tile(&game->minefield, r, c)->visible = true;
+        for (r = 0; r < game->minefield.height; r++) {
+            for (c = 0; c < game->minefield.width; c++) {
+                minefield_get_tile(&game->minefield, c, r)->visible = true;
             }
         }
     } else {

@@ -4,75 +4,74 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-void minefield_init(struct Minefield *minefield, size_t rows, size_t cols, size_t mines) {
-    minefield->rows = rows;
-    minefield->cols = cols;
+void minefield_init(struct Minefield *minefield, size_t width, size_t height, size_t mines) {
+    minefield->width = width;
+    minefield->height = height;
     minefield->mines = mines;
     minefield->placed_flags = 0;
 
-    minefield->cur.col = cols / 2;
-    minefield->cur.row = rows / 2;
+    minefield->cur.x = width / 2;
+    minefield->cur.y = height / 2;
 
     if (minefield->tiles != NULL) {
         free(minefield->tiles);
     }
-    minefield->tiles = calloc(rows * cols, sizeof(struct Tile));
-}
-
-// set a tile as a mine and increment surrounding
-static void minefield_set_mine(struct Minefield *minefield, size_t row, size_t col) {
-    struct Tile *tile = minefield_get_tile(minefield, row, col);
-    tile->mine = true;
-
-    size_t r_start = row > 0 ? row - 1 : 0;
-    size_t c_start = col > 0 ? col - 1 : 0;
-    // TODO: this is kinda ugly
-    size_t r_end = row < minefield->rows - 1 ? row + 1 : row;
-    size_t c_end = col < minefield->cols - 1 ? col + 1 : col;
-    for (size_t r = r_start; r <= r_end; r++) {
-        for (size_t c = c_start; c <= c_end; c++) {
-            minefield_get_tile(minefield, r, c)->surrounding++;
-        }
-    }
-}
-void minefield_populate(struct Minefield *minefield) {
-    // randomly spread mines
-    int r, c; // otherwise our 3x3 check might overflow and break
-    size_t i = 0;
-    while (i < minefield->mines) {
-        r = (rand() % (minefield->rows)); // non inclusive; i didn't forget about starting at 0
-        c = (rand() % (minefield->cols));
-
-        // don't generate mines in a 3x3 centered on the cursor
-        // TODO: maybe calculate using distance formula
-        if ((r >= minefield->cur.row - 1) &&
-            (c >= minefield->cur.col - 1) &&
-            (r <= minefield->cur.row + 1) &&
-            (c <= minefield->cur.col + 1)) {
-            continue;
-        }
-        if (minefield_get_tile(minefield, r, c)->mine) {
-            continue;
-        }
-
-        minefield_set_mine(minefield, r, c);
-        i++;
-    }
+    minefield->tiles = calloc(width * height, sizeof(struct Tile));
 }
 
 void minefield_cleanup(struct Minefield *minefield) {
     free(minefield->tiles);
 }
 
-struct Tile *minefield_get_tile(struct Minefield *minefield, size_t row, size_t col) {
+// set a tile as a mine and increment surrounding
+static void minefield_set_mine(struct Minefield *minefield, size_t x, size_t y) {
+    struct Tile *tile = minefield_get_tile(minefield, x, y);
+    tile->mine = true;
+
+    size_t x_start = x > 0 ? x - 1 : 0;
+    size_t y_start = y > 0 ? y - 1 : 0;
+    // TODO: this is kinda ugly
+    size_t x_end = x < minefield->width - 1 ? x + 1 : x;
+    size_t y_end = y < minefield->height - 1 ? y + 1 : y;
+    for (size_t x1 = x_start; x1 <= x_end; x1++) {
+        for (size_t y1 = y_start; y1 <= y_end; y1++) {
+            minefield_get_tile(minefield, x1, y1)->surrounding++;
+        }
+    }
+}
+void minefield_populate(struct Minefield *minefield) {
+    // randomly spread mines
+    for (size_t i = 0; i < minefield->mines;) {
+        // non inclusive; don't worry, i didn't forget about starting at 0
+        size_t x = (rand() % (minefield->width));
+        size_t y = (rand() % (minefield->height));
+
+        // TODO: maybe calculate using distance formula
+        // don't generate mines in a 3x3 centered on the cursor
+        if ((x >= minefield->cur.x - 1) &&
+            (y >= minefield->cur.y - 1) &&
+            (x <= minefield->cur.x + 1) &&
+            (y <= minefield->cur.y + 1)) {
+            continue;
+        }
+        if (minefield_get_tile(minefield, x, y)->mine) {
+            continue;
+        }
+
+        minefield_set_mine(minefield, x, y);
+        i++;
+    }
+}
+
+struct Tile *minefield_get_tile(struct Minefield *minefield, size_t x, size_t y) {
     // tile array is treated as a sequential list of rows, each row containing `minefield.cols` elements
-    size_t row_start = row * minefield->cols; // index of start of row
-    return &minefield->tiles[row_start + col];
+    size_t offset = y * minefield->width;
+    return &minefield->tiles[offset + x];
 }
 
 // output: bool - false if the clicked tile was a mine, true otherwise
-bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) {
-    struct Tile *tile = minefield_get_tile(minefield, row, col);
+bool minefield_reveal_tile(struct Minefield *minefield, size_t x, size_t y) {
+    struct Tile *tile = minefield_get_tile(minefield, x, y);
     assert(!tile->visible);
     assert(!tile->flagged);
     if (tile->mine) {
@@ -83,31 +82,28 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t row, size_t col) 
         return true;
     }
 
-    size_t r_start = row > 0 ? row - 1 : 0;
-    size_t c_start = col > 0 ? col - 1 : 0;
+    size_t x_start = x > 0 ? x - 1 : 0;
+    size_t y_start = y > 0 ? y - 1 : 0;
     // TODO: this is kinda ugly
-    size_t r_end = row < minefield->rows - 1 ? row + 1 : row;
-    size_t c_end = col < minefield->cols - 1 ? col + 1 : col;
-    for (size_t r = r_start; r <= r_end; r++) {
-        for (size_t c = c_start; c <= c_end; c++) {
-            if (!minefield_get_tile(minefield, r, c)->visible) {
-                minefield_reveal_tile(minefield, r, c);
+    size_t x_end = x < minefield->width - 1 ? x + 1 : x;
+    size_t y_end = y < minefield->height - 1 ? y + 1 : y;
+    for (size_t x1 = x_start; x1 <= x_end; x1++) {
+        for (size_t y1 = y_start; y1 <= y_end; y1++) {
+            if (!minefield_get_tile(minefield, x1, y1)->visible) {
+                minefield_reveal_tile(minefield, x1, y1);
             }
         }
     }
     return true;
 }
 
-size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row, size_t col) {
-    size_t r, c;
+size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t x, size_t y) {
     size_t surrounding = 0;
-    struct Tile *current_tile = NULL;
 
-    for (r = row - 1; r < row + 2; r++) {
-        for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { // make sure we are in bounds
-                current_tile = minefield_get_tile(minefield, r, c);
-                if (current_tile->mine) {
+    for (int x1 = x - 1; x1 <= x + 1; x1++) {
+        for (int y1 = y - 1; y1 <= y + 1; y1++) {
+            if ((x1 >= 0 && y1 >= 0) && (x1 < minefield->width && y1 < minefield->height)) { // make sure we are in bounds
+                if (minefield_get_tile(minefield, x1, y1)->mine) {
                     surrounding++;
                 }
             }
@@ -117,16 +113,13 @@ size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t row
     return surrounding;
 }
 
-size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row, size_t col) {
-    size_t r, c;
+size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t x, size_t y) {
     size_t surrounding = 0;
-    struct Tile *current_tile = NULL;
 
-    for (r = row - 1; r < row + 2; r++) {
-        for (c = col - 1; c < col + 2; c++) {
-            if ((r >= 0 && c >= 0) && (r < minefield->rows && c < minefield->cols)) { // make sure we are in bounds
-                current_tile = minefield_get_tile(minefield, r, c);
-                if (current_tile->flagged) {
+    for (int x1 = x - 1; x1 <= x + 1; x1++) {
+        for (int y1 = y - 1; y1 <= y + 1; y1++) {
+            if ((x1 >= 0 && y1 >= 0) && (x1 < minefield->width && y1 < minefield->height)) { // make sure we are in bounds
+                if (minefield_get_tile(minefield, x1, y1)->flagged) {
                     surrounding++;
                 }
             }
@@ -139,11 +132,10 @@ size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t row
 bool minefield_check_victory(struct Minefield *minefield) {
     /* TODO: count up the hidden tiles as they are revealed so they
      * don't have to be recounted every time this function runs */
-    size_t r, c;
     size_t hidden = 0;
-    for (r = 0; r < minefield->rows; r++) {
-        for (c = 0; c < minefield->cols; c++) {
-            if (!minefield_get_tile(minefield, r, c)->visible)
+    for (size_t x = 0; x < minefield->width; x++) {
+        for (size_t y = 0; y < minefield->height; y++) {
+            if (!minefield_get_tile(minefield, x, y)->visible)
                 hidden++;
         }
     }
