@@ -81,9 +81,9 @@ static void display_make_windows(struct Display *display) {
 }
 static void display_set_min_size(struct Display *display) {
     // check if terminal is too small
-    display->min_rows = SCOREBOARD_ROWS + display->game->minefield.height + 2; // add 2 for borders
-    display->min_cols = display->game->minefield.width * 2 + 2;
-    if (LINES < display->min_rows || COLS < display->min_cols) {
+    display->min_width = display->game->minefield.width * 2 + 2;
+    display->min_height = SCOREBOARD_ROWS + display->game->minefield.height + 2; // add 2 for borders
+    if (COLS < display->min_width || LINES < display->min_height) {
         display->too_small = true;
     } else {
         display->too_small = false;
@@ -169,9 +169,9 @@ static int get_surround_color(int surrounding) {
         return COLOR_PAIR(100);
     }
 }
-static void display_draw_tile_text(struct Display *display, struct Tile *tile, int row, int col) {
+static void display_draw_tile_text(struct Display *display, struct Tile *tile, int x, int y) {
     WINDOW *win = display->minefield;
-    wmove(win, row + 1, col * 2 + 1); // add 1 because of border? TODO: verify this
+    wmove(win, y + 1, x * 2 + 1); // add 1 because of border? TODO: verify this
     if (tile->flagged) {
         wattron(win, A_BOLD);
         if (display->game->state == DEAD && !tile->mine) {
@@ -196,7 +196,7 @@ static void display_draw_tile_text(struct Display *display, struct Tile *tile, i
         wprintw(win, " ?");
     }
 }
-static void display_draw_tile(struct Display *display, struct Tile *tile, int row, int col) {
+static void display_draw_tile(struct Display *display, struct Tile *tile, int x, int y) {
     int color;
     // get the color pair to draw with
     if (tile->flagged) {
@@ -217,14 +217,14 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, int ro
         color = COLOR_PAIR(TILE_HIDDEN);
     }
     wattron(display->minefield, color);
-    display_draw_tile_text(display, tile, row, col);
+    display_draw_tile_text(display, tile, x, y);
     wattroff(display->minefield, color);
 }
 
 static void display_draw_minefield(struct Display *display) {
     for (int y = 0; y < display->game->minefield.height; y++) {
         for (int x = 0; x < display->game->minefield.width; x++) {
-            display_draw_tile(display, minefield_get_tile(&display->game->minefield, x, y), y, x);
+            display_draw_tile(display, minefield_get_tile(&display->game->minefield, x, y), x, y);
         }
     }
 
@@ -233,7 +233,7 @@ static void display_draw_minefield(struct Display *display) {
     int cur_y = display->game->minefield.cur.y;
     wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
-    display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_x, cur_y), cur_y, cur_x);
+    display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_x, cur_y), cur_x, cur_y);
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
     
     wborder(display->minefield, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -283,7 +283,7 @@ void display_draw(struct Display *display) {
     if (display->too_small) {
         wmove(display->too_small_popup, 0, 0);
         // TODO: make a window to display this so it overlays
-        wprintw(display->too_small_popup, "Please make your terminal at least %i cols by %i rows\n", display->min_cols, display->min_rows);
+        wprintw(display->too_small_popup, "Please make your terminal at least %i cols by %i rows\n", display->min_width, display->min_height);
         wprintw(display->too_small_popup, "Current size: %i cols by %i rows", COLS, LINES);
         //wrefresh(display->too_small_popup);
         return;

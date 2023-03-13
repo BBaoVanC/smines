@@ -23,7 +23,7 @@ struct Display {
         int x, y;
     } origin;
 
-    int min_rows, min_cols;
+    int min_width, min_height;
 };
 
 // should only be called once; there should only be one Display!
