@@ -183,136 +183,138 @@ int main(int argc, char *argv[]) {
     display_init(&display);
     nodelay(stdscr, 0); // block while waiting for key press
 
-game:; // otherwise syntax error for this declaration
     struct Game game = {0};
+    bool restart_game = true;
+    while (restart_game) {
+        game.state = ALIVE;
+        game.game_number++;
 
-    game.state = ALIVE;
-    game.game_number++;
+        minefield_init(&game.minefield, width, height, mines);
+        bool first_reveal = true;
 
-    minefield_init(&game.minefield, width, height, mines);
-    bool first_reveal = true;
+        display_set_game(&display, &game);
 
-    display_set_game(&display, &game);
+        struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
+        int ch; // key that was pressed
+        bool continue_running_game = true;
+        while (continue_running_game) {
+            display_draw(&display);
+            display_refresh(&display);
+            cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
+            ch = getch(); // blocks until a key is pressed
+            if (ch == KEY_RESIZE) {
+                display_resize(&display);
+                continue;
+            }
 
-    struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
-    int ch; // key that was pressed
-    while (true) {
-        display_draw(&display);
-        display_refresh(&display);
-        cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
-        ch = getch(); // blocks until a key is pressed
-        if (ch == KEY_RESIZE) {
-            display_resize(&display);
-            continue;
-        }
-
-        if (display.state == HELP) {
+            if (display.state == HELP) {
+                switch (ch) {
+                    case 'H': // close help
+                    case '?':
+                    case 'q':
+                        display_transition_game(&display);
+                        break;
+                }
+                continue;
+            }
             switch (ch) {
-                case 'H': // close help
+                case 'L': // redraw screen
+                    display_resize(&display);
+                    display_draw(&display);
+                    display_refresh(&display);
+                    break;
+
+                case 'q': // quit
+                    restart_game = false;
+                    continue_running_game = false;
+                    break;
+
+                case 'r': // restart
+                    continue_running_game = false;
+                    break;
+
+                case 'H': // toggle help, only checked here if not visible already
                 case '?':
-                case 'q':
-                    display_transition_game(&display);
+                    display_transition_help(&display);
+                    break;
+
+                // movement keys
+                case 'h':
+                case KEY_LEFT:
+                    if (game.minefield.cur.x > 0)
+                        game.minefield.cur.x--;
+                    break;
+                case 'j':
+                case KEY_DOWN:
+                    if (game.minefield.cur.y < game.minefield.height - 1)
+                        game.minefield.cur.y++;
+                    break;
+                case 'k':
+                case KEY_UP:
+                    if (game.minefield.cur.y > 0)
+                        game.minefield.cur.y--;
+                    break;
+                case 'l':
+                case KEY_RIGHT:
+                    if (game.minefield.cur.x < game.minefield.width - 1)
+                        game.minefield.cur.x++;
+                    break;
+
+                case '0':
+                case '^':
+                    game.minefield.cur.x = 0;
+                    break;
+                case '$':
+                    game.minefield.cur.x = game.minefield.width - 1;
+                    break;
+                case 'g':
+                    game.minefield.cur.y = 0;
+                    break;
+                case 'G':
+                    game.minefield.cur.y = game.minefield.height - 1;
+                    break;
+
+                case 'u': // undo
+                    if (undo_flag) {
+                        game_undo(&game);
+                    }
+                    break;
+
+                case ' ': // reveal tile
+                    if (first_reveal) {
+                        // TODO: add these back lmao
+                        minefield_populate(&game.minefield);
+                        minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
+                        first_reveal = false;
+                        game_undo_store(&game);
+                        break;
+                    }
+                    if (game.state != ALIVE) {
+                        break;
+                    }
+                    if (!cur_tile->flagged && !cur_tile->visible) {
+                        game_click_tile(&game, game.minefield.cur.y, game.minefield.cur.x);
+                        break;
+                    }
+                    break;
+
+                case 'f': // toggle flag
+                    if (game.state != ALIVE) {
+                        break;
+                    }
+                    if (!cur_tile->visible) {
+                        cur_tile->flagged = !cur_tile->flagged;
+                        if (cur_tile->flagged) {
+                            game.minefield.placed_flags++;
+                        } else {
+                            game.minefield.placed_flags--;
+                        }
+                    }
                     break;
             }
-            continue;
-        }
-        switch (ch) {
-            case 'L': // redraw screen
-                display_resize(&display);
-                display_draw(&display);
-                display_refresh(&display);
-                break;
-
-            case 'q': // quit
-                goto quit;
-                break;
-
-            case 'r': // restart
-                goto game;
-                break;
-
-            case 'H': // toggle help, only checked here if not visible already
-            case '?':
-                display_transition_help(&display);
-                break;
-
-            // movement keys
-            case 'h':
-            case KEY_LEFT:
-                if (game.minefield.cur.x > 0)
-                    game.minefield.cur.x--;
-                break;
-            case 'j':
-            case KEY_DOWN:
-                if (game.minefield.cur.y < game.minefield.height - 1)
-                    game.minefield.cur.y++;
-                break;
-            case 'k':
-            case KEY_UP:
-                if (game.minefield.cur.y > 0)
-                    game.minefield.cur.y--;
-                break;
-            case 'l':
-            case KEY_RIGHT:
-                if (game.minefield.cur.x < game.minefield.width - 1)
-                    game.minefield.cur.x++;
-                break;
-
-            case '0':
-            case '^':
-                game.minefield.cur.x = 0;
-                break;
-            case '$':
-                game.minefield.cur.x = game.minefield.width - 1;
-                break;
-            case 'g':
-                game.minefield.cur.y = 0;
-                break;
-            case 'G':
-                game.minefield.cur.y = game.minefield.height - 1;
-                break;
-
-            case 'u': // undo
-                if (undo_flag) {
-                    game_undo(&game);
-                }
-                break;
-
-            case ' ': // reveal tile
-                if (first_reveal) {
-                    // TODO: add these back lmao
-                    minefield_populate(&game.minefield);
-                    minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
-                    first_reveal = false;
-                    game_undo_store(&game);
-                    break;
-                }
-                if (game.state != ALIVE) {
-                    break;
-                }
-                if (!cur_tile->flagged && !cur_tile->visible) {
-                    game_click_tile(&game, game.minefield.cur.y, game.minefield.cur.x);
-                    break;
-                }
-                break;
-
-            case 'f': // toggle flag
-                if (game.state != ALIVE) {
-                    break;
-                }
-                if (!cur_tile->visible) {
-                    cur_tile->flagged = !cur_tile->flagged;
-                    if (cur_tile->flagged) {
-                        game.minefield.placed_flags++;
-                    } else {
-                        game.minefield.placed_flags--;
-                    }
-                }
-                break;
         }
     }
 
-quit:
     minefield_cleanup(&game.minefield);
     display_destroy(&display);
 }
