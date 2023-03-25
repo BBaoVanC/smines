@@ -245,7 +245,7 @@ static void display_draw_scoreboard(struct Display *display) {
     size_t mines = display->game->minefield.mines;
     size_t placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game->game_number, display->game->minefield.width, display->game->minefield.height);
+    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game_number, display->game->minefield.width, display->game->minefield.height);
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 

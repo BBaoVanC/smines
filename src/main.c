@@ -180,19 +180,17 @@ int main(int argc, char *argv[]) {
     srand((unsigned)time(NULL)); // seed the random number generator
 
     struct Display display;
+    struct Game game = {0};
     display_init(&display);
     nodelay(stdscr, 0); // block while waiting for key press
 
-    struct Game game = {0};
     bool restart_game = true;
     while (restart_game) {
-        game.state = ALIVE;
-        game.game_number++;
+        display.game_number++;
+        game_init(&game, width, height, mines);
+        display_set_game(&display, &game); // TODO: why can't this just be run once at declaration above
 
-        minefield_init(&game.minefield, width, height, mines);
         bool first_reveal = true;
-
-        display_set_game(&display, &game);
 
         struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
         int ch; // key that was pressed
@@ -315,6 +313,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    minefield_cleanup(&game.minefield);
+    game_cleanup(&game);
     display_destroy(&display);
 }

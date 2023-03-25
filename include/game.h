@@ -14,7 +14,6 @@ enum GameState {
 struct Game {
     enum GameState state;
     struct Minefield minefield;
-    uint32_t game_number;
     struct {
         enum GameState state;
         // TODO: deep copy tiles array
@@ -22,6 +21,8 @@ struct Game {
     } undo;
 };
 
+void game_init(struct Game *game, size_t width, size_t height, size_t mines);
+void game_cleanup(struct Game *game);
 void game_click_tile(struct Game *game, size_t x, size_t y);
 void game_undo_store(struct Game *game);
 void game_undo(struct Game *game);

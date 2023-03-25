@@ -4,6 +4,15 @@
 
 #include <stddef.h>
 
+void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
+    game->state = ALIVE;
+    minefield_init(&game->minefield, width, height, mines);
+}
+
+void game_cleanup(struct Game *game) {
+    minefield_cleanup(&game->minefield);
+}
+
 void game_click_tile(struct Game *game, size_t x, size_t y) {
     game_undo_store(game);
     bool still_alive = minefield_reveal_tile(&game->minefield, x, y); // false if dead from clicking a mine

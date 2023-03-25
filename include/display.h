@@ -14,6 +14,7 @@ struct Display {
     bool too_small;
     bool erase_needed; // if entire screen needs to be erased (during transition)
     struct Game *game;
+    uint32_t game_number;
     enum DisplayState state; // current screen we are displaying
     WINDOW *scoreboard;
     WINDOW *minefield;
