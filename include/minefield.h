@@ -27,7 +27,9 @@ struct Minefield {
 
 // does not populate mines, remember to run minefield_populate!
 // also remember to run minefield_cleanup afterwards; it frees the tiles array
-void minefield_init(struct Minefield *minefield, size_t width, size_t height, size_t mines);
+//
+// if this returns false, then the tiles allocation failed! (and errno was likely set by calloc)
+bool minefield_init(struct Minefield *minefield, size_t width, size_t height, size_t mines);
 void minefield_cleanup(struct Minefield *minefield);
 void minefield_populate(struct Minefield *minefield);
 struct Tile *minefield_get_tile(struct Minefield *minefield, size_t x, size_t y);

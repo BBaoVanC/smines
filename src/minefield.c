@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-void minefield_init(struct Minefield *minefield, size_t width, size_t height, size_t mines) {
+bool minefield_init(struct Minefield *minefield, size_t width, size_t height, size_t mines) {
     minefield->width = width;
     minefield->height = height;
     minefield->mines = mines;
@@ -16,7 +16,13 @@ void minefield_init(struct Minefield *minefield, size_t width, size_t height, si
     if (minefield->tiles != NULL) {
         free(minefield->tiles);
     }
+
     minefield->tiles = calloc(width * height, sizeof(struct Tile));
+    if (!minefield->tiles) {
+        return false;
+    }
+
+    return true;
 }
 
 void minefield_cleanup(struct Minefield *minefield) {
