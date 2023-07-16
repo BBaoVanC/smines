@@ -290,7 +290,7 @@ int main(int argc, char *argv[]) {
                     if (game.state != ALIVE) {
                         break;
                     }
-                    if (!cur_tile->flagged && !cur_tile->visible) {
+                    if (!cur_tile->flagged) {
                         game_click_tile(&game, game.minefield.cur.x, game.minefield.cur.y);
                         break;
                     }
