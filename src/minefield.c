@@ -78,13 +78,13 @@ struct Tile *minefield_get_tile(struct Minefield *minefield, size_t x, size_t y)
 // output: bool - false if the clicked tile was a mine, true otherwise
 bool minefield_reveal_tile(struct Minefield *minefield, size_t x, size_t y) {
     struct Tile *tile = minefield_get_tile(minefield, x, y);
-    assert(!tile->visible);
     assert(!tile->flagged);
+    bool start_visible = tile->visible;
     if (tile->mine) {
         return false;
     }
     tile->visible = true;
-    if (tile->surrounding != 0) {
+    if (tile->surrounding != 0 && !start_visible) {
         return true;
     }
 
@@ -93,14 +93,16 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t x, size_t y) {
     // TODO: this is kinda ugly
     size_t x_end = x < minefield->width - 1 ? x + 1 : x;
     size_t y_end = y < minefield->height - 1 ? y + 1 : y;
+    bool no_mines = true;
     for (size_t x1 = x_start; x1 <= x_end; x1++) {
         for (size_t y1 = y_start; y1 <= y_end; y1++) {
-            if (!minefield_get_tile(minefield, x1, y1)->visible) {
-                minefield_reveal_tile(minefield, x1, y1);
+            struct Tile *surtile = minefield_get_tile(minefield, x1, y1);
+            if (!surtile->visible && !surtile->flagged) {
+                no_mines &= minefield_reveal_tile(minefield, x1, y1);
             }
         }
     }
-    return true;
+    return no_mines;
 }
 
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t x, size_t y) {
