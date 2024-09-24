@@ -51,13 +51,13 @@ static int subtract_timespecs(const struct timespec end, const struct timespec s
         };
     }
 }
-timespec timer_get_time(struct Timer *timer) {
+int timer_get_time(struct Timer *timer, struct timespec *out) {
     struct timespec now = {0};
     int res = clock_gettime(CLOCK_MONOTONIC, &now);
     if (res == -1) {
         return -1;
     }
-    return subtract_timespecs(now, timer->start);
+    *out = subtract_timespecs(now, timer->start);
 }
 
 void timer_cleanup(struct Timer *timer) {
