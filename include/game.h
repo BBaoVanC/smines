@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 enum GameState {
+    INIT, // first tile hasn't been revealed yet
     ALIVE, // game is in progress
     VICTORY, // game has been won
     DEAD, // game was lost
@@ -28,6 +29,7 @@ void game_init(struct Game *game, size_t width, size_t height, size_t mines);
 int game_start(struct Game *game);
 void game_cleanup(struct Game *game);
 void game_click_tile(struct Game *game, size_t x, size_t y);
+struct Tile *game_get_cursor_tile(struct Game *game);
 void game_undo_store(struct Game *game);
 void game_undo(struct Game *game);
 

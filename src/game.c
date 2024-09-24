@@ -6,12 +6,19 @@
 #include <stddef.h>
 
 void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
-    game->state = ALIVE;
+    game->state = INIT;
     minefield_init(&game->minefield, width, height, mines);
     // leave timer uninitialized for now, will be in game_start
 }
 
 int game_start(struct Game *game) {
+    assert(game->state == INIT);
+
+    minefield_populate(&game.minefield);
+    minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
+    game_undo_store(game);
+    game->state = ALIVE;
+
     game->timer = {0};
     return timer_start(&game->timer);
 }
@@ -44,6 +51,10 @@ void game_click_tile(struct Game *game, size_t x, size_t y) {
     } else {
         // TODO: try recursion or someting here
     }
+}
+
+struct Tile *game_get_cursor_tile(struct Game *game) {
+    return minefield_get_tile(&game->minefield, game->minefield.cur.x, game->minefield.cur.y);
 }
 
 void game_undo_store(struct Game *game) {

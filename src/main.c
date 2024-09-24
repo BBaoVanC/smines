@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
         while (continue_running_game) {
             display_draw(&display);
             display_refresh(&display);
-            cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
+            cur_tile = game_get_cursor_tile(&game);
             ch = getch(); // blocks until a key is pressed
             if (ch == KEY_RESIZE) {
                 display_resize(&display);
@@ -281,10 +281,8 @@ int main(int argc, char *argv[]) {
                 case ' ': // reveal tile
                     if (first_reveal) {
                         // TODO: add these back lmao
-                        minefield_populate(&game.minefield);
-                        minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
                         first_reveal = false;
-                        game_undo_store(&game);
+                        game_start(&game);
                         break;
                     }
                     if (game.state != ALIVE) {
