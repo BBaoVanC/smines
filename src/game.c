@@ -1,16 +1,24 @@
 #include "game.h"
 
 #include "minefield.h"
+#include "timer.h"
 
 #include <stddef.h>
 
 void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
     game->state = ALIVE;
     minefield_init(&game->minefield, width, height, mines);
+    // leave timer uninitialized for now, will be in game_start
+}
+
+int game_start(struct Game *game) {
+    game->timer = {0};
+    return timer_start(&game->timer);
 }
 
 void game_cleanup(struct Game *game) {
     minefield_cleanup(&game->minefield);
+    timer_cleanup(&game->timer);
 }
 
 void game_click_tile(struct Game *game, size_t x, size_t y) {

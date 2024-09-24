@@ -3,6 +3,7 @@ srcs = [
   'display.c',
   'game.c',
   'minefield.c',
+  'timer.c',
 ]
 
 executable(

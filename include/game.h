@@ -2,6 +2,7 @@
 #define SMINES_GAME_H
 
 #include "minefield.h"
+#include "timer.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -19,9 +20,12 @@ struct Game {
         // TODO: deep copy tiles array
         struct Minefield minefield;
     } undo;
+    struct Timer timer;
 };
 
 void game_init(struct Game *game, size_t width, size_t height, size_t mines);
+// returns -1 if there was an error, and errno will be set
+int game_start(struct Game *game);
 void game_cleanup(struct Game *game);
 void game_click_tile(struct Game *game, size_t x, size_t y);
 void game_undo_store(struct Game *game);
