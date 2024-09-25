@@ -3,6 +3,7 @@
 #include "minefield.h"
 #include "timer.h"
 
+#include <assert.h>
 #include <stddef.h>
 
 void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
@@ -14,12 +15,11 @@ void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
 int game_start(struct Game *game) {
     assert(game->state == INIT);
 
-    minefield_populate(&game.minefield);
-    minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
+    minefield_populate(&game->minefield);
+    minefield_reveal_tile(&game->minefield, game->minefield.cur.x, game->minefield.cur.y);
     game_undo_store(game);
     game->state = ALIVE;
 
-    game->timer = {0};
     return timer_start(&game->timer);
 }
 

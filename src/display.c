@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static const int SCOREBOARD_ROWS = 5;
+static const int SCOREBOARD_ROWS = 4;
 static const char helptxt[] =
     "H or ?: view this help page\n"
     "L: redraw screen (just in case)\n"
@@ -246,21 +246,24 @@ static void display_draw_scoreboard(struct Display *display) {
     size_t mines = display->game->minefield.mines;
     size_t placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 2, 0, "Game #%i (%lix%li)", display->game_number, display->game->minefield.width, display->game->minefield.height);
-    mvwprintw(win, 3, 0, "Flags: %li", placed);
-    mvwprintw(win, 4, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
+    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game_number, display->game->minefield.width, display->game->minefield.height);
+    mvwprintw(win, 2, 0, "Flags: %li", placed);
+    mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 
     // TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting
     switch (display->game->state) { // draw the top line
+        case INIT:
+            wattron(win, A_BOLD);
+            mvwprintw(win, 0, 0, "Press ? for help");
+            wattroff(win, A_BOLD);
+            break;
         case ALIVE:
             wattron(win, A_BOLD);
 
             struct timespec now = {0};
-            timer_get_time(display->game->timer, &now);
-            div_t mins_and_secs = div(timer.tv_sec, 60);
+            timer_get_time(&display->game->timer, &now);
+            div_t mins_and_secs = div(now.tv_sec, 60);
             mvwprintw(win, 0, 0, "Time: %02i:%02i", mins_and_secs.quot, mins_and_secs.rem);
-
-            mvwprintw(win, 1, 0, "Press ? for help");
 
             wattroff(win, A_BOLD);
             break;

@@ -7,9 +7,9 @@
 #include <unistd.h>
 
 int timer_start(struct Timer *timer) {
-    timespec start_time = {0};
-    int res = clock_gettime(CLOCK_MONOTONIC, &start_time);
-    if (res == -1) {
+    struct timespec start_time = {0};
+    int gettime_res = clock_gettime(CLOCK_MONOTONIC, &start_time);
+    if (gettime_res == -1) {
         return -1;
     }
     timer->start = start_time;
@@ -22,23 +22,23 @@ int timer_start(struct Timer *timer) {
 
     struct itimerspec spec = {
         .it_interval = {
-            .tv_sec = 1;
-            .tv_nsec = 0;
+            .tv_sec = 1,
+            .tv_nsec = 0,
         },
         .it_value = {
-            .tv_sec = 1;
-            .tv_nsec = 0;
+            .tv_sec = 1,
+            .tv_nsec = 0,
         },
     };
-    int res = timerfd_settime(timer->fd, 0, &spec, NULL);
-    if (res == -1) {
+    int settime_res = timerfd_settime(timer->fd, 0, &spec, NULL);
+    if (settime_res == -1) {
         return -1;
     }
 
     return 0;
 }
 
-static int subtract_timespecs(const struct timespec end, const struct timespec start) {
+static struct timespec subtract_timespecs(const struct timespec end, const struct timespec start) {
     if (end.tv_nsec > start.tv_nsec) {
         return (struct timespec) {
             .tv_sec = end.tv_sec - start.tv_sec,

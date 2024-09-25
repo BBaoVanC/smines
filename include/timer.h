@@ -1,8 +1,11 @@
 #ifndef SMINES_TIMER_H
 #define SMINES_TIMER_H
 
+#include <time.h>
+
 struct Timer {
     int fd;
+    struct timespec start;
 };
 
 // if error, returns -1 and errno is set by related clock/timer methods called
