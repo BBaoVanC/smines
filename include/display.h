@@ -5,6 +5,7 @@
 #include "minefield.h"
 
 #include <ncurses.h>
+#include <stdbool.h>
 
 enum DisplayState {
     GAME, // showing the minesweeper game

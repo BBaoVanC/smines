@@ -4,9 +4,11 @@
 #include "timer.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 void game_init(struct Game *game, size_t width, size_t height, size_t mines) {
+    assert(game->timer.fd == 0);
     game->state = INIT;
     minefield_init(&game->minefield, width, height, mines);
     // leave timer uninitialized for now, will be in game_start

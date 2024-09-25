@@ -1,14 +1,17 @@
 #include "display.h"
 #include "game.h"
-#include "minefield.h"
 
 #include <getopt.h>
 
+#include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h> // strcasecmp
+#include <sys/epoll.h>
 #include <time.h>
+#include <unistd.h>
 
 int main(int argc, char *argv[]) {
     // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
@@ -179,140 +182,212 @@ int main(int argc, char *argv[]) {
 
     srand((unsigned)time(NULL)); // seed the random number generator
 
+    // use these to exit the program inside game loop
+    bool exit_error = false;
+    char *exit_error_msg = NULL;
+
+    int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1) {
+        exit_error = true;
+        exit_error_msg = "error creating epoll instance\n";
+        goto exit;
+    }
+
+    struct epoll_event ev_stdin = { .events = EPOLLIN, .data = { .fd = STDIN_FILENO } };
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, STDIN_FILENO, &ev_stdin) == -1) {
+        exit_error = true;
+        exit_error_msg = "error creating stdin listener via epoll_ctl\n";
+        goto exit;
+    }
+
     struct Display display;
     struct Game game = {0};
     display_init(&display);
-    nodelay(stdscr, 0); // block while waiting for key press
+    // return error if nothing in queue on getch() so we can warn if something's messed up in the event handling
+    nodelay(stdscr, 1);
 
     bool restart_game = true;
+    struct epoll_event ev_timer = { .events = EPOLLIN, .data = { .fd = 0 } }; // fd will be set later
     while (restart_game) {
         display.game_number++;
-        game_init(&game, width, height, mines);
-        display_set_game(&display, &game); // TODO: why can't this just be run once at declaration above
 
+        // TODO: should we replace this outer if with the assert condition; i.e. check if fd == 0 directly
+        if (display.game_number != 1) {
+            assert(game.timer.fd != 0);
+            if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, game.timer.fd, NULL) == -1) {
+                exit_error = true;
+                exit_error_msg = "error deleting epoll interest when creating new game\n";
+                goto exit;
+            }
+            timer_cleanup(&game.timer);
+        }
+
+        game_init(&game, width, height, mines);
+
+        display_set_game(&display, &game); // TODO: why can't this just be run once at declaration above
         bool first_reveal = true;
+
+        display_draw(&display);
+        display_refresh(&display);
 
         struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
         int ch; // key that was pressed
         bool continue_running_game = true;
         while (continue_running_game) {
-            display_draw(&display);
-            display_refresh(&display);
-            cur_tile = game_get_cursor_tile(&game);
-            ch = getch(); // blocks until a key is pressed
-            if (ch == KEY_RESIZE) {
-                display_resize(&display);
-                continue;
+            // TODO: add constant for event amount
+            struct epoll_event epoll_events[10];
+            int wait_res = epoll_wait(epoll_fd, epoll_events, 10, -1);
+            if (wait_res == -1) {
+                exit_error = true;
+                exit_error_msg = "error on epoll_wait\n";
+                goto exit;
             }
-
-            if (display.state == HELP) {
-                switch (ch) {
-                    case 'H': // close help
-                    case '?':
-                    case 'q':
-                        display_transition_game(&display);
-                        break;
-                }
-                continue;
-            }
-            switch (ch) {
-                case 'L': // redraw screen
-                    display_resize(&display);
+            for (int i = 0; i < wait_res; i++) {
+                mvprintw(0, 0, "%i", i);
+                sleep(0.5);
+                mvprintw(0, 0, "      ");
+                if (game.timer.fd != 0 && epoll_events[i].data.fd == game.timer.fd) {
                     display_draw(&display);
                     display_refresh(&display);
-                    break;
-
-                case 'q': // quit
-                    restart_game = false;
-                    continue_running_game = false;
-                    break;
-
-                case 'r': // restart
-                    continue_running_game = false;
-                    break;
-
-                case 'H': // toggle help, only checked here if not visible already
-                case '?':
-                    display_transition_help(&display);
-                    break;
-
-                // movement keys
-                case 'h':
-                case KEY_LEFT:
-                    if (game.minefield.cur.x > 0)
-                        game.minefield.cur.x--;
-                    break;
-                case 'j':
-                case KEY_DOWN:
-                    if (game.minefield.cur.y < game.minefield.height - 1)
-                        game.minefield.cur.y++;
-                    break;
-                case 'k':
-                case KEY_UP:
-                    if (game.minefield.cur.y > 0)
-                        game.minefield.cur.y--;
-                    break;
-                case 'l':
-                case KEY_RIGHT:
-                    if (game.minefield.cur.x < game.minefield.width - 1)
-                        game.minefield.cur.x++;
-                    break;
-
-                case '0':
-                case '^':
-                    game.minefield.cur.x = 0;
-                    break;
-                case '$':
-                    game.minefield.cur.x = game.minefield.width - 1;
-                    break;
-                case 'g':
-                    game.minefield.cur.y = 0;
-                    break;
-                case 'G':
-                    game.minefield.cur.y = game.minefield.height - 1;
-                    break;
-
-                case 'u': // undo
-                    if (undo_flag) {
-                        game_undo(&game);
+                } else if (epoll_events[i].data.fd == STDIN_FILENO) {
+                    cur_tile = game_get_cursor_tile(&game);
+                    ch = getch();
+                    assert(ch != -1);
+                    if (ch == KEY_RESIZE) {
+                        display_resize(&display);
+                        continue;
                     }
-                    break;
 
-                case ' ': // reveal tile
-                    if (first_reveal) {
-                        // TODO: add these back lmao
-                        first_reveal = false;
-                        game_start(&game);
-                        break;
-                    }
-                    if (game.state != ALIVE) {
-                        break;
-                    }
-                    if (!cur_tile->flagged) {
-                        game_click_tile(&game, game.minefield.cur.x, game.minefield.cur.y);
-                        break;
-                    }
-                    break;
-
-                case 'f': // toggle flag
-                    if (game.state != ALIVE) {
-                        break;
-                    }
-                    if (!cur_tile->visible) {
-                        cur_tile->flagged = !cur_tile->flagged;
-                        if (cur_tile->flagged) {
-                            game.minefield.placed_flags++;
-                        } else {
-                            game.minefield.placed_flags--;
+                    if (display.state == HELP) {
+                        switch (ch) {
+                            case 'H': // close help
+                            case '?':
+                            case 'q':
+                                display_transition_game(&display);
+                                break;
                         }
+                        continue;
                     }
-                    break;
+                    switch (ch) {
+                        case 'L': // redraw screen
+                            display_resize(&display);
+                            display_draw(&display);
+                            display_refresh(&display);
+                            break;
+
+                        case 'q': // quit
+                            restart_game = false;
+                            continue_running_game = false;
+                            break;
+
+                        case 'r': // restart
+                            continue_running_game = false;
+                            break;
+
+                        case 'H': // toggle help, only checked here if not visible already
+                        case '?':
+                            display_transition_help(&display);
+                            break;
+
+                        // movement keys
+                        case 'h':
+                        case KEY_LEFT:
+                            if (game.minefield.cur.x > 0)
+                                game.minefield.cur.x--;
+                            break;
+                        case 'j':
+                        case KEY_DOWN:
+                            if (game.minefield.cur.y < game.minefield.height - 1)
+                                game.minefield.cur.y++;
+                            break;
+                        case 'k':
+                        case KEY_UP:
+                            if (game.minefield.cur.y > 0)
+                                game.minefield.cur.y--;
+                            break;
+                        case 'l':
+                        case KEY_RIGHT:
+                            if (game.minefield.cur.x < game.minefield.width - 1)
+                                game.minefield.cur.x++;
+                            break;
+
+                        case '0':
+                        case '^':
+                            game.minefield.cur.x = 0;
+                            break;
+                        case '$':
+                            game.minefield.cur.x = game.minefield.width - 1;
+                            break;
+                        case 'g':
+                            game.minefield.cur.y = 0;
+                            break;
+                        case 'G':
+                            game.minefield.cur.y = game.minefield.height - 1;
+                            break;
+
+                        case 'u': // undo
+                            if (undo_flag) {
+                                game_undo(&game);
+                            }
+                            break;
+
+                        case ' ': // reveal tile
+                            if (first_reveal) {
+                                // TODO: add these back lmao
+                                first_reveal = false;
+                                game_start(&game);
+
+                                ev_timer.data.fd = game.timer.fd;
+                                if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, game.timer.fd, &ev_timer) == -1) {
+                                    exit_error = true;
+                                    exit_error_msg = "error creating timer listener via epoll_ctl\n";
+                                    goto exit;
+                                }
+
+                                break;
+                            }
+                            if (game.state != ALIVE) {
+                                break;
+                            }
+                            if (!cur_tile->flagged) {
+                                game_click_tile(&game, game.minefield.cur.x, game.minefield.cur.y);
+                                break;
+                            }
+                            break;
+
+                        case 'f': // toggle flag
+                            if (game.state != ALIVE) {
+                                break;
+                            }
+                            if (!cur_tile->visible) {
+                                cur_tile->flagged = !cur_tile->flagged;
+                                if (cur_tile->flagged) {
+                                    game.minefield.placed_flags++;
+                                } else {
+                                    game.minefield.placed_flags--;
+                                }
+                            }
+                            break;
+                    }
+                    display_draw(&display);
+                    display_refresh(&display);
+                } else { // event did not match STDIN_FILENO or game.timer.fd
+                    abort();
+                }
             }
+
         }
     }
 
+exit:
+    close(epoll_fd);
     game_cleanup(&game);
     display_destroy(&display);
 
+    if (exit_error) {
+        printf("errno: %i\n", errno);
+        printf(exit_error_msg);
+        return 1;
+    }
     return 0;
 }
