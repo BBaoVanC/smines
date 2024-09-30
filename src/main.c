@@ -13,171 +13,19 @@
 #include <time.h>
 #include <unistd.h>
 
+struct Config {
+    uint32_t width;
+    uint32_t height;
+    uint32_t mines;
+    bool undo;
+};
+int parse_args(struct Config *config_out, int argc, char *argv[]);
+
 int main(int argc, char *argv[]) {
-    // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
-    static const char cmd_usage[] =
-        "Usage: smines [options]\n"
-    ;
-    static const char cmd_help[] =
-        "Options:\n"
-        "  -h, --help\n"
-        "  -c, --cols=WIDTH                 Set the width of the minefield\n"
-        "  -r, --rows=HEIGHT                Set the height of the minefield\n"
-        "  -m, --mines=MINES                Set the amount of mines in the minefield\n"
-        "  -d, --difficulty=DIFFICULTY      Set the rows, columns, and mines based on difficulty level\n"
-        "  -u, --allow-undo                 Allow undoing the last move\n"
-        "Difficulties:\n"
-        "  super-easy, super_easy   20x10, 10 mines\n"
-        "  easy                     9x9,   10 mines\n"
-        "  intermediate, medium     16x16, 40 mines\n"
-        "  hard                     30x16, 99 mines\n"
-    ;
-
-    static int help_flag = 0;
-    static int undo_flag = 0;
-    static const struct option long_options[] = {
-        { "help",       no_argument,        &help_flag, 1   },
-        { "cols",       required_argument,  0,          'r' },
-        { "rows",       required_argument,  0,          'c' },
-        { "mines",      required_argument,  0,          'm' },
-        { "difficulty", required_argument,  0,          'd' },
-        { "allow-undo", no_argument,        &undo_flag, 1   },
-        { 0, 0, 0, 0 }
-    };
-    // TODO: make these unsigned and also use stdint
-    // TODO: check if not provided and error if not
-    int width = -1;
-    int height = -1;
-    int mines = -1;
-
-    bool exit_for_invalid_args = false;
-    int opt_idx = 0;
-    char *strtol_endptr;
-    int c;
-    while ((c = getopt_long(argc, argv, "hc:r:m:d:u", long_options, &opt_idx)) != -1) {
-        switch (c) {
-            case 0:
-                // do nothing else if flag was set
-                if (long_options[opt_idx].flag != 0) {
-                    break;
-                }
-                abort();
-            case '?':
-                exit_for_invalid_args = true;
-                break;
-            case 'h':
-                help_flag = 1;
-                break;
-            case 'c':
-                errno = 0;
-                width = strtol(optarg, &strtol_endptr, 10);
-                if (optarg == strtol_endptr || errno != 0) {
-                    printf("error parsing 'width' as number\n");
-                    exit_for_invalid_args = true;
-                }
-                if (width < 0) {
-                    printf("'width' cannot be negative!\n");
-                    exit_for_invalid_args = true;
-                }
-                break;
-            case 'r':
-                errno = 0;
-                height = strtol(optarg, &strtol_endptr, 10);
-                // TODO: check for more errors (such as "52jkfndnkj" being read as 52)
-                if (optarg == strtol_endptr || errno != 0) {
-                    printf("error parsing 'height' as number\n");
-                    exit_for_invalid_args = true;
-                }
-                if (height < 0) {
-                    printf("'height' cannot be negative!\n");
-                    exit_for_invalid_args = true;
-                }
-                break;
-            case 'm':
-                errno = 0;
-                mines = strtol(optarg, &strtol_endptr, 10);
-                if (optarg == strtol_endptr || errno != 0) {
-                    printf("error parsing 'mines' as number\n");
-                    exit_for_invalid_args = true;
-                }
-                if (mines < 0) {
-                    printf("'mines' cannot be negative!\n");
-                    exit_for_invalid_args = true;
-                }
-                break;
-            case 'd':
-                if (strcasecmp(optarg, "easy") == 0) {
-                    width = 9;
-                    height = 9;
-                    mines = 10;
-                } else if (strcasecmp(optarg, "super-easy") == 0 || strcasecmp(optarg, "super_easy") == 0) {
-                    width = 20;
-                    height = 10;
-                    mines = 10;
-                } else if (strcasecmp(optarg, "intermediate") == 0 || strcasecmp(optarg, "medium") == 0) {
-                    width = 16;
-                    height = 16;
-                    mines = 40;
-                } else if (strcasecmp(optarg, "hard") == 0) {
-                    width = 30;
-                    height = 16;
-                    mines = 99;
-                } else {
-                    printf("invalid difficulty: %s\n", optarg);
-                    exit_for_invalid_args = true;
-                }
-                break;
-            case 'u':
-                undo_flag = 1;
-                break;
-            default:
-                abort();
-        }
-    }
-    if (help_flag) {
-        printf(cmd_usage);
-        printf(cmd_help);
-        return 0;
-    }
-
-    if (width == -1) {
-        printf("'width' was not set, use --width or --difficulty\n");
-        exit_for_invalid_args = true;
-    }
-    if (height == -1) {
-        printf("'height' was not set, use --height or --difficulty\n");
-        exit_for_invalid_args = true;
-    }
-    if (mines == -1) {
-        printf("'mines' was not set, use --mines or --difficulty\n");
-        exit_for_invalid_args = true;
-    }
-
-    if (exit_for_invalid_args) {
-        printf(cmd_usage);
-        printf("Use the '--help' option to display help page\n");
-        return 1;
-    }
-
-    if (optind < argc) {
-        printf("non-option arguments were found: ");
-        for (; optind < argc; optind++) {
-            printf("%s ", argv[optind]);
-        }
-        putchar('\n');
-    }
-
-    if (mines > (width * height) - 9) { // subtract 9 because mines can't be around the start
-        printf("minefield is not large enough to fit the requested amount of mines\n");
-        return 1;
-    }
-    if (width < 5) {
-        printf("'width' must be at least 5\n");
-        return 1;
-    }
-    if (height < 5) {
-        printf("'height' must be at least 5\n");
-        return 1;
+    struct Config config = {0};
+    int parse_ret = parse_args(&config, argc, argv);
+    if (parse_ret != 0) {
+        return parse_ret;
     }
 
     srand((unsigned)time(NULL)); // seed the random number generator
@@ -222,7 +70,7 @@ int main(int argc, char *argv[]) {
             timer_cleanup(&game.timer);
         }
 
-        game_init(&game, width, height, mines);
+        game_init(&game, config.width, config.height, config.mines);
 
         display_set_game(&display, &game); // TODO: why can't this just be run once at declaration above
         bool first_reveal = true;
@@ -326,7 +174,7 @@ int main(int argc, char *argv[]) {
                             break;
 
                         case 'u': // undo
-                            if (undo_flag) {
+                            if (config.undo) {
                                 game_undo(&game);
                             }
                             break;
@@ -389,5 +237,175 @@ exit:
         printf(exit_error_msg);
         return 1;
     }
+    return 0;
+}
+
+int parse_args(struct Config *config_out, int argc, char *argv[]) {
+    // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
+    static const char cmd_usage[] =
+        "Usage: smines [options]\n"
+    ;
+    static const char cmd_help[] =
+        "Options:\n"
+        "  -h, --help\n"
+        "  -c, --cols=WIDTH                 Set the width of the minefield\n"
+        "  -r, --rows=HEIGHT                Set the height of the minefield\n"
+        "  -m, --mines=MINES                Set the amount of mines in the minefield\n"
+        "  -d, --difficulty=DIFFICULTY      Set the rows, columns, and mines based on difficulty level\n"
+        "  -u, --allow-undo                 Allow undoing the last move\n"
+        "Difficulties:\n"
+        "  super-easy, super_easy   20x10, 10 mines\n"
+        "  easy                     9x9,   10 mines\n"
+        "  intermediate, medium     16x16, 40 mines\n"
+        "  hard                     30x16, 99 mines\n"
+    ;
+
+    static int help_flag = 0;
+    static int undo_flag = 0;
+    static const struct option long_options[] = {
+        { "help",       no_argument,        &help_flag, 1   },
+        { "cols",       required_argument,  0,          'r' },
+        { "rows",       required_argument,  0,          'c' },
+        { "mines",      required_argument,  0,          'm' },
+        { "difficulty", required_argument,  0,          'd' },
+        { "allow-undo", no_argument,        &undo_flag, 1   },
+        { 0, 0, 0, 0 }
+    };
+
+    config_out->width = 0;
+    config_out->height = 0;
+    config_out->mines = 0;
+    config_out->undo = false;
+
+    bool exit_for_invalid_args = false;
+    int opt_idx = 0;
+    char *strtol_endptr;
+    int c;
+    while ((c = getopt_long(argc, argv, "hc:r:m:d:u", long_options, &opt_idx)) != -1) {
+        switch (c) {
+            case 0:
+                // do nothing else if flag was set
+                if (long_options[opt_idx].flag != 0) {
+                    break;
+                }
+                abort();
+            case '?':
+                exit_for_invalid_args = true;
+                break;
+            case 'h':
+                help_flag = 1;
+                break;
+            case 'c':
+                errno = 0;
+                config_out->width = strtol(optarg, &strtol_endptr, 10);
+                if (optarg == strtol_endptr || errno != 0) {
+                    printf("error parsing 'width' as number\n");
+                    exit_for_invalid_args = true;
+                }
+                if (config_out->width < 0) {
+                    printf("'width' cannot be negative!\n");
+                    exit_for_invalid_args = true;
+                }
+                break;
+            case 'r':
+                errno = 0;
+                config_out->height = strtol(optarg, &strtol_endptr, 10);
+                // TODO: check for more errors (such as "52jkfndnkj" being read as 52)
+                if (optarg == strtol_endptr || errno != 0) {
+                    printf("error parsing 'height' as number\n");
+                    exit_for_invalid_args = true;
+                }
+                if (config_out->height < 0) {
+                    printf("'height' cannot be negative!\n");
+                    exit_for_invalid_args = true;
+                }
+                break;
+            case 'm':
+                errno = 0;
+                config_out->mines = strtol(optarg, &strtol_endptr, 10);
+                if (optarg == strtol_endptr || errno != 0) {
+                    printf("error parsing 'mines' as number\n");
+                    exit_for_invalid_args = true;
+                }
+                if (config_out->mines < 0) {
+                    printf("'mines' cannot be negative!\n");
+                    exit_for_invalid_args = true;
+                }
+                break;
+            case 'd':
+                if (strcasecmp(optarg, "easy") == 0) {
+                    config_out->width = 9;
+                    config_out->height = 9;
+                    config_out->mines = 10;
+                } else if (strcasecmp(optarg, "super-easy") == 0 || strcasecmp(optarg, "super_easy") == 0) {
+                    config_out->width = 20;
+                    config_out->height = 10;
+                    config_out->mines = 10;
+                } else if (strcasecmp(optarg, "intermediate") == 0 || strcasecmp(optarg, "medium") == 0) {
+                    config_out->width = 16;
+                    config_out->height = 16;
+                    config_out->mines = 40;
+                } else if (strcasecmp(optarg, "hard") == 0) {
+                    config_out->width = 30;
+                    config_out->height = 16;
+                    config_out->mines = 99;
+                } else {
+                    printf("invalid difficulty: %s\n", optarg);
+                    exit_for_invalid_args = true;
+                }
+                break;
+            case 'u':
+                config_out->undo = true;
+                break;
+            default:
+                abort();
+        }
+    }
+    if (help_flag) {
+        printf(cmd_usage);
+        printf(cmd_help);
+        return 0;
+    }
+
+    if (config_out->width == 0) {
+        printf("'width' was not set, use --width or --difficulty\n");
+        exit_for_invalid_args = true;
+    }
+    if (config_out->height == 0) {
+        printf("'height' was not set, use --height or --difficulty\n");
+        exit_for_invalid_args = true;
+    }
+    if (config_out->mines == 0) {
+        printf("'mines' was not set, use --mines or --difficulty\n");
+        exit_for_invalid_args = true;
+    }
+
+    if (exit_for_invalid_args) {
+        printf(cmd_usage);
+        printf("Use the '--help' option to display help page\n");
+        return 1;
+    }
+
+    if (optind < argc) {
+        printf("non-option arguments were found: ");
+        for (; optind < argc; optind++) {
+            printf("%s ", argv[optind]);
+        }
+        putchar('\n');
+    }
+
+    if (config_out->mines > (config_out->width * config_out->height) - 9) { // subtract 9 because mines can't be around the start
+        printf("minefield is not large enough to fit the requested amount of mines\n");
+        return 1;
+    }
+    if (config_out->width < 5) {
+        printf("'width' must be at least 5\n");
+        return 1;
+    }
+    if (config_out->height < 5) {
+        printf("'height' must be at least 5\n");
+        return 1;
+    }
+
     return 0;
 }
