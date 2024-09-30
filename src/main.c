@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +56,6 @@ int main(int argc, char *argv[]) {
     nodelay(stdscr, 1);
 
     bool restart_game = true;
-    struct epoll_event ev_timer = { .events = EPOLLIN, .data = { .fd = 0 } }; // fd will be set later
     while (restart_game) {
         display.game_number++;
 
@@ -91,10 +91,9 @@ int main(int argc, char *argv[]) {
                 goto exit;
             }
             for (int i = 0; i < wait_res; i++) {
-                mvprintw(0, 0, "%i", i);
-                sleep(0.5);
-                mvprintw(0, 0, "      ");
                 if (game.timer.fd != 0 && epoll_events[i].data.fd == game.timer.fd) {
+                    uint64_t timer_read_discard;
+                    read(game.timer.fd, &timer_read_discard, 8); // discard the count of missed timers
                     display_draw(&display);
                     display_refresh(&display);
                 } else if (epoll_events[i].data.fd == STDIN_FILENO) {
@@ -185,7 +184,10 @@ int main(int argc, char *argv[]) {
                                 first_reveal = false;
                                 game_start(&game);
 
-                                ev_timer.data.fd = game.timer.fd;
+                                // so when we read the count of expired timers in order to discard it, it won't block if none have expired:
+                                int timer_fd_flags = fcntl(game.timer.fd, F_GETFL);
+                                fcntl(game.timer.fd, F_SETFL, timer_fd_flags | O_NONBLOCK); // TODO: error checking
+                                struct epoll_event ev_timer = { .events = EPOLLIN, .data = { .fd = game.timer.fd } };
                                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, game.timer.fd, &ev_timer) == -1) {
                                     exit_error = true;
                                     exit_error_msg = "error creating timer listener via epoll_ctl\n";
