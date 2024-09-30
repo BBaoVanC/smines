@@ -58,6 +58,7 @@ int timer_get_time(struct Timer *timer, struct timespec *out) {
         return -1;
     }
     *out = subtract_timespecs(now, timer->start);
+    return 0;
 }
 
 void timer_cleanup(struct Timer *timer) {
