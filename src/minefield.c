@@ -108,8 +108,8 @@ bool minefield_reveal_tile(struct Minefield *minefield, size_t x, size_t y) {
 size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t x, size_t y) {
     size_t surrounding = 0;
 
-    for (int x1 = x - 1; x1 <= x + 1; x1++) {
-        for (int y1 = y - 1; y1 <= y + 1; y1++) {
+    for (size_t x1 = x - 1; x1 <= x + 1; x1++) {
+        for (size_t y1 = y - 1; y1 <= y + 1; y1++) {
             if ((x1 >= 0 && y1 >= 0) && (x1 < minefield->width && y1 < minefield->height)) { // make sure we are in bounds
                 if (minefield_get_tile(minefield, x1, y1)->mine) {
                     surrounding++;
@@ -124,8 +124,8 @@ size_t minefield_count_surrounding_mines(struct Minefield *minefield, size_t x, 
 size_t minefield_count_surrounding_flags(struct Minefield *minefield, size_t x, size_t y) {
     size_t surrounding = 0;
 
-    for (int x1 = x - 1; x1 <= x + 1; x1++) {
-        for (int y1 = y - 1; y1 <= y + 1; y1++) {
+    for (size_t x1 = x - 1; x1 <= x + 1; x1++) {
+        for (size_t y1 = y - 1; y1 <= y + 1; y1++) {
             if ((x1 >= 0 && y1 >= 0) && (x1 < minefield->width && y1 < minefield->height)) { // make sure we are in bounds
                 if (minefield_get_tile(minefield, x1, y1)->flagged) {
                     surrounding++;
