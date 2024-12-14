@@ -4,7 +4,6 @@
 #include "minefield.h"
 
 #include <stddef.h>
-#include <stdint.h>
 
 enum GameState {
     ALIVE, /* game is in progress */
@@ -21,9 +20,9 @@ struct Game {
     } undo;
 };
 
-void game_init(struct Game *game, size_t width, size_t height, size_t mines);
+void game_init(struct Game *game, int width, int height, int mines);
 void game_cleanup(struct Game *game);
-void game_click_tile(struct Game *game, size_t x, size_t y);
+void game_click_tile(struct Game *game, int x, int y);
 void game_undo_store(struct Game *game);
 void game_undo(struct Game *game);
 

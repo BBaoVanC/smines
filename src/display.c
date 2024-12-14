@@ -243,12 +243,12 @@ static void display_draw_minefield(struct Display *display) {
 static void display_draw_scoreboard(struct Display *display) {
     WINDOW *win = display->scoreboard;
     werase(win); /* if we don't clear, and the new text is shorter than the old text, characters are left on screen */
-    size_t mines = display->game->minefield.mines;
-    size_t placed = display->game->minefield.placed_flags;
+    int mines = display->game->minefield.mines;
+    int placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
-    mvwprintw(win, 1, 0, "Game #%i (%lix%li)", display->game_number, display->game->minefield.width, display->game->minefield.height);
-    mvwprintw(win, 2, 0, "Flags: %li", placed);
-    mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
+    mvwprintw(win, 1, 0, "Game #%i (%ix%i)", display->game_number, display->game->minefield.width, display->game->minefield.height);
+    mvwprintw(win, 2, 0, "Flags: %i", placed);
+    mvwprintw(win, 3, 0, "Mines: %i/%i (%i%%)", mines - placed, mines, found_percentage);
 
     /* TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting */
     switch (display->game->state) { /* draw the top line */
