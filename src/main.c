@@ -315,4 +315,6 @@ int main(int argc, char *argv[]) {
 
     game_cleanup(&game);
     display_destroy(&display);
+
+    return 0;
 }
