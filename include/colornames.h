@@ -1,7 +1,7 @@
 #ifndef SMINES_COLORNAMES_H
 #define SMINES_COLORNAMES_H
 
-// TODO: these should be enum
+/* TODO: these should be enum */
 #define TILE_ZERO  10
 #define TILE_ONE   1
 #define TILE_TWO   2
@@ -25,7 +25,7 @@
 #define MSG_WIN   17
 
 
-// extra colors that ncurses doesn't define by default
+/* extra colors that ncurses doesn't define by default */
 #define COLOR_LIGHT_BLACK   8
 #define COLOR_LIGHT_RED     9
 #define COLOR_LIGHT_GREEN   10

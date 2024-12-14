@@ -7,11 +7,11 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h> // strcasecmp
+#include <strings.h> /* strcasecmp */
 #include <time.h>
 
 int main(int argc, char *argv[]) {
-    // https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main
+    /* https://stackoverflow.com/questions/38462701/why-declare-a-static-variable-in-main */
     static const char cmd_usage[] =
         "Usage: smines [options]\n"
     ;
@@ -41,8 +41,8 @@ int main(int argc, char *argv[]) {
         { "allow-undo", no_argument,        &undo_flag, 1   },
         { 0, 0, 0, 0 }
     };
-    // TODO: make these unsigned and also use stdint
-    // TODO: check if not provided and error if not
+    /* TODO: make these unsigned and also use stdint */
+    /* TODO: check if not provided and error if not */
     int width = -1;
     int height = -1;
     int mines = -1;
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     while ((c = getopt_long(argc, argv, "hc:r:m:d:u", long_options, &opt_idx)) != -1) {
         switch (c) {
             case 0:
-                // do nothing else if flag was set
+                /* do nothing else if flag was set */
                 if (long_options[opt_idx].flag != 0) {
                     break;
                 }
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
             case 'r':
                 errno = 0;
                 height = strtol(optarg, &strtol_endptr, 10);
-                // TODO: check for more errors (such as "52jkfndnkj" being read as 52)
+                /* TODO: check for more errors (such as "52jkfndnkj" being read as 52) */
                 if (optarg == strtol_endptr || errno != 0) {
                     printf("error parsing 'height' as number\n");
                     exit_for_invalid_args = true;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
         putchar('\n');
     }
 
-    if (mines > (width * height) - 9) { // subtract 9 because mines can't be around the start
+    if (mines > (width * height) - 9) { /* subtract 9 because mines can't be around the start */
         printf("minefield is not large enough to fit the requested amount of mines\n");
         return 1;
     }
@@ -177,29 +177,29 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    srand((unsigned)time(NULL)); // seed the random number generator
+    srand((unsigned)time(NULL)); /* seed the random number generator */
 
     struct Display display;
     struct Game game = {0};
     display_init(&display);
-    nodelay(stdscr, 0); // block while waiting for key press
+    nodelay(stdscr, 0); /* block while waiting for key press */
 
     bool restart_game = true;
     while (restart_game) {
         display.game_number++;
         game_init(&game, width, height, mines);
-        display_set_game(&display, &game); // TODO: why can't this just be run once at declaration above
+        display_set_game(&display, &game); /* TODO: why can't this just be run once at declaration above */
 
         bool first_reveal = true;
 
-        struct Tile *cur_tile = NULL; // pointer to the tile the cursor is on
-        int ch; // key that was pressed
+        struct Tile *cur_tile = NULL; /* pointer to the tile the cursor is on */
+        int ch; /* key that was pressed */
         bool continue_running_game = true;
         while (continue_running_game) {
             display_draw(&display);
             display_refresh(&display);
             cur_tile = minefield_get_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
-            ch = getch(); // blocks until a key is pressed
+            ch = getch(); /* blocks until a key is pressed */
             if (ch == KEY_RESIZE) {
                 display_resize(&display);
                 continue;
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 
             if (display.state == HELP) {
                 switch (ch) {
-                    case 'H': // close help
+                    case 'H': /* close help */
                     case '?':
                     case 'q':
                         display_transition_game(&display);
@@ -216,27 +216,27 @@ int main(int argc, char *argv[]) {
                 continue;
             }
             switch (ch) {
-                case 'L': // redraw screen
+                case 'L': /* redraw screen */
                     display_resize(&display);
                     display_draw(&display);
                     display_refresh(&display);
                     break;
 
-                case 'q': // quit
+                case 'q': /* quit */
                     restart_game = false;
                     continue_running_game = false;
                     break;
 
-                case 'r': // restart
+                case 'r': /* restart */
                     continue_running_game = false;
                     break;
 
-                case 'H': // toggle help, only checked here if not visible already
+                case 'H': /* toggle help, only checked here if not visible already */
                 case '?':
                     display_transition_help(&display);
                     break;
 
-                // movement keys
+                /* movement keys */
                 case 'h':
                 case KEY_LEFT:
                     if (game.minefield.cur.x > 0)
@@ -272,15 +272,15 @@ int main(int argc, char *argv[]) {
                     game.minefield.cur.y = game.minefield.height - 1;
                     break;
 
-                case 'u': // undo
+                case 'u': /* undo */
                     if (undo_flag) {
                         game_undo(&game);
                     }
                     break;
 
-                case ' ': // reveal tile
+                case ' ': /* reveal tile */
                     if (first_reveal) {
-                        // TODO: add these back lmao
+                        /* TODO: add these back lmao */
                         minefield_populate(&game.minefield);
                         minefield_reveal_tile(&game.minefield, game.minefield.cur.x, game.minefield.cur.y);
                         first_reveal = false;
@@ -296,7 +296,7 @@ int main(int argc, char *argv[]) {
                     }
                     break;
 
-                case 'f': // toggle flag
+                case 'f': /* toggle flag */
                     if (game.state != ALIVE) {
                         break;
                     }

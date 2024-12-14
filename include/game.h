@@ -7,16 +7,16 @@
 #include <stdint.h>
 
 enum GameState {
-    ALIVE, // game is in progress
-    VICTORY, // game has been won
-    DEAD, // game was lost
+    ALIVE, /* game is in progress */
+    VICTORY, /* game has been won */
+    DEAD, /* game was lost */
 };
 struct Game {
     enum GameState state;
     struct Minefield minefield;
     struct {
         enum GameState state;
-        // TODO: deep copy tiles array
+        /* TODO: deep copy tiles array */
         struct Minefield minefield;
     } undo;
 };

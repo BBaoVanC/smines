@@ -15,10 +15,10 @@ void game_cleanup(struct Game *game) {
 
 void game_click_tile(struct Game *game, size_t x, size_t y) {
     game_undo_store(game);
-    bool still_alive = minefield_reveal_tile(&game->minefield, x, y); // false if dead from clicking a mine
+    bool still_alive = minefield_reveal_tile(&game->minefield, x, y); /* false if dead from clicking a mine */
     if (!still_alive) {
         game->state = DEAD;
-        // reveal all the mines
+        /* reveal all the mines */
         for (size_t x = 0; x < game->minefield.width; x++) {
             for (size_t y = 0; y < game->minefield.height; y++) {
                 if (minefield_get_tile(&game->minefield, x, y)->mine) {
@@ -34,7 +34,7 @@ void game_click_tile(struct Game *game, size_t x, size_t y) {
             }
         }
     } else {
-        // TODO: try recursion or someting here
+        /* TODO: try recursion or someting here */
     }
 }
 

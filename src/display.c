@@ -27,20 +27,20 @@ static const char helptxt[] =
     "G: jump to bottom side\n"
 ;
 
-// set the correct starting position to center the game in the terminal
-// reads from ncurses to figure that out
+/* set the correct starting position to center the game in the terminal */
+/* reads from ncurses to figure that out */
 static void display_update_origin(struct Display *display) {
     int scr_rows, scr_cols;
     getmaxyx(stdscr, scr_rows, scr_cols);
-    // add 1 col/row per side for each border, so 2 rows and 2 cols for all 4 borders
+    /* add 1 col/row per side for each border, so 2 rows and 2 cols for all 4 borders */
     int width = display->game->minefield.width * 2 + 2;
     int height = display->game->minefield.height + SCOREBOARD_ROWS * 2;
 
     display->origin.x = (scr_cols - width) / 2;
     display->origin.y = (scr_rows - height) / 2;
 
-    // prevent from starting off screen in top-left direction
-    // TODO: is there a nicer way to do these checks
+    /* prevent from starting off screen in top-left direction */
+    /* TODO: is there a nicer way to do these checks */
     if (display->origin.x < 0) {
         display->origin.x = 0;
     }
@@ -74,24 +74,24 @@ static void destroy_win(WINDOW *local_win) {
 static void display_make_windows(struct Display *display) {
     display->scoreboard = newwin(SCOREBOARD_ROWS, display->game->minefield.width * 2, display->origin.y, display->origin.x);
 
-    // add 2 for borders
+    /* add 2 for borders */
     display->minefield = newwin(display->game->minefield.height + 2, display->game->minefield.width * 2 + 2, display->origin.y + SCOREBOARD_ROWS, display->origin.x);
 
     display->too_small_popup = newwin(2, COLS, 0, 0);
 }
 static void display_set_min_size(struct Display *display) {
-    // check if terminal is too small
+    /* check if terminal is too small */
     display->min_width = display->game->minefield.width * 2 + 2;
-    display->min_height = SCOREBOARD_ROWS + display->game->minefield.height + 2; // add 2 for borders
+    display->min_height = SCOREBOARD_ROWS + display->game->minefield.height + 2; /* add 2 for borders */
     if (COLS < display->min_width || LINES < display->min_height) {
         display->too_small = true;
     } else {
         display->too_small = false;
     }
 }
-// recalculate everything if the terminal is resized
-// TODO: maybe store Minefield somewhere in Display so it's not an arg
-// TODO: should this be `display_reset` instead?
+/* recalculate everything if the terminal is resized */
+/* TODO: maybe store Minefield somewhere in Display so it's not an arg */
+/* TODO: should this be `display_reset` instead? */
 void display_resize(struct Display *display) {
     display->erase_needed = true;
 
@@ -99,28 +99,28 @@ void display_resize(struct Display *display) {
     destroy_win(display->minefield);
     destroy_win(display->too_small_popup);
 
-    endwin(); // make ncurses recalculate stuff like global vars LINES and COLS
+    endwin(); /* make ncurses recalculate stuff like global vars LINES and COLS */
     display_set_min_size(display);
     display_update_origin(display);
     display_make_windows(display);
 }
 
 bool display_init(struct Display *display) {
-    // ncurses setup
+    /* ncurses setup */
     initscr();
     if (!has_colors()) {
         endwin();
         printf("smines requires color support in your terminal to work properly.\n");
         return false;
     }
-    keypad(stdscr, TRUE); // arrow keys
-    noecho(); // don't show letter on key press
-    curs_set(0); // make cursor invisible
+    keypad(stdscr, TRUE); /* arrow keys */
+    noecho(); /* don't show letter on key press */
+    curs_set(0); /* make cursor invisible */
     start_color();
-    use_default_colors(); // allows extra colors such as terminal background color
+    use_default_colors(); /* allows extra colors such as terminal background color */
 
-    // set up color pairs
-    // init_pair(id, fg, bg);
+    /* set up color pairs */
+    /* init_pair(id, fg, bg); */
     init_pair(TILE_ZERO, COLOR_WHITE, COLOR_BLACK);
     init_pair(TILE_MINE, COLOR_RED, COLOR_BLACK);
     init_pair(TILE_MINE_SAFE, COLOR_GREEN, COLOR_BLACK);
@@ -159,11 +159,11 @@ void display_destroy(struct Display *display) {
     endwin();
 }
 
-// get color pair needed to draw a tile with a specific amount of surrounding mines
+/* get color pair needed to draw a tile with a specific amount of surrounding mines */
 static int get_surround_color(int surrounding) {
     if (surrounding == 0) {
         return COLOR_PAIR(10);
-    } else if ((surrounding <= 8) && (surrounding >= 1)) { // 1 <= surrounding <= 8
+    } else if ((surrounding <= 8) && (surrounding >= 1)) { /* 1 <= surrounding <= 8 */
         return COLOR_PAIR(surrounding);
     } else {
         return COLOR_PAIR(100);
@@ -171,7 +171,7 @@ static int get_surround_color(int surrounding) {
 }
 static void display_draw_tile_text(struct Display *display, struct Tile *tile, int x, int y) {
     WINDOW *win = display->minefield;
-    wmove(win, y + 1, x * 2 + 1); // add 1 because of border? TODO: verify this
+    wmove(win, y + 1, x * 2 + 1); /* add 1 because of border? TODO: verify this */
     if (tile->flagged) {
         wattron(win, A_BOLD);
         if (display->game->state == DEAD && !tile->mine) {
@@ -198,7 +198,7 @@ static void display_draw_tile_text(struct Display *display, struct Tile *tile, i
 }
 static void display_draw_tile(struct Display *display, struct Tile *tile, int x, int y) {
     int color;
-    // get the color pair to draw with
+    /* get the color pair to draw with */
     if (tile->flagged) {
         if (display->game->state == VICTORY) {
             color = COLOR_PAIR(TILE_MINE_SAFE);
@@ -228,10 +228,10 @@ static void display_draw_minefield(struct Display *display) {
         }
     }
 
-    // draw the cursor
+    /* draw the cursor */
     int cur_x = display->game->minefield.cur.x;
     int cur_y = display->game->minefield.cur.y;
-    wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); // add 1 because of border? TODO: verify this
+    wmove(display->minefield, cur_y + 1, cur_x * 2 + 1); /* add 1 because of border? TODO: verify this */
     wattron(display->minefield, COLOR_PAIR(TILE_CURSOR));
     display_draw_tile_text(display, minefield_get_tile(&display->game->minefield, cur_x, cur_y), cur_x, cur_y);
     wattroff(display->minefield, COLOR_PAIR(TILE_CURSOR));
@@ -241,7 +241,7 @@ static void display_draw_minefield(struct Display *display) {
 
 static void display_draw_scoreboard(struct Display *display) {
     WINDOW *win = display->scoreboard;
-    werase(win); // if we don't clear, and the new text is shorter than the old text, characters are left on screen
+    werase(win); /* if we don't clear, and the new text is shorter than the old text, characters are left on screen */
     size_t mines = display->game->minefield.mines;
     size_t placed = display->game->minefield.placed_flags;
     int found_percentage = ((float)placed / (float)mines) * 100;
@@ -249,8 +249,8 @@ static void display_draw_scoreboard(struct Display *display) {
     mvwprintw(win, 2, 0, "Flags: %li", placed);
     mvwprintw(win, 3, 0, "Mines: %li/%li (%i%%)", mines - placed, mines, found_percentage);
 
-    // TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting
-    switch (display->game->state) { // draw the top line
+    /* TODO: somehow this doesnt work on first frame until keypress when window is close to not fitting */
+    switch (display->game->state) { /* draw the top line */
         case ALIVE:
             wattron(win, A_BOLD);
             mvwprintw(win, 0, 0, "Press ? for help");
@@ -282,10 +282,10 @@ void display_draw(struct Display *display) {
     }
     if (display->too_small) {
         wmove(display->too_small_popup, 0, 0);
-        // TODO: make a window to display this so it overlays
+        /* TODO: make a window to display this so it overlays */
         wprintw(display->too_small_popup, "Please make your terminal at least %i cols by %i rows\n", display->min_width, display->min_height);
         wprintw(display->too_small_popup, "Current size: %i cols by %i rows", COLS, LINES);
-        //wrefresh(display->too_small_popup);
+        /*wrefresh(display->too_small_popup); */
         return;
     }
 
