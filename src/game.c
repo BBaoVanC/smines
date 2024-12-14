@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include "bool.h"
 #include "minefield.h"
 
 #include <stddef.h>

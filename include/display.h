@@ -1,6 +1,7 @@
 #ifndef SMINES_DISPLAY_H
 #define SMINES_DISPLAY_H
 
+#include "bool.h"
 #include "game.h"
 #include "minefield.h"
 

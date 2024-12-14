@@ -1,7 +1,8 @@
 #ifndef SMINES_MINEFIELD_H
 #define SMINES_MINEFIELD_H
 
-#include <stdbool.h>
+#include "bool.h"
+
 #include <stddef.h>
 
 struct Tile {

@@ -1,3 +1,4 @@
+#include "bool.h"
 #include "minefield.h"
 
 #include <assert.h>

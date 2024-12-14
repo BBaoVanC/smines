@@ -1,5 +1,6 @@
 #include "display.h"
 
+#include "bool.h"
 #include "colornames.h"
 #include "game.h"
 #include "minefield.h"

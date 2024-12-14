@@ -1,3 +1,4 @@
+#include "bool.h"
 #include "display.h"
 #include "game.h"
 #include "minefield.h"
