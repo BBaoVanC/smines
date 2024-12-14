@@ -222,8 +222,9 @@ static void display_draw_tile(struct Display *display, struct Tile *tile, int x,
 }
 
 static void display_draw_minefield(struct Display *display) {
-    for (int y = 0; y < display->game->minefield.height; y++) {
-        for (int x = 0; x < display->game->minefield.width; x++) {
+    int y, x;
+    for (y = 0; y < display->game->minefield.height; y++) {
+        for (x = 0; x < display->game->minefield.width; x++) {
             display_draw_tile(display, minefield_get_tile(&display->game->minefield, x, y), x, y);
         }
     }

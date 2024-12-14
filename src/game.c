@@ -19,8 +19,9 @@ void game_click_tile(struct Game *game, size_t x, size_t y) {
     if (!still_alive) {
         game->state = DEAD;
         /* reveal all the mines */
-        for (size_t x = 0; x < game->minefield.width; x++) {
-            for (size_t y = 0; y < game->minefield.height; y++) {
+        size_t x, y;
+        for (x = 0; x < game->minefield.width; x++) {
+            for (y = 0; y < game->minefield.height; y++) {
                 if (minefield_get_tile(&game->minefield, x, y)->mine) {
                     minefield_get_tile(&game->minefield, x, y)->visible = true;
                 }
@@ -28,8 +29,9 @@ void game_click_tile(struct Game *game, size_t x, size_t y) {
         }
     } else if (minefield_check_victory(&game->minefield)) {
         game->state = VICTORY;
-        for (size_t x = 0; x < game->minefield.width; x++) {
-            for (size_t y = 0; y < game->minefield.height; y++) {
+        size_t x, y;
+        for (x = 0; x < game->minefield.width; x++) {
+            for (y = 0; y < game->minefield.height; y++) {
                 minefield_get_tile(&game->minefield, x, y)->visible = true;
             }
         }
